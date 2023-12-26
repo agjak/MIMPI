@@ -13,11 +13,13 @@ int main(int argc, char* argv[]) {
     char* prog_name=argv[2];
     char** prog_args = &argv[3];
 
-    ASSERT_SYS_OK(setenv("MIMPI_world_size", argv[1]));
+    ASSERT_SYS_OK(setenv("MIMPI_world_size", argv[1], 1));
 
+    char* world_rank = malloc(2*sizeof(char));
     for (int i=0; i<world_size; i++)
     {
-        ASSERT_SYS_OK(setenv("MIMPI_world_rank", itoa(i)));
+        
+        ASSERT_SYS_OK(setenv("MIMPI_world_rank", itoa(i,world_rank,10), 1));
         pid_t pid;
         ASSERT_SYS_OK(pid = fork());
         if(!pid)
@@ -25,6 +27,7 @@ int main(int argc, char* argv[]) {
             execvp(prog_name, prog_args);
         }
     }
+    free(world_rank);
 
     for(int i=0; i<world_size; i++)
     {
