@@ -10,6 +10,10 @@
 #include <stdbool.h>
 #include <stdnoreturn.h>
 
+#include <stdlib.h>
+#include <sys/types.h>
+#include <stddef.h>
+
 /*
     Assert that expression doesn't evaluate to -1 (as almost every system function does in case of error).
 
