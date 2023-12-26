@@ -9,11 +9,9 @@
 void MIMPI_Init(bool enable_deadlock_detection) {
     channels_init();
 
-    TODO
 }
 
 void MIMPI_Finalize() {
-    TODO
 
     channels_finalize();
 }
