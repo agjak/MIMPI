@@ -19,11 +19,11 @@ void MIMPI_Finalize() {
 }
 
 int MIMPI_World_size() {
-    TODO
+    return atoi(getenv("MIMPI_world_size"));
 }
 
 int MIMPI_World_rank() {
-    TODO
+    return atoi(getenv("MIMPI_world_rank"));
 }
 
 MIMPI_Retcode MIMPI_Send(
