@@ -3,6 +3,7 @@
  * */
 
 #include "mimpi_common.h"
+#include "channel.h"
 
 int main(int argc, char* argv[]) {
     if (argc<3)
@@ -14,6 +15,22 @@ int main(int argc, char* argv[]) {
     char** prog_args = &argv[3];
 
     ASSERT_SYS_OK(setenv("MIMPI_world_size", argv[1], 1));
+
+    int** comm_pipes = malloc(world_size*sizeof(int));
+    for(int i=0; i<world_size; i++)
+    {
+        comm_pipes[i] = malloc(world_size*sizeof(int));
+    }
+
+    for(int i=0; i<world_size; i++)
+    {
+        for(int j=i+1; j<world_size; j++)
+        {
+            int fds[2];
+            channel(fds);
+            comm_pipes[]
+        }
+    }
 
     char* world_rank = malloc(2*sizeof(char));
     for (int i=0; i<world_size; i++)
