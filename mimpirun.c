@@ -18,8 +18,8 @@ int main(int argc, char* argv[]) {
     char* world_rank = malloc(2*sizeof(char));
     for (int i=0; i<world_size; i++)
     {
-        
-        ASSERT_SYS_OK(setenv("MIMPI_world_rank", itoa(i,world_rank,10), 1));
+        sprintf(world_rank, "%d", i);
+        ASSERT_SYS_OK(setenv("MIMPI_world_rank", world_rank, 1));
         pid_t pid;
         ASSERT_SYS_OK(pid = fork());
         if(!pid)
