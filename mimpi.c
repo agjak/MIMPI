@@ -13,14 +13,21 @@ void MIMPI_Init(bool enable_deadlock_detection) {
 
 void MIMPI_Finalize() {
 
-    char* name1 = malloc(32*sizeof(char));
-    char* name2 = malloc(32*sizeof(char));
+    char* name1 = malloc(40*sizeof(char));
+    char* name2 = malloc(40*sizeof(char));
     for(int i=0; i< MIMPI_World_size(); i++)
     {
         if(i!=MIMPI_World_rank())
         {
             sprintf(name1, "MIMPI_channel_to_%d", i);
             sprintf(name2, "MIMPI_channel_from_%d",i);
+            int write_fd=atoi(getenv(name1));
+            int read_fd=atoi(getenv(name2));
+            close(write_fd);
+            close(read_fd);
+
+            sprintf(name1, "MIMPI_sync_channel_to_%d", i);
+            sprintf(name2, "MIMPI_sync_channel_from_%d",i);
             int write_fd=atoi(getenv(name1));
             int read_fd=atoi(getenv(name2));
             close(write_fd);
