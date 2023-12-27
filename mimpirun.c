@@ -62,7 +62,7 @@ int main(int argc, char* argv[]) {
                 sprintf(name1, "MIMPI_channel_from_%d",j);
                 sprintf(value1, "%d", write_pipes[j][i]);
                 sprintf(name2, "MIMPI_channel_to_%d",j);
-                sprintf(value2, "%d", read_pipes[i],[j]);
+                sprintf(value2, "%d", read_pipes[i][j]);
             }
         }
 
