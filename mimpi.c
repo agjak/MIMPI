@@ -70,11 +70,11 @@ MIMPI_Retcode MIMPI_Recv(
     int source,
     int tag
 ) {
-    if (destination == MIMPI_World_rank())
+    if (source == MIMPI_World_rank())
     {
         return MIMPI_ERROR_ATTEMPTED_SELF_OP;
     }
-    if (destination < 0 || destination >= MIMPI_World_size())
+    if (source < 0 || source >= MIMPI_World_size())
     {
         return MIMPI_ERROR_NO_SUCH_RANK;
     }
