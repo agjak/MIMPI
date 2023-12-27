@@ -26,8 +26,9 @@ void MIMPI_Finalize() {
             close(write_fd);
             close(read_fd);
         }
-        
     }
+    free(name1);
+    free(name2);
     
     
     channels_finalize();
