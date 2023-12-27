@@ -57,9 +57,9 @@ MIMPI_Retcode MIMPI_Send(
     }
     char* name = malloc(32*sizeof(char));
     sprintf(name, "MIMPI_channel_to_%d",destination);
-    int write_fd=atoi(getenv(name));
+    int send_fd=atoi(getenv(name));
 
-    chsend(write_fd, data, count);
+    chsend(send_fd, data, count);
     free(name);
     return MIMPI_SUCCESS;
 }
@@ -70,7 +70,21 @@ MIMPI_Retcode MIMPI_Recv(
     int source,
     int tag
 ) {
-    TODO
+    if (destination == MIMPI_World_rank())
+    {
+        return MIMPI_ERROR_ATTEMPTED_SELF_OP;
+    }
+    if (destination < 0 || destination >= MIMPI_World_size())
+    {
+        return MIMPI_ERROR_NO_SUCH_RANK;
+    }
+    char* name = malloc(32*sizeof(char));
+    sprintf(name, "MIMPI_channel_from_%d",source);
+    int recv_fd=atoi(getenv(name));
+
+    chrecv(recv_fd, data, count);
+    free(name);
+    return MIMPI_SUCCESS;
 }
 
 MIMPI_Retcode MIMPI_Barrier() {
