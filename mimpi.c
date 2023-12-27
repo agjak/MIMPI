@@ -19,12 +19,12 @@ void MIMPI_Finalize() {
     {
         if(i!=MIMPI_World_rank())
         {
-            sprintf(name1, "MIMPI_channel_to_%d",destination);
-            sprintf(name2, "MIMPI_channel_from_%d",destination);
+            sprintf(name1, "MIMPI_channel_to_%d", i);
+            sprintf(name2, "MIMPI_channel_from_%d",i);
             int write_fd=atoi(getenv(name1));
             int read_fd=atoi(getenv(name2));
             close(write_fd);
-            close(read_fd;)
+            close(read_fd);
         }
         
     }
@@ -51,7 +51,7 @@ MIMPI_Retcode MIMPI_Send(
     {
         return MIMPI_ERROR_ATTEMPTED_SELF_OP;
     }
-    if (destination < 0 || destination >= MIMPI_World_size)
+    if (destination < 0 || destination >= MIMPI_World_size())
     {
         return MIMPI_ERROR_NO_SUCH_RANK;
     }

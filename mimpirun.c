@@ -47,9 +47,9 @@ int main(int argc, char* argv[]) {
     }
     char* name1 = malloc(32*sizeof(char));
     char* name2 = malloc(32*sizeof(char));
-    char* value1 = malloc(10*sizeof(char));
-    char* value2 = malloc(10*sizeof(char));
-    char* world_rank = malloc(10*sizeof(char));
+    char* value1 = malloc(12*sizeof(char));
+    char* value2 = malloc(12*sizeof(char));
+    char* world_rank = malloc(12*sizeof(char));
     for (int i=0; i<world_size; i++)
     {
         sprintf(world_rank, "%d", i);
