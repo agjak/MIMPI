@@ -61,6 +61,7 @@ MIMPI_Retcode MIMPI_Send(
 
     chsend(write_fd, data, count);
     free(name);
+    return MIMPI_SUCCESS;
 }
 
 MIMPI_Retcode MIMPI_Recv(
