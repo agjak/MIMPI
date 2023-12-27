@@ -13,6 +13,23 @@ void MIMPI_Init(bool enable_deadlock_detection) {
 
 void MIMPI_Finalize() {
 
+    char* name1 = malloc(32*sizeof(char));
+    char* name2 = malloc(32*sizeof(char));
+    for(int i=0; i< MIMPI_World_size(); i++)
+    {
+        if(i!=MIMPI_World_rank())
+        {
+            sprintf(name1, "MIMPI_channel_to_%d",destination);
+            sprintf(name2, "MIMPI_channel_from_%d",destination);
+            int write_fd=atoi(getenv(name1));
+            int read_fd=atoi(getenv(name2));
+            close(write_fd);
+            close(read_fd;)
+        }
+        
+    }
+    
+    
     channels_finalize();
 }
 
@@ -30,7 +47,20 @@ MIMPI_Retcode MIMPI_Send(
     int destination,
     int tag
 ) {
-    TODO
+    if (destination == MIMPI_World_rank())
+    {
+        return MIMPI_ERROR_ATTEMPTED_SELF_OP;
+    }
+    if (destination < 0 || destination >= MIMPI_World_size)
+    {
+        return MIMPI_ERROR_NO_SUCH_RANK;
+    }
+    char* name = malloc(32*sizeof(char));
+    sprintf(name, "MIMPI_channel_to_%d",destination);
+    int write_fd=atoi(getenv(name));
+
+    chsend(write_fd, data, count);
+    free(name);
 }
 
 MIMPI_Retcode MIMPI_Recv(
