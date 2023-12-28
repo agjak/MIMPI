@@ -191,9 +191,11 @@ MIMPI_Retcode MIMPI_Barrier() {
             
             sprintf(name, "MIMPI_sync_channel_from_%d",(rank-1)/2);
             int recv_fd=atoi(getenv(name));
-            void* mess = malloc(1*sizeof(char));
-            chrecv(recv_fd,mess,1);
-            messpar[0] = ((char*) mess)[0];
+            void* mess2 = malloc(1*sizeof(char));
+            chrecv(recv_fd,mess2,1);
+            messpar[0] = ((char*) mess2)[0];
+            free(name);
+            free(mess2);
             
             if(messpar[0]=='F')
             {

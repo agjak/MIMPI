@@ -47,7 +47,6 @@ _Noreturn void fatal(const char* fmt, ...)
 void MIMPI_send_finished_sync_signal_to_your_parent()
 {
     int rank = atoi(getenv("MIMPI_world_rank"));
-    int size = atoi(getenv("MIMPI_world_size"));
     if(rank>0)
     {
         char* name = malloc(40*sizeof(char));
