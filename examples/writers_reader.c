@@ -23,6 +23,7 @@ int main(int argc, char **argv)
     int const reader_rank = world_size - 1;
     for (int turn = 0; turn < world_size; ++turn)
     {
+        printf("turn %d rank %d size %d\n", turn, world_rank, world_size);
         /*
         We have (n-1) writers and 1 reader (process with the last rank).
         Everyone acts in turns.
