@@ -32,8 +32,8 @@ void MIMPI_Finalize() {
 
             sprintf(name1, "MIMPI_sync_channel_to_%d", i);
             sprintf(name2, "MIMPI_sync_channel_from_%d",i);
-            int write_fd=atoi(getenv(name1));
-            int read_fd=atoi(getenv(name2));
+            write_fd=atoi(getenv(name1));
+            read_fd=atoi(getenv(name2));
             close(write_fd);
             close(read_fd);
         }
@@ -115,7 +115,7 @@ MIMPI_Retcode MIMPI_Barrier() {
 
     if(rank*2+1<size)
     {
-        char* name = malloc(32*sizeof(char));
+        char* name = malloc(40*sizeof(char));
         sprintf(name, "MIMPI_sync_channel_from_%d",rank*2+1);
         int recv_fd=atoi(getenv(name));
         void* mess = malloc(1*sizeof(char));
@@ -126,7 +126,7 @@ MIMPI_Retcode MIMPI_Barrier() {
     }
     if(rank*2+2<size)
     {
-        char* name = malloc(32*sizeof(char));
+        char* name = malloc(40*sizeof(char));
         sprintf(name, "MIMPI_sync_channel_from_%d",rank*2+2);
         int recv_fd=atoi(getenv(name));
         void* mess = malloc(1*sizeof(char));
@@ -137,7 +137,7 @@ MIMPI_Retcode MIMPI_Barrier() {
     }
     if(rank!=0)
     {
-        char* name = malloc(32*sizeof(char));
+        char* name = malloc(40*sizeof(char));
         sprintf(name, "MIMPI_sync_channel_from_%d",(rank-1)/2);
         int recv_fd=atoi(getenv(name));
         void* mess = malloc(1*sizeof(char));
@@ -149,7 +149,7 @@ MIMPI_Retcode MIMPI_Barrier() {
 
     if(rank==0)
     {
-        if(messch1[0]=="F" || messch2[0]=="F")   //parent or children have already finished the MIMPI block
+        if(messch1[0]=='F' || messch2[0]=='F')   //parent or children have already finished the MIMPI block
         {
             MIMPI_send_finished_sync_signal_to_your_children();
             setenv("MIMPI_remotes_finished","1",1);
@@ -169,7 +169,7 @@ MIMPI_Retcode MIMPI_Barrier() {
     }
     else
     {
-        if(messch1[0]=="F" || messch2[0]=="F" || messpar[0]=="F")   //parent or children have already finished the MIMPI block
+        if(messch1[0]=='F' || messch2[0]=='F' || messpar[0]=='F')   //parent or children have already finished the MIMPI block
         {
             MIMPI_send_finished_sync_signal_to_your_children();
             MIMPI_send_finished_sync_signal_to_your_parent();
@@ -181,12 +181,13 @@ MIMPI_Retcode MIMPI_Barrier() {
         }
         else    //parent and both children have started MIMPI_Barrier
         {
-            char* name = malloc(32*sizeof(char));
+            char* name = malloc(40*sizeof(char));
             sprintf(name, "MIMPI_sync_channel_to_%d",(rank-1)/2);
             int send_fd=atoi(getenv(name));
             char* mess = malloc(1*sizeof(char));
             mess = "B"; //BARRIER
             chsend(send_fd, (void*) mess, 1);
+            free(mess);
             
             sprintf(name, "MIMPI_sync_channel_from_%d",(rank-1)/2);
             int recv_fd=atoi(getenv(name));
@@ -194,7 +195,7 @@ MIMPI_Retcode MIMPI_Barrier() {
             chrecv(recv_fd,mess,1);
             messpar[0] = ((char*) mess)[0];
             
-            if(messpar[0]=="F")
+            if(messpar[0]=='F')
             {
                 MIMPI_send_finished_sync_signal_to_your_children();
                 free(messch1);

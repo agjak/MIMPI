@@ -50,11 +50,11 @@ void MIMPI_send_finished_sync_signal_to_your_parent()
     int size = atoi(getenv("MIMPI_world_size"));
     if(rank>0)
     {
-        char* name = malloc(32*sizeof(char));
+        char* name = malloc(40*sizeof(char));
         sprintf(name, "MIMPI_sync_channel_to_%d",(rank-1)/2);
         int send_fd=atoi(getenv(name));
         char* mess = malloc(1*sizeof(char));
-        mess = "F"; //FINISHED
+        mess[0] = 'F'; //FINISHED
         chsend(send_fd, (void*) mess, 1);
         free(name);
         free(mess);
@@ -67,22 +67,22 @@ void MIMPI_send_finished_sync_signal_to_your_children()
     int size = atoi(getenv("MIMPI_world_size"));
     if(rank*2+1<size)
     {
-        char* name = malloc(32*sizeof(char));
+        char* name = malloc(40*sizeof(char));
         sprintf(name, "MIMPI_sync_channel_to_%d",rank*2+1);
         int send_fd=atoi(getenv(name));
         char* mess = malloc(1*sizeof(char));
-        mess = "F"; //FINISHED
+        mess[0] = 'F'; //FINISHED
         chsend(send_fd, (void*)(mess), 1);
         free(name);
         free(mess);
     }
     if(rank*2+2<size)
     {
-        char* name = malloc(32*sizeof(char));
+        char* name = malloc(40*sizeof(char));
         sprintf(name, "MIMPI_sync_channel_to_%d",rank*2+2);
         int send_fd=atoi(getenv(name));
         char* mess = malloc(1*sizeof(char));
-        mess = "F"; //FINISHED
+        mess[0] = 'F'; //FINISHED
         chsend(send_fd, (void*) mess, 1);
         free(name);
         free(mess);
@@ -96,22 +96,22 @@ void MIMPI_send_barrier_sync_signal_to_your_children()
 
     if(rank*2+1<size)
     {
-        char* name = malloc(32*sizeof(char));
+        char* name = malloc(40*sizeof(char));
         sprintf(name, "MIMPI_sync_channel_to_%d",rank*2+1);
         int send_fd=atoi(getenv(name));
         char* mess = malloc(1*sizeof(char));
-        mess = "B"; //BARRIER
+        mess[0] = 'B'; //BARRIER
         chsend(send_fd, (void*)(mess), 1);
         free(name);
         free(mess);
     }
     if(rank*2+2<size)
     {
-        char* name = malloc(32*sizeof(char));
+        char* name = malloc(40*sizeof(char));
         sprintf(name, "MIMPI_sync_channel_to_%d",rank*2+2);
         int send_fd=atoi(getenv(name));
         char* mess = malloc(1*sizeof(char));
-        mess = "B"; //BARRIER
+        mess[0] = 'B'; //BARRIER
         chsend(send_fd, (void*) mess, 1);
         free(name);
         free(mess);
