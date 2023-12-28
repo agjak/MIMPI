@@ -194,7 +194,7 @@ void MIMPI_send_barrier_sync_signal_to_both_children(int rank, int size)
     pid_t pid1;
     pid_t pid2;
     ASSERT_SYS_OK(pid1 = fork());
-    if(!pid1)
+    if(pid1==0)
     {
         MIMPI_send_barrier_sync_signal_to_left_child(rank,size);
         MIMPI_close_all_program_channels(rank,size);
@@ -203,7 +203,7 @@ void MIMPI_send_barrier_sync_signal_to_both_children(int rank, int size)
     else
     {
         ASSERT_SYS_OK(pid2 = fork());
-        if(!pid2)
+        if(pid2==0)
         {
             MIMPI_send_barrier_sync_signal_to_right_child(rank,size);
             MIMPI_close_all_program_channels(rank,size);
