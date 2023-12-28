@@ -197,7 +197,6 @@ void MIMPI_send_barrier_sync_signal_to_both_children(int rank, int size)
     {
         printf("Sending to left child %d %d\n", rank, getpid());
         MIMPI_send_barrier_sync_signal_to_left_child(rank,size);
-        MIMPI_close_all_program_channels(rank,size);
         exit(0);
     }
     else
@@ -207,7 +206,6 @@ void MIMPI_send_barrier_sync_signal_to_both_children(int rank, int size)
         {
             printf("Sending to right child %d %d\n", rank, getpid());
             MIMPI_send_barrier_sync_signal_to_right_child(rank,size);
-            MIMPI_close_all_program_channels(rank,size);
             exit(0);
         }
         else

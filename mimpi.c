@@ -88,7 +88,7 @@ MIMPI_Retcode MIMPI_Barrier()
     }
     int rank = MIMPI_World_rank();
     int size = MIMPI_World_size();
-    printf("Before %d\n", rank);
+    printf("Before %d %d\n", rank, getpid());
     MIMPI_send_barrier_sync_signal_to_both_children(rank, size);
     //MIMPI_send_barrier_sync_signal_to_right_child(rank, size);
     //MIMPI_send_barrier_sync_signal_to_left_child(rank, size);
