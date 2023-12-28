@@ -115,7 +115,6 @@ void MIMPI_send_finished_sync_signal_to_both_children(int rank, int size)
             ASSERT_SYS_OK(wait(NULL));
         }
     }
-    printf("F signal sent to children from %d\n", rank);
 }
 
 void MIMPI_send_finished_sync_signal_to_both_children_and_parent(int rank, int size)
@@ -156,7 +155,6 @@ void MIMPI_send_finished_sync_signal_to_both_children_and_parent(int rank, int s
             }
         }
     }
-    printf("F signal sent to children and parent from %d\n", rank);
 }
 
 void MIMPI_send_barrier_sync_signal_to_left_child(int rank, int size)
@@ -215,7 +213,6 @@ void MIMPI_send_barrier_sync_signal_to_both_children(int rank, int size)
             ASSERT_SYS_OK(wait(NULL));
         }
     }
-    printf("B signal sent to children from %d\n", rank);
 }
 
 void MIMPI_close_all_program_channels(int rank, int size)
