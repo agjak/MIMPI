@@ -12,7 +12,7 @@ int main(int argc, char* argv[]) {
     }
     int world_size=atoi(argv[1]);
     char* prog_name=argv[2];
-    char** prog_args = &argv[3];
+    char** prog_args = &argv[2];
 
     ASSERT_SYS_OK(setenv("MIMPI_world_size", argv[1], 1));
     ASSERT_SYS_OK(setenv("MIMPI_remotes_finished", "0", 1));
