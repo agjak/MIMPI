@@ -15,6 +15,7 @@ int main(int argc, char* argv[]) {
     char** prog_args = &argv[3];
 
     ASSERT_SYS_OK(setenv("MIMPI_world_size", argv[1], 1));
+    ASSERT_SYS_OK(setenv("MIMPI_remotes_finished", "0", 1));
 
     channels_init();
 

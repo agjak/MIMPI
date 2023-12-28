@@ -56,7 +56,9 @@ _Noreturn extern void fatal(const char* fmt, ...);
 // Put your declarations here
 
 
-
+void MIMPI_send_finished_sync_signal_to_your_parent();
+void MIMPI_send_finished_sync_signal_to_your_children();
+void MIMPI_send_barrier_sync_signal_to_your_children();
 
 
 #endif // MIMPI_COMMON_H

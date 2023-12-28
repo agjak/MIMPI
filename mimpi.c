@@ -13,8 +13,12 @@ void MIMPI_Init(bool enable_deadlock_detection) {
 
 void MIMPI_Finalize() {
 
+    MIMPI_send_finished_sync_signal_to_your_children();
+    MIMPI_send_finished_sync_signal_to_your_parent();
+
     char* name1 = malloc(40*sizeof(char));
     char* name2 = malloc(40*sizeof(char));
+
     for(int i=0; i< MIMPI_World_size(); i++)
     {
         if(i!=MIMPI_World_rank())
@@ -96,7 +100,120 @@ MIMPI_Retcode MIMPI_Recv(
 }
 
 MIMPI_Retcode MIMPI_Barrier() {
-    TODO
+    if(atoi(getenv("MIMPI_remotes_finished"))>0)
+    {
+        return MIMPI_ERROR_REMOTE_FINISHED;
+    }
+    int rank = MIMPI_World_rank();
+    int size = MIMPI_World_size();
+
+    MIMPI_send_barrier_sync_signal_to_your_children();
+
+    char* messch1 = "E";    //EMPTY
+    char* messch2 = "E";    //EMPTY
+    char* messpar = "E";    //EMPTY
+
+    if(rank*2+1<size)
+    {
+        char* name = malloc(32*sizeof(char));
+        sprintf(name, "MIMPI_sync_channel_from_%d",rank*2+1);
+        int recv_fd=atoi(getenv(name));
+        void* mess = malloc(1*sizeof(char));
+        chrecv(recv_fd,mess,1);
+        messch1[0]= ((char*) mess)[0];
+        free(name);
+        free(mess);
+    }
+    if(rank*2+2<size)
+    {
+        char* name = malloc(32*sizeof(char));
+        sprintf(name, "MIMPI_sync_channel_from_%d",rank*2+2);
+        int recv_fd=atoi(getenv(name));
+        void* mess = malloc(1*sizeof(char));
+        chrecv(recv_fd,mess,1);
+        messch2[0] = ((char*) mess)[0];
+        free(name);
+        free(mess);
+    }
+    if(rank!=0)
+    {
+        char* name = malloc(32*sizeof(char));
+        sprintf(name, "MIMPI_sync_channel_from_%d",(rank-1)/2);
+        int recv_fd=atoi(getenv(name));
+        void* mess = malloc(1*sizeof(char));
+        chrecv(recv_fd,mess,1);
+        messpar[0] = ((char*) mess)[0];
+        free(name);
+        free(mess);
+    }
+
+    if(rank==0)
+    {
+        if(messch1[0]=="F" || messch2[0]=="F")   //parent or children have already finished the MIMPI block
+        {
+            MIMPI_send_finished_sync_signal_to_your_children();
+            setenv("MIMPI_remotes_finished","1",1);
+            free(messch1);
+            free(messch2);
+            free(messpar);
+            return MIMPI_ERROR_REMOTE_FINISHED;
+        }
+        else
+        {
+            MIMPI_send_barrier_sync_signal_to_your_children();
+            free(messch1);
+            free(messch2);
+            free(messpar);
+            return MIMPI_SUCCESS;
+        }
+    }
+    else
+    {
+        if(messch1[0]=="F" || messch2[0]=="F" || messpar[0]=="F")   //parent or children have already finished the MIMPI block
+        {
+            MIMPI_send_finished_sync_signal_to_your_children();
+            MIMPI_send_finished_sync_signal_to_your_parent();
+            setenv("MIMPI_remotes_finished","1",1);
+            free(messch1);
+            free(messch2);
+            free(messpar);
+            return MIMPI_ERROR_REMOTE_FINISHED;
+        }
+        else    //parent and both children have started MIMPI_Barrier
+        {
+            char* name = malloc(32*sizeof(char));
+            sprintf(name, "MIMPI_sync_channel_to_%d",(rank-1)/2);
+            int send_fd=atoi(getenv(name));
+            char* mess = malloc(1*sizeof(char));
+            mess = "B"; //BARRIER
+            chsend(send_fd, (void*) mess, 1);
+            
+            sprintf(name, "MIMPI_sync_channel_from_%d",(rank-1)/2);
+            int recv_fd=atoi(getenv(name));
+            void* mess = malloc(1*sizeof(char));
+            chrecv(recv_fd,mess,1);
+            messpar[0] = ((char*) mess)[0];
+            
+            if(messpar[0]=="F")
+            {
+                MIMPI_send_finished_sync_signal_to_your_children();
+                free(messch1);
+                free(messch2);
+                free(messpar);
+                return MIMPI_ERROR_REMOTE_FINISHED;
+            }
+            else
+            {
+                MIMPI_send_barrier_sync_signal_to_your_children();
+                free(messch1);
+                free(messch2);
+                free(messpar);
+                return MIMPI_SUCCESS;
+            }
+
+        }
+    }
+    
 }
 
 MIMPI_Retcode MIMPI_Bcast(
