@@ -111,12 +111,8 @@ void MIMPI_send_finished_sync_signal_to_both_children(int rank, int size)
         }
         else
         {
-            int* status1;
-            int* status2;
-            wait(status1);
-            wait(status2);
-            ASSERT_ZERO(*status1);
-            ASSERT_ZERO(*status2);
+            ASSERT_SYS_OK(wait(NULL));
+            ASSERT_SYS_OK(wait(NULL));
         }
     }
 }
@@ -153,15 +149,9 @@ void MIMPI_send_finished_sync_signal_to_both_children_and_parent(int rank, int s
             }
             else
             {
-                int* status1;
-                int* status2;
-                int* status3;
-                wait(status1);
-                wait(status2);
-                wait(status3);
-                ASSERT_ZERO(*status1);
-                ASSERT_ZERO(*status2);
-                ASSERT_ZERO(*status3);
+                ASSERT_SYS_OK(wait(NULL));
+                ASSERT_SYS_OK(wait(NULL));
+                ASSERT_SYS_OK(wait(NULL));
             }
         }
     }
@@ -219,12 +209,8 @@ void MIMPI_send_barrier_sync_signal_to_both_children(int rank, int size)
         }
         else
         {
-            int* status1;
-            int* status2;
-            wait(status1);
-            wait(status2);
-            ASSERT_ZERO(*status1);
-            ASSERT_ZERO(*status2);
+            ASSERT_SYS_OK(wait(NULL));
+            ASSERT_SYS_OK(wait(NULL));
         }
     }
 }

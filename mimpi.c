@@ -20,7 +20,7 @@ void MIMPI_Finalize() {
     MIMPI_send_finished_sync_signal_to_right_child(rank,size);
     MIMPI_send_finished_sync_signal_to_your_parent(rank);
 
-    MIMPI_close_all_program_channels(rank,size)
+    MIMPI_close_all_program_channels(rank,size);
     
     
     channels_finalize();
