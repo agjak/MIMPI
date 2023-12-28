@@ -192,7 +192,7 @@ void MIMPI_send_barrier_sync_signal_to_both_children(int rank, int size)
     printf("Sending begun %d %d\n", rank, getpid());
     pid_t pid1;
     pid_t pid2;
-    ASSERT_SYS_OK(pid1 = fork());
+    pid1 = fork();
     if(pid1==0)
     {
         printf("Sending to left child %d %d\n", rank, getpid());
@@ -201,7 +201,7 @@ void MIMPI_send_barrier_sync_signal_to_both_children(int rank, int size)
     }
     else
     {
-        ASSERT_SYS_OK(pid2 = fork());
+        pid2 = fork();
         if(pid2==0)
         {
             printf("Sending to right child %d %d\n", rank, getpid());

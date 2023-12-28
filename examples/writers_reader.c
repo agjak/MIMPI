@@ -13,6 +13,7 @@ Refers to <usprawnienie2> TODO: przenazwać to.
 int main(int argc, char **argv)
 {
     MIMPI_Init(false);
+    printf("running writers_readers\n");
 
     // Find out rank, size
     int const world_rank = MIMPI_World_rank();

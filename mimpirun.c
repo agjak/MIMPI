@@ -6,6 +6,7 @@
 #include "channel.h"
 
 int main(int argc, char* argv[]) {
+    printf("running mimpirun\n");
     if (argc<3)
     {
         fatal("Usage: %s <num_of_copies> <name_of_prog_to_run> <args>\n", argv[0]);
