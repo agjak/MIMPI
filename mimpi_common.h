@@ -58,9 +58,18 @@ _Noreturn extern void fatal(const char* fmt, ...);
 // Put your declarations here
 
 
-void MIMPI_send_finished_sync_signal_to_your_parent();
-void MIMPI_send_finished_sync_signal_to_your_children();
-void MIMPI_send_barrier_sync_signal_to_your_children();
+void MIMPI_send_finished_sync_signal_to_your_parent(int rank);
+void MIMPI_send_finished_sync_signal_to_left_child(int rank, int size);
+void MIMPI_send_finished_sync_signal_to_right_child(int rank, int size);
+void MIMPI_send_finished_sync_signal_to_both_children(int rank, int size);
+void MIMPI_send_finished_sync_signal_to_both_children_and_parent(int rank, int size);
+
+void MIMPI_send_barrier_sync_signal_to_left_child(int rank, int size);
+void MIMPI_send_barrier_sync_signal_to_right_child(int rank, int size);
+void MIMPI_send_barrier_sync_signal_to_both_children(int rank, int size);
+
+void MIMPI_close_all_program_channels(int rank, int size);
+
 
 
 #endif // MIMPI_COMMON_H

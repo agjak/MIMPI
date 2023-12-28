@@ -13,33 +13,14 @@ void MIMPI_Init(bool enable_deadlock_detection) {
 
 void MIMPI_Finalize() {
 
-    MIMPI_send_finished_sync_signal_to_your_children();
-    MIMPI_send_finished_sync_signal_to_your_parent();
+    int rank = MIMPI_World_rank();
+    int size = MIMPI_World_size();
 
-    char* name1 = malloc(40*sizeof(char));
-    char* name2 = malloc(40*sizeof(char));
+    MIMPI_send_finished_sync_signal_to_left_child(rank,size);
+    MIMPI_send_finished_sync_signal_to_right_child(rank,size);
+    MIMPI_send_finished_sync_signal_to_your_parent(rank);
 
-    for(int i=0; i< MIMPI_World_size(); i++)
-    {
-        if(i!=MIMPI_World_rank())
-        {
-            sprintf(name1, "MIMPI_channel_to_%d", i);
-            sprintf(name2, "MIMPI_channel_from_%d",i);
-            int write_fd=atoi(getenv(name1));
-            int read_fd=atoi(getenv(name2));
-            close(write_fd);
-            close(read_fd);
-
-            sprintf(name1, "MIMPI_sync_channel_to_%d", i);
-            sprintf(name2, "MIMPI_sync_channel_from_%d",i);
-            write_fd=atoi(getenv(name1));
-            read_fd=atoi(getenv(name2));
-            close(write_fd);
-            close(read_fd);
-        }
-    }
-    free(name1);
-    free(name2);
+    MIMPI_close_all_program_channels(rank,size)
     
     
     channels_finalize();
@@ -107,7 +88,7 @@ MIMPI_Retcode MIMPI_Barrier() {
     int rank = MIMPI_World_rank();
     int size = MIMPI_World_size();
 
-    MIMPI_send_barrier_sync_signal_to_your_children();
+    MIMPI_send_barrier_sync_signal_to_both_children(rank, size);
 
     char* messch1 = malloc(1*sizeof(char));
     messch1[0] = 'E';                       //EMPTY
@@ -154,19 +135,19 @@ MIMPI_Retcode MIMPI_Barrier() {
     {
         if(messch1[0]=='F' || messch2[0]=='F')   //parent or children have already finished the MIMPI block
         {
-            MIMPI_send_finished_sync_signal_to_your_children();
-            setenv("MIMPI_remotes_finished","1",1);
             free(messch1);
             free(messch2);
             free(messpar);
+            MIMPI_send_finished_sync_signal_to_both_children(rank, size);
+            setenv("MIMPI_remotes_finished","1",1);
             return MIMPI_ERROR_REMOTE_FINISHED;
         }
         else
         {
-            MIMPI_send_barrier_sync_signal_to_your_children();
             free(messch1);
             free(messch2);
             free(messpar);
+            MIMPI_send_barrier_sync_signal_to_both_children(rank, size);
             return MIMPI_SUCCESS;
         }
     }
@@ -174,12 +155,11 @@ MIMPI_Retcode MIMPI_Barrier() {
     {
         if(messch1[0]=='F' || messch2[0]=='F' || messpar[0]=='F')   //parent or children have already finished the MIMPI block
         {
-            MIMPI_send_finished_sync_signal_to_your_children();
-            MIMPI_send_finished_sync_signal_to_your_parent();
-            setenv("MIMPI_remotes_finished","1",1);
             free(messch1);
             free(messch2);
             free(messpar);
+            MIMPI_send_finished_sync_signal_to_both_children_and_parent(rank, size);
+            setenv("MIMPI_remotes_finished","1",1);
             return MIMPI_ERROR_REMOTE_FINISHED;
         }
         else    //parent and both children have started MIMPI_Barrier
@@ -202,18 +182,18 @@ MIMPI_Retcode MIMPI_Barrier() {
             
             if(messpar[0]=='F')
             {
-                MIMPI_send_finished_sync_signal_to_your_children();
                 free(messch1);
                 free(messch2);
                 free(messpar);
+                MIMPI_send_finished_sync_signal_to_both_children(rank, size);
                 return MIMPI_ERROR_REMOTE_FINISHED;
             }
             else
             {
-                MIMPI_send_barrier_sync_signal_to_your_children();
                 free(messch1);
                 free(messch2);
                 free(messpar);
+                MIMPI_send_barrier_sync_signal_to_both_children(rank, size);
                 return MIMPI_SUCCESS;
             }
 
