@@ -88,11 +88,9 @@ MIMPI_Retcode MIMPI_Barrier()
     }
     int rank = MIMPI_World_rank();
     int size = MIMPI_World_size();
-    printf("Before %d %d\n", rank, getpid());
     MIMPI_send_barrier_sync_signal_to_both_children(rank, size);
     //MIMPI_send_barrier_sync_signal_to_right_child(rank, size);
     //MIMPI_send_barrier_sync_signal_to_left_child(rank, size);
-    printf("After %d\n", rank);
 
     char* messch1 = malloc(1*sizeof(char));
     messch1[0] = 'E';                       //EMPTY
