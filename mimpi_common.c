@@ -91,7 +91,9 @@ void MIMPI_send_finished_sync_signal_to_right_child(int rank, int size)
 
 void MIMPI_send_finished_sync_signal_to_both_children(int rank, int size)
 {
-    pid_t pid1;
+    MIMPI_send_finished_sync_signal_to_left_child(rank,size);
+    MIMPI_send_finished_sync_signal_to_right_child(rank,size);
+ /* pid_t pid1;
     pid_t pid2;
     ASSERT_SYS_OK(pid1 = fork());
     if(!pid1)
@@ -114,12 +116,15 @@ void MIMPI_send_finished_sync_signal_to_both_children(int rank, int size)
             ASSERT_SYS_OK(wait(NULL));
             ASSERT_SYS_OK(wait(NULL));
         }
-    }
+    }*/
 }
 
 void MIMPI_send_finished_sync_signal_to_both_children_and_parent(int rank, int size)
 {
-    pid_t pid1;
+    MIMPI_send_finished_sync_signal_to_left_child(rank,size);
+    MIMPI_send_finished_sync_signal_to_right_child(rank,size);
+    MIMPI_send_finished_sync_signal_to_your_parent(rank);
+    /*pid_t pid1;
     pid_t pid2;
     pid_t pid3;
     ASSERT_SYS_OK(pid1 = fork());
@@ -154,7 +159,7 @@ void MIMPI_send_finished_sync_signal_to_both_children_and_parent(int rank, int s
                 ASSERT_SYS_OK(wait(NULL));
             }
         }
-    }
+    }*/
 }
 
 void MIMPI_send_barrier_sync_signal_to_left_child(int rank, int size)
