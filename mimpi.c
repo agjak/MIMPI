@@ -80,7 +80,8 @@ MIMPI_Retcode MIMPI_Recv(
     return MIMPI_SUCCESS;
 }
 
-MIMPI_Retcode MIMPI_Barrier() {
+MIMPI_Retcode MIMPI_Barrier() 
+{
     if(atoi(getenv("MIMPI_remotes_finished"))>0)
     {
         return MIMPI_ERROR_REMOTE_FINISHED;
@@ -88,9 +89,9 @@ MIMPI_Retcode MIMPI_Barrier() {
     int rank = MIMPI_World_rank();
     int size = MIMPI_World_size();
     printf("Before %d\n", rank);
-    //MIMPI_send_barrier_sync_signal_to_both_children(rank, size);
-    MIMPI_send_barrier_sync_signal_to_right_child(rank, size);
-    MIMPI_send_barrier_sync_signal_to_left_child(rank, size);
+    MIMPI_send_barrier_sync_signal_to_both_children(rank, size);
+    //MIMPI_send_barrier_sync_signal_to_right_child(rank, size);
+    //MIMPI_send_barrier_sync_signal_to_left_child(rank, size);
     printf("After %d\n", rank);
 
     char* messch1 = malloc(1*sizeof(char));
