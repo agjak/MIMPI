@@ -72,7 +72,7 @@ void MIMPI_send_finished_sync_signal_to_your_children()
         int send_fd=atoi(getenv(name));
         char* mess = malloc(1*sizeof(char));
         mess = "F"; //FINISHED
-        chsend(send_fd, void*(mess), 1);
+        chsend(send_fd, (void*)(mess), 1);
         free(name);
         free(mess);
     }
@@ -101,7 +101,7 @@ void MIMPI_send_barrier_sync_signal_to_your_children()
         int send_fd=atoi(getenv(name));
         char* mess = malloc(1*sizeof(char));
         mess = "B"; //BARRIER
-        chsend(send_fd, void*(mess), 1);
+        chsend(send_fd, (void*)(mess), 1);
         free(name);
         free(mess);
     }

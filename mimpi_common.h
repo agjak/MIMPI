@@ -6,6 +6,8 @@
 #ifndef MIMPI_COMMON_H
 #define MIMPI_COMMON_H
 
+#include "channel.h"
+
 #include <assert.h>
 #include <stdbool.h>
 #include <stdnoreturn.h>
