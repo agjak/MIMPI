@@ -98,7 +98,7 @@ void MIMPI_send_finished_sync_signal_to_both_children(int rank, int size)
     {
         MIMPI_send_finished_sync_signal_to_left_child(rank,size);
         MIMPI_close_all_program_channels(rank,size);
-        exit();
+        exit(0);
     }
     else
     {
@@ -107,12 +107,16 @@ void MIMPI_send_finished_sync_signal_to_both_children(int rank, int size)
         {
             MIMPI_send_finished_sync_signal_to_right_child(rank,size);
             MIMPI_close_all_program_channels(rank,size);
-            exit();
+            exit(0);
         }
         else
         {
-            wait();
-            wait();
+            int* status1;
+            int* status2;
+            wait(status1);
+            wait(status2);
+            ASSERT_ZERO(*status1);
+            ASSERT_ZERO(*status2);
         }
     }
 }
@@ -127,7 +131,7 @@ void MIMPI_send_finished_sync_signal_to_both_children_and_parent(int rank, int s
     {
         MIMPI_send_finished_sync_signal_to_left_child(rank,size);
         MIMPI_close_all_program_channels(rank,size);
-        exit();
+        exit(0);
     }
     else
     {
@@ -136,7 +140,7 @@ void MIMPI_send_finished_sync_signal_to_both_children_and_parent(int rank, int s
         {
             MIMPI_send_finished_sync_signal_to_right_child(rank,size);
             MIMPI_close_all_program_channels(rank,size);
-            exit();
+            exit(0);
         }
         else
         {
@@ -145,13 +149,19 @@ void MIMPI_send_finished_sync_signal_to_both_children_and_parent(int rank, int s
             {
                 MIMPI_send_finished_sync_signal_to_your_parent(rank);
                 MIMPI_close_all_program_channels(rank,size);
-                exit();
+                exit(0);
             }
             else
             {
-                wait();
-                wait();
-                wait();
+                int* status1;
+                int* status2;
+                int* status3;
+                wait(status1);
+                wait(status2);
+                wait(status3);
+                ASSERT_ZERO(*status1);
+                ASSERT_ZERO(*status2);
+                ASSERT_ZERO(*status3);
             }
         }
     }
@@ -196,7 +206,7 @@ void MIMPI_send_barrier_sync_signal_to_both_children(int rank, int size)
     {
         MIMPI_send_barrier_sync_signal_to_left_child(rank,size);
         MIMPI_close_all_program_channels(rank,size);
-        exit();
+        exit(0);
     }
     else
     {
@@ -205,12 +215,16 @@ void MIMPI_send_barrier_sync_signal_to_both_children(int rank, int size)
         {
             MIMPI_send_barrier_sync_signal_to_right_child(rank,size);
             MIMPI_close_all_program_channels(rank,size);
-            exit();
+            exit(0);
         }
         else
         {
-            wait();
-            wait();
+            int* status1;
+            int* status2;
+            wait(status1);
+            wait(status2);
+            ASSERT_ZERO(*status1);
+            ASSERT_ZERO(*status2);
         }
     }
 }
