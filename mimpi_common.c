@@ -189,7 +189,9 @@ void MIMPI_send_barrier_sync_signal_to_right_child(int rank, int size)
 
 void MIMPI_send_barrier_sync_signal_to_both_children(int rank, int size)
 {
-    printf("Sending begun %d %d\n", rank, getpid());
+    MIMPI_send_barrier_sync_signal_to_left_child(rank,size);
+    MIMPI_send_barrier_sync_signal_to_right_child(rank,size);
+    /*printf("Sending begun %d %d\n", rank, getpid());
     pid_t pid1;
     pid_t pid2;
     pid1 = fork();
@@ -215,7 +217,7 @@ void MIMPI_send_barrier_sync_signal_to_both_children(int rank, int size)
             ASSERT_SYS_OK(wait(NULL));
         }
     }
-    printf("Sending finished %d %d\n", rank, getpid());
+    printf("Sending finished %d %d\n", rank, getpid());*/
 }
 
 void MIMPI_close_all_program_channels(int rank, int size)
