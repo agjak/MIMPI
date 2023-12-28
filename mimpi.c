@@ -109,9 +109,12 @@ MIMPI_Retcode MIMPI_Barrier() {
 
     MIMPI_send_barrier_sync_signal_to_your_children();
 
-    char* messch1 = "E";    //EMPTY
-    char* messch2 = "E";    //EMPTY
-    char* messpar = "E";    //EMPTY
+    char* messch1 = malloc(1*sizeof(char));
+    messch1[0] = 'E';                       //EMPTY
+    char* messch2 = malloc(1*sizeof(char));
+    messch2[0] = 'E';                       //EMPTY
+    char* messpar = malloc(1*sizeof(char));
+    messpar[0] = 'E';                       //EMPTY
 
     if(rank*2+1<size)
     {
@@ -185,7 +188,7 @@ MIMPI_Retcode MIMPI_Barrier() {
             sprintf(name, "MIMPI_sync_channel_to_%d",(rank-1)/2);
             int send_fd=atoi(getenv(name));
             char* mess = malloc(1*sizeof(char));
-            mess = "B"; //BARRIER
+            mess[0] = 'B'; //BARRIER
             chsend(send_fd, (void*) mess, 1);
             free(mess);
             
