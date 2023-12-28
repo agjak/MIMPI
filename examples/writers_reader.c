@@ -7,6 +7,7 @@ Refers to <usprawnienie2> TODO: przenazwać to.
 #include <stdbool.h>
 #include <stdio.h>
 #include <assert.h>
+#include <unistd.h>
 #include "../mimpi.h"
 #include "mimpi_err.h"
 
