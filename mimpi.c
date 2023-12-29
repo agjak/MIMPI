@@ -89,8 +89,6 @@ MIMPI_Retcode MIMPI_Barrier()
     int rank = MIMPI_World_rank();
     int size = MIMPI_World_size();
     MIMPI_send_barrier_sync_signal_to_both_children(rank, size);
-    //MIMPI_send_barrier_sync_signal_to_right_child(rank, size);
-    //MIMPI_send_barrier_sync_signal_to_left_child(rank, size);
 
     char* messch1 = malloc(1*sizeof(char));
     messch1[0] = 'E';                       //EMPTY
@@ -149,9 +147,7 @@ MIMPI_Retcode MIMPI_Barrier()
             free(messch1);
             free(messch2);
             free(messpar);
-            //MIMPI_send_barrier_sync_signal_to_both_children(rank, size);
-            MIMPI_send_barrier_sync_signal_to_right_child(rank, size);
-            MIMPI_send_barrier_sync_signal_to_left_child(rank, size);
+            MIMPI_send_barrier_sync_signal_to_both_children(rank, size);
             return MIMPI_SUCCESS;
         }
     }
