@@ -193,15 +193,21 @@ void MIMPI_do_broadcast(void* data, int count, int root, int rank, int size)
 {
     if(rank==root)
     {
+        pid_t pid;
         for(int i=0; i<size; i++)
         {
-            if(i!=rank)
+            ASSERT_SYS_OK(pid = fork());
+            if(!pid)
             {
-                char* name = malloc(40*sizeof(char));
-                sprintf(name, "MIMPI_sync_channel_to_%d",i);
-                int send_fd=atoi(getenv(name));
-                chsend(send_fd, data, count);
-                free(name);
+                if(i!=rank)
+                {
+                    char* name = malloc(40*sizeof(char));
+                    sprintf(name, "MIMPI_sync_channel_to_%d",i);
+                    int send_fd=atoi(getenv(name));
+                    chsend(send_fd, data, count);
+                    free(name);
+                }
+                exit(0);
             }
         }
     }
