@@ -66,7 +66,6 @@ void MIMPI_send_sync_signal_to_both_children_and_parent(int rank, int size, char
 
 void MIMPI_close_all_program_channels(int rank, int size);
 
-void MIMPI_do_broadcast(void* data, int count,int root,int rank,int size);
 
 
 

@@ -272,7 +272,26 @@ MIMPI_Retcode MIMPI_Bcast(
             free(messpar);
             MIMPI_send_sync_signal_to_both_children(rank, size, 'R');   //BROADCAST
 
-            MIMPI_do_broadcast(data,count,root,rank,size);
+            if(rank==root)
+            {
+                pid_t pid;
+                for(int i=0; i<size; i++)
+                {
+                    ASSERT_SYS_OK(pid = fork());
+                    if(!pid)
+                    {
+                        if(i!=rank)
+                        {
+                            MIMPI_Send(data,count,i,-1);
+                        }
+                        exit(0);
+                    }
+                }
+            }
+            else
+            {
+                MIMPI_Recv(data,count,root,-1);
+            }
 
             return MIMPI_SUCCESS;
         }
@@ -321,7 +340,26 @@ MIMPI_Retcode MIMPI_Bcast(
                 free(messpar);
                 MIMPI_send_sync_signal_to_both_children(rank, size, 'R');   //BROADCAST
 
-                MIMPI_do_broadcast(data,count,root,rank,size);
+                if(rank==root)
+                {
+                    pid_t pid;
+                    for(int i=0; i<size; i++)
+                    {
+                        ASSERT_SYS_OK(pid = fork());
+                        if(!pid)
+                        {
+                            if(i!=rank)
+                            {
+                                MIMPI_Send(data,count,i,-1);
+                            }
+                            exit(0);
+                        }
+                    }
+                }
+                else
+                {
+                    MIMPI_Recv(data,count,root,-1);
+                }
 
                 return MIMPI_SUCCESS;
             }
