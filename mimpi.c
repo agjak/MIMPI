@@ -197,9 +197,7 @@ MIMPI_Retcode MIMPI_Barrier()
                 free(messch1);
                 free(messch2);
                 free(messpar);
-                //MIMPI_send_barrier_sync_signal_to_both_children(rank, size);
-                MIMPI_send_barrier_sync_signal_to_right_child(rank, size);
-                MIMPI_send_barrier_sync_signal_to_left_child(rank, size);
+                MIMPI_send_barrier_sync_signal_to_both_children(rank, size);
                 return MIMPI_SUCCESS;
             }
 
