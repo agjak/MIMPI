@@ -15,9 +15,8 @@ int main(int argc, char* argv[]) {
     char** prog_args = &argv[2];
 
     ASSERT_SYS_OK(setenv("MIMPI_world_size", argv[1], 1));
-    ASSERT_SYS_OK(setenv("MIMPI_remotes_finished", "0", 1));
+    
 
-    channels_init();
 
     int** read_channels_between_programs = malloc(world_size*sizeof(int*));
     int** write_channels_between_programs = malloc(world_size*sizeof(int*));
@@ -140,7 +139,6 @@ int main(int argc, char* argv[]) {
     free(read_sync_channels_between_programs);
     free(write_sync_channels_between_programs);
 
-    channels_finalize();
 
     for(int i=0; i<world_size; i++)
     {

@@ -62,7 +62,9 @@ void MIMPI_send_sync_signal_to_parent(int rank, char signal);
 void MIMPI_send_sync_signal_to_left_child(int rank, int size, char signal);
 void MIMPI_send_sync_signal_to_right_child(int rank, int size, char signal);
 void MIMPI_send_sync_signal_to_both_children(int rank, int size, char signal);
-void MIMPI_send_sync_signal_to_both_children_and_parent(int rank, int size, char signal);
+
+MIMPI_Retcode MIMPI_sync_send(char signal, int destination);
+MIMPI_Retcode MIMPI_sync_recv(char* signal, int source);
 
 void MIMPI_close_all_program_channels(int rank, int size);
 
