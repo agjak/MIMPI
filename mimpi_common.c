@@ -155,14 +155,6 @@ MIMPI_Retcode MIMPI_sync_send(
     char signal,
     int destination
 ) {
-    if (destination == MIMPI_World_rank())
-    {
-        return MIMPI_ERROR_ATTEMPTED_SELF_OP;
-    }
-    if (destination < 0 || destination >= MIMPI_World_size())
-    {
-        return MIMPI_ERROR_NO_SUCH_RANK;
-    }
     char* name = malloc(40*sizeof(char));
     sprintf(name, "MIMPI_sync_channel_to_%d",destination);
     int send_fd=atoi(getenv(name));
@@ -186,14 +178,6 @@ MIMPI_Retcode MIMPI_sync_recv(
     char* signal,
     int source
 ) {
-    if (source == MIMPI_World_rank())
-    {
-        return MIMPI_ERROR_ATTEMPTED_SELF_OP;
-    }
-    if (source < 0 || source >= MIMPI_World_size())
-    {
-        return MIMPI_ERROR_NO_SUCH_RANK;
-    }
     char* name = malloc(40*sizeof(char));
     sprintf(name, "MIMPI_sync_channel_from_%d",source);
     int recv_fd=atoi(getenv(name));
