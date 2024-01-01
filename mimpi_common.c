@@ -44,7 +44,7 @@ _Noreturn void fatal(const char* fmt, ...)
 /////////////////////////////////////////////////
 // Put your implementation here
 
-MIMPI_Retcode MIMPI_send_sync_signal_to_parent(int rank, char signal)
+MIMPI_Sync_Retcode MIMPI_send_sync_signal_to_parent(int rank, char signal)
 {
     if(rank>0)
     {
@@ -55,7 +55,7 @@ MIMPI_Retcode MIMPI_send_sync_signal_to_parent(int rank, char signal)
 
 
 
-MIMPI_Retcode MIMPI_send_sync_signal_to_both_children(int rank, int size, char signal)
+MIMPI_Sync_Retcode MIMPI_send_sync_signal_to_both_children(int rank, int size, char signal)
 {
     pid_t pid1;
     pid_t pid2;
@@ -63,7 +63,7 @@ MIMPI_Retcode MIMPI_send_sync_signal_to_both_children(int rank, int size, char s
     ASSERT_SYS_OK(pid1 = fork());
     if(!pid1)
     {
-        MIMPI_Retcode status = MIMPI_send_sync_signal_to_left_child(rank,size,signal);
+        MIMPI_Sync_Retcode status = MIMPI_send_sync_signal_to_left_child(rank,size,signal);
         if (status==MIMPI_SUCCESS)
         {
             exit(0);
@@ -78,7 +78,7 @@ MIMPI_Retcode MIMPI_send_sync_signal_to_both_children(int rank, int size, char s
         ASSERT_SYS_OK(pid2 = fork());
         if(!pid2)
         {
-            MIMPI_Retcode status = MIMPI_send_sync_signal_to_right_child(rank,size,signal);
+            MIMPI_Sync_Retcode status = MIMPI_send_sync_signal_to_right_child(rank,size,signal);
             if (status==MIMPI_SUCCESS)
             {
                 exit(0);
@@ -104,7 +104,7 @@ MIMPI_Retcode MIMPI_send_sync_signal_to_both_children(int rank, int size, char s
 }
 
 
-MIMPI_Retcode MIMPI_send_sync_signal_to_left_child(int rank, int size, char signal)
+MIMPI_Sync_Retcode MIMPI_send_sync_signal_to_left_child(int rank, int size, char signal)
 {
     if(rank*2+1<size)
     {
@@ -113,7 +113,7 @@ MIMPI_Retcode MIMPI_send_sync_signal_to_left_child(int rank, int size, char sign
     return MIMPI_SUCCESS;
 }
 
-MIMPI_Retcode MIMPI_send_sync_signal_to_right_child(int rank, int size, char signal)
+MIMPI_Sync_Retcode MIMPI_send_sync_signal_to_right_child(int rank, int size, char signal)
 {
     if(rank*2+2<size)
     {
@@ -151,7 +151,7 @@ void MIMPI_close_all_program_channels(int rank, int size)
 }
 
 
-MIMPI_Retcode MIMPI_sync_send(
+MIMPI_Sync_Retcode MIMPI_sync_send(
     char signal,
     int destination
 ) {
@@ -174,7 +174,7 @@ MIMPI_Retcode MIMPI_sync_send(
     }
 }
 
-MIMPI_Retcode MIMPI_sync_recv(
+MIMPI_Sync_Retcode MIMPI_sync_recv(
     char* signal,
     int source
 ) {
