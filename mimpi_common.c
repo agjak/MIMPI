@@ -50,7 +50,7 @@ MIMPI_Sync_Retcode MIMPI_send_sync_signal_to_parent(int rank, char signal)
     {
         return MIMPI_sync_send(signal, (rank-1)/2);
     }
-    return MIMPI_SUCCESS;
+    return MIMPI_SYNC_SUCCESS;
 }
 
 
@@ -64,7 +64,7 @@ MIMPI_Sync_Retcode MIMPI_send_sync_signal_to_both_children(int rank, int size, c
     if(!pid1)
     {
         MIMPI_Sync_Retcode status = MIMPI_send_sync_signal_to_left_child(rank,size,signal);
-        if (status==MIMPI_SUCCESS)
+        if (status==MIMPI_SYNC_SUCCESS)
         {
             exit(0);
         }
@@ -79,7 +79,7 @@ MIMPI_Sync_Retcode MIMPI_send_sync_signal_to_both_children(int rank, int size, c
         if(!pid2)
         {
             MIMPI_Sync_Retcode status = MIMPI_send_sync_signal_to_right_child(rank,size,signal);
-            if (status==MIMPI_SUCCESS)
+            if (status==MIMPI_SYNC_SUCCESS)
             {
                 exit(0);
             }
@@ -95,11 +95,11 @@ MIMPI_Sync_Retcode MIMPI_send_sync_signal_to_both_children(int rank, int size, c
     ASSERT_SYS_OK(wait(&status2));
     if(status1+status2==0)
     {
-        return MIMPI_SUCCESS;
+        return MIMPI_SYNC_SUCCESS;
     }
     else
     {
-        return MIMPI_ERROR_REMOTE_FINISHED;
+        return MIMPI_SYNC_ERROR_REMOTE_FINISHED;
     }
 }
 
@@ -110,7 +110,7 @@ MIMPI_Sync_Retcode MIMPI_send_sync_signal_to_left_child(int rank, int size, char
     {
         return MIMPI_sync_send(signal, rank*2+1);
     }
-    return MIMPI_SUCCESS;
+    return MIMPI_SYNC_SUCCESS;
 }
 
 MIMPI_Sync_Retcode MIMPI_send_sync_signal_to_right_child(int rank, int size, char signal)
@@ -119,7 +119,7 @@ MIMPI_Sync_Retcode MIMPI_send_sync_signal_to_right_child(int rank, int size, cha
     {
         return MIMPI_sync_send(signal, rank*2+2);
     }
-    return MIMPI_SUCCESS;
+    return MIMPI_SYNC_SUCCESS;
 }
 
 void MIMPI_close_all_program_channels(int rank, int size)
@@ -165,12 +165,12 @@ MIMPI_Sync_Retcode MIMPI_sync_send(
     if(chsend(send_fd, mess, 1)==-1)
     {
         free(mess);
-        return MIMPI_ERROR_REMOTE_FINISHED;
+        return MIMPI_SYNC_ERROR_REMOTE_FINISHED;
     }
     else
     {
         free(mess);
-        return MIMPI_SUCCESS;
+        return MIMPI_SYNC_SUCCESS;
     }
 }
 
@@ -185,11 +185,11 @@ MIMPI_Sync_Retcode MIMPI_sync_recv(
 
     if(chrecv(recv_fd, (void*)signal, 1)==0)
     {
-        return MIMPI_ERROR_REMOTE_FINISHED;
+        return MIMPI_SYNC_ERROR_REMOTE_FINISHED;
     }
     else
     {
-        return MIMPI_SUCCESS;
+        return MIMPI_SYNC_SUCCESS;
     }
 }
 

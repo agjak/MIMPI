@@ -58,11 +58,11 @@ _Noreturn extern void fatal(const char* fmt, ...);
 // Put your declarations here
 
 typedef enum {
-    MIMPI_SUCCESS = 0, /// operation ended successfully
-    MIMPI_ERROR_ATTEMPTED_SELF_OP = 1, /// process attempted to send/recv to itself
-    MIMPI_ERROR_NO_SUCH_RANK = 2, /// no process with requested rank exists in the world
-    MIMPI_ERROR_REMOTE_FINISHED = 3, /// the remote process involved in communication has finished
-    MIMPI_ERROR_DEADLOCK_DETECTED = 4, /// a deadlock has been detected
+    MIMPI_SYNC_SUCCESS = 0, /// operation ended successfully
+    MIMPI_SYNC_ERROR_ATTEMPTED_SELF_OP = 1, /// process attempted to send/recv to itself
+    MIMPI_SYNC_ERROR_NO_SUCH_RANK = 2, /// no process with requested rank exists in the world
+    MIMPI_SYNC_ERROR_REMOTE_FINISHED = 3, /// the remote process involved in communication has finished
+    MIMPI_SYNC_ERROR_DEADLOCK_DETECTED = 4, /// a deadlock has been detected
 } MIMPI_Sync_Retcode;
 
 
