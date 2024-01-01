@@ -747,7 +747,7 @@ MIMPI_Retcode MIMPI_Reduce(
             MIMPI_send_sync_signal_to_both_children(rank, size, 'D');   //REDUCE
             if(root==0)
             {
-                recv_data=(void*)data_to_send;
+                recv_data=data_to_send;
             }
             else
             {
