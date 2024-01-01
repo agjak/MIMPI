@@ -747,11 +747,14 @@ MIMPI_Retcode MIMPI_Reduce(
             MIMPI_send_sync_signal_to_both_children(rank, size, 'D');   //REDUCE
             if(root==0)
             {
-                recv_data=data_to_send;
+                for(int i=0: i<count; i++)
+                {
+                    recv_data[i]=data_to_send[i];
+                }
             }
             else
             {
-                MIMPI_Send((void*)data_to_send,count,root,-2);
+                MIMPI_Send(data_to_send,count,root,-2);
             }
             return MIMPI_SUCCESS;
         }
