@@ -130,7 +130,7 @@ MIMPI_Retcode MIMPI_sync_reduce_recv(
         }
         else
         {
-            MIMPI_Recv(data, count, source, tag);
+            MIMPI_Recv(data, count, source, -2);
             return MIMPI_SUCCESS;
         }
     }
@@ -140,7 +140,7 @@ MIMPI_Retcode MIMPI_send_sync_signal_to_parent(int rank, char signal)
 {
     if(rank>0)
     {
-        return MIMPI_send(signal, (rank-1)/2);
+        return MIMPI_sync_send(signal, (rank-1)/2);
     }
     return MIMPI_SUCCESS;
 }
@@ -720,7 +720,7 @@ MIMPI_Retcode MIMPI_Reduce(
     {
         for(int i=0; i<count; i++)
         {
-            data_to_send[i]=(uint8_t*)send_data[i];
+            data_to_send[i]=((uint8_t*)send_data)[i];
         }
     }
     free(child_1_data);
