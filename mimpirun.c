@@ -96,13 +96,31 @@ int main(int argc, char* argv[]) {
                 {
                     if(j!=k && j!=i)
                     {
-                        close(read_channels_between_programs[i][j]);
-                        close(write_channels_between_programs[j][i]);
-                        close(read_sync_channels_between_programs[i][j]);
-                        close(write_sync_channels_between_programs[j][i]);
+                        close(read_channels_between_programs[k][j]);
+                        close(write_channels_between_programs[j][k]);
+                        close(read_sync_channels_between_programs[k][j]);
+                        close(write_sync_channels_between_programs[j][k]);
                     }
                 }
             }
+            for(int i=0; i<world_size; i++)
+            {
+                free(read_channels_between_programs[i]);
+                free(write_channels_between_programs[i]);
+                free(read_sync_channels_between_programs[i]);
+                free(write_sync_channels_between_programs[i]);
+            }
+            free(read_channels_between_programs);
+            free(write_channels_between_programs);
+            free(read_sync_channels_between_programs);
+            free(write_sync_channels_between_programs);
+
+            free(name1);
+            free(name2);
+            free(value1);
+            free(value2);
+            free(world_rank);
+
             execvp(prog_name, prog_args);
         }
     }

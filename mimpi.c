@@ -754,6 +754,7 @@ MIMPI_Retcode MIMPI_Reduce(
             {
                 MIMPI_Send((void*)data_to_send,count,root,-2);
             }
+            free(data_to_send);
             return MIMPI_SUCCESS;
         }
     }
@@ -763,6 +764,7 @@ MIMPI_Retcode MIMPI_Reduce(
         {
             free(messch1);
             free(messch2);
+            free(data_to_send);
             
             MIMPI_Retcode result = MIMPI_send_sync_signal_to_parent(rank, 'F');    //FINISHED
             if(result==MIMPI_ERROR_REMOTE_FINISHED) //parent has finished
@@ -785,6 +787,7 @@ MIMPI_Retcode MIMPI_Reduce(
             free(messch1);
             free(messch2);
             MIMPI_Retcode result = MIMPI_sync_reduce_send('D', (rank-1)/2, data_to_send, count);
+            free(data_to_send);
             if(result==MIMPI_ERROR_REMOTE_FINISHED) //parent has finished
             {
                 MIMPI_send_sync_signal_to_both_children(rank,size,'F');
