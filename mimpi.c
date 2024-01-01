@@ -141,7 +141,7 @@ MIMPI_Retcode MIMPI_Barrier()
             free(messch1);
             free(messch2);
             
-            MIMPI_Sync_Retcode result = MIMPI_send_sync_signal_to_parent(rank, size, 'F');    //FINISHED
+            MIMPI_Sync_Retcode result = MIMPI_send_sync_signal_to_parent(rank, 'F');    //FINISHED
             if(result==MIMPI_SYNC_ERROR_REMOTE_FINISHED) //parent has finished
             {
                 MIMPI_send_sync_signal_to_both_children(rank,size,'F');
@@ -161,7 +161,7 @@ MIMPI_Retcode MIMPI_Barrier()
         {
             free(messch1);
             free(messch2);
-            MIMPI_Sync_Retcode result = MIMPI_send_sync_signal_to_parent(rank, size, 'B');    //FINISHED
+            MIMPI_Sync_Retcode result = MIMPI_send_sync_signal_to_parent(rank,'B');    //BARRIER
             if(result==MIMPI_SYNC_ERROR_REMOTE_FINISHED) //parent has finished
             {
                 MIMPI_send_sync_signal_to_both_children(rank,size,'F');
@@ -269,7 +269,7 @@ MIMPI_Retcode MIMPI_Bcast(
             free(messch1);
             free(messch2);
             
-            MIMPI_Sync_Retcode result = MIMPI_send_sync_signal_to_parent(rank, size, 'F');    //FINISHED
+            MIMPI_Sync_Retcode result = MIMPI_send_sync_signal_to_parent(rank, 'F');    //FINISHED
             if(result==MIMPI_SYNC_ERROR_REMOTE_FINISHED) //parent has finished
             {
                 MIMPI_send_sync_signal_to_both_children(rank,size,'F');
@@ -289,7 +289,7 @@ MIMPI_Retcode MIMPI_Bcast(
         {
             free(messch1);
             free(messch2);
-            MIMPI_Sync_Retcode result = MIMPI_send_sync_signal_to_parent(rank, size, 'R');    //BROADCAST
+            MIMPI_Sync_Retcode result = MIMPI_send_sync_signal_to_parent(rank, 'R');    //BROADCAST
             if(result==MIMPI_SYNC_ERROR_REMOTE_FINISHED) //parent has finished
             {
                 MIMPI_send_sync_signal_to_both_children(rank,size,'F');
