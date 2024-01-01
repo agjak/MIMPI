@@ -731,7 +731,6 @@ MIMPI_Retcode MIMPI_Reduce(
     {
         if(messch1[0]=='F' || messch2[0]=='F')   //some descendant has already finished the MIMPI block
         {
-            printf("Jestem rank 0, koncze redukcje, nie udalo sie\n");
             free(messch1);
             free(messch2);
             free(messpar);
@@ -740,7 +739,6 @@ MIMPI_Retcode MIMPI_Reduce(
         }
         else    //messch1[0]=='D' && messch2[0]=='D'
         {
-            printf("Jestem rank 0, koncze redukcje %d\n",data_to_send[0]);
             free(messch1);
             free(messch2);
             free(messpar);
