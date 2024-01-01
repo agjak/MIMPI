@@ -686,9 +686,9 @@ MIMPI_Retcode MIMPI_Reduce(
     char* messpar = malloc(1*sizeof(char));
     messpar[0] = 'E';                       //EMPTY
 
-    uint8_t *child_1_data=malloc(count*sizeof(uint8_t));
-    uint8_t *child_2_data=malloc(count*sizeof(uint8_t));
-    uint8_t *data_to_send=malloc(count*sizeof(uint8_t));
+    uint8_t* child_1_data=malloc(count*sizeof(uint8_t));
+    uint8_t* child_2_data=malloc(count*sizeof(uint8_t));
+    uint8_t* data_to_send=malloc(count*sizeof(uint8_t));
 
     if(rank*2+2<size)
     {
@@ -745,10 +745,7 @@ MIMPI_Retcode MIMPI_Reduce(
             MIMPI_send_sync_signal_to_both_children(rank, size, 'D');   //REDUCE
             if(root==0)
             {
-                for(int i=0; i<count; i++)
-                {
-                    recv_data[i]=(void*)data_to_send[i];
-                }
+                    recv_data=(void*)data_to_send;
             }
             else
             {

@@ -13,6 +13,7 @@
 #include <stdnoreturn.h>
 
 #include <stdlib.h>
+#include <stdint.h>
 #include <sys/types.h>
 #include <stddef.h>
 #include <unistd.h>
