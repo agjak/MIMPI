@@ -4,7 +4,7 @@ EXAMPLES := $(addprefix examples_build/,$(notdir $(basename $(wildcard examples/
 FILES_ALLOWED_FOR_CHANGE := $(shell cat files_allowed_for_change)
 CHANGED_FILES := $(wildcard $(FILES_ALLOWED_FOR_CHANGE))
 TEMPLATE_HASH := $(shell cat template_hash)
-CFLAGS := -g -std=gnu11 -Wall -lpthread
+CFLAGS := --std=gnu11 -Wall -DDEBUG -lpthread
 TESTS := $(wildcard tests/*.self)
 
 CHANNEL_SRC := channel.c channel.h
@@ -15,11 +15,11 @@ MIMPI_SRC := $(MIMPI_COMMON_SRC) mimpi.c mimpi.h
 all: mimpirun $(EXAMPLES) $(TESTS)
 
 mimpirun: $(MIMPIRUN_SRC)
-	gcc $(CFLAGS) -o $@ $(filter %.c,$^)
+	gcc -g -o $@ $(filter %.c,$^)
 
 examples_build/%: examples/%.c $(MIMPI_SRC)
 	mkdir -p examples_build
-	gcc $(CFLAGS) -o $@ $(filter %.c,$^)
+	gcc -g -o $@ $(filter %.c,$^)
 
 assignment.zip: $(CHANGED_FILES)
 	zip assignment.zip $(CHANGED_FILES)
