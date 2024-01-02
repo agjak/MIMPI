@@ -260,7 +260,6 @@ void *buffer_messages(void* source_pt)
             memcpy(&count, count_bytes, sizeof(int));
             int tag;
             memcpy(&tag, tag_bytes, sizeof(int));
-            printf("Got a new message %d %d\n", count, tag);
             uint8_t* message=malloc(count);
             chrecv(recv_fd, message, count);
             pthread_mutex_lock(&buffer_mutexes[source]);
@@ -292,7 +291,6 @@ void *buffer_messages(void* source_pt)
             }
             pthread_mutex_unlock(&buffer_mutexes[source]);
             pthread_cond_signal(&buffer_conditions[source]);
-            printf("Letting folks know about the message\n");
             free(message);
         }
     }
@@ -440,7 +438,6 @@ MIMPI_Retcode MIMPI_Recv(
     {
         while(true)
         {
-            printf("Looking for the message\n");
             for(int i=0; i<messages_buffered[source]; i++)
             {
                 if(message_buffers[source][i]!=NULL)
@@ -456,7 +453,6 @@ MIMPI_Retcode MIMPI_Recv(
                     memcpy(&mess_count, count_bytes, sizeof(int));
                     int mess_tag=0;
                     memcpy(&mess_tag, tag_bytes, sizeof(int));
-                    printf("%d %d %d %d\n", tag, mess_tag, count, mess_count);
                     if(count==mess_count && (tag==mess_tag || tag==0))
                     {
                         for(int j=0; j<count; j++)
@@ -464,7 +460,6 @@ MIMPI_Retcode MIMPI_Recv(
                             ((uint8_t*)data)[j]=message_buffers[source][i][j+2*sizeof(int)];
                         }
                         pthread_mutex_unlock(&buffer_mutexes[source]);
-                        printf("Found the message\n");
                         return MIMPI_SUCCESS;
                     }
                 }
