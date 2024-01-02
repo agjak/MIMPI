@@ -293,9 +293,9 @@ MIMPI_Retcode MIMPI_Send(
     {
         return MIMPI_ERROR_NO_SUCH_RANK;
     }
-    uint8_t count_bytes[4];
+    uint8_t *count_bytes=malloc(4);
     memcpy(count_bytes, &count, sizeof(int));
-    uint8_t tag_bytes[4];
+    uint8_t *tag_bytes=malloc(4);
     memcpy(tag_bytes, &tag, sizeof(int));
 
     uint8_t *data_to_send=malloc((count+8));
