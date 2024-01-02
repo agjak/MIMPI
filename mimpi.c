@@ -275,7 +275,7 @@ void *buffer_messages(void* source_pt)
             }
             if(free_space==-1)
             {
-                message_buffers[source] = realloc(message_buffers[source], sizeof(message_buffers[source])+sizeof(uint8_t*));
+                message_buffers[source] = realloc(message_buffers[source], (messages_buffered[source]+1)*sizeof(uint8_t*));
                 messages_buffered[source]++;
                 free_space=messages_buffered[source]-1;
             }
