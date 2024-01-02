@@ -289,8 +289,6 @@ void *buffer_messages(void* source_pt)
             }
             pthread_mutex_unlock(&buffer_mutexes[source]);
             free(message);
-            free(tag_bytes);
-            free(count_bytes);
         }
     }
 
