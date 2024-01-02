@@ -255,10 +255,12 @@ void *buffer_messages(void* source_pt)
         }
         else
         {
-            printf("Got a new message\n");
             chrecv(recv_fd, tag_bytes, sizeof(int));
             int count;
             memcpy(&count, count_bytes, sizeof(int));
+            int tag;
+            memcpy(&tag, tag_bytes, sizeof(int));
+            printf("Got a new message %d %d\n", count, tag);
             uint8_t* message=malloc(count);
             chrecv(recv_fd, message, count);
             pthread_mutex_lock(&buffer_mutexes[source]);
