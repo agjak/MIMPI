@@ -221,6 +221,7 @@ void *buffer_messages(void* source_pt)
     int source= *((int*)source_pt);
     free(source_pt);
     printf("%d %d \n", source, MIMPI_World_rank());
+    fflush(stdout);
     return 0;
 }
 
@@ -267,7 +268,7 @@ void MIMPI_Finalize() {
         if(i!=rank)
         {
             ASSERT_ZERO(pthread_mutex_destroy(&buffer_mutexes[i]));
-            
+            ASSERT_ZERO(pthread_join(buffer_threads[i],NULL));
         }
     }
     free(buffer_mutexes);
