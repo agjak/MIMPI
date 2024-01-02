@@ -5,6 +5,8 @@
 #include "channel.h"
 #include "mimpi.h"
 #include "mimpi_common.h"
+#include <string.h>
+#include <pthread.h>
 
 uint8_t ***message_buffers;
 pthread_mutex_t *buffer_mutexes;
@@ -307,7 +309,7 @@ MIMPI_Retcode MIMPI_Send(
     free(tag_bytes);
     for(int i=0; i<count; i++)
     {
-        data_to_send[i+8]=data[i];
+        data_to_send[i+8]=((uint8_t*)data)[i];
     }
 
     char* name = malloc(32*sizeof(char));
