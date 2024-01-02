@@ -250,6 +250,7 @@ void *buffer_messages(void* source_pt)
             }
             free(message_buffers[source]);
             message_buffers[source]=NULL;
+            messages_buffered[source]=-1;
             pthread_mutex_unlock(&(buffer_mutexes[source]));
             return 0;
         }
@@ -430,8 +431,9 @@ MIMPI_Retcode MIMPI_Recv(
     }
     
     pthread_mutex_lock(&buffer_mutexes[source]);
-    if(message_buffers[source]==NULL)
+    if(messages_buffered[source]==-1)
     {
+        pthread_mutex_unlock(&buffer_mutexes[source]);
         return MIMPI_ERROR_REMOTE_FINISHED;
     }
     else
