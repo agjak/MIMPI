@@ -248,7 +248,7 @@ void *buffer_messages(void* source_pt)
             }
             free(message_buffers[source]);
             message_buffers[source]=NULL;
-            pthread_mutex_unlock(&buffer_messages[source]);
+            pthread_mutex_unlock(&(buffer_messages[source]));
             return 0;
         }
         else
@@ -262,7 +262,7 @@ void *buffer_messages(void* source_pt)
             int free_space = -1;
             for(int i=0; i<((sizeof(message_buffers[source]))/(sizeof(uint8_t*))); i++)
             {
-                if(buffer_messages[i]==NULL)
+                if((buffer_messages[i])==NULL)
                 {
                     free_space=i;
                     break;
