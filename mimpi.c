@@ -450,7 +450,7 @@ MIMPI_Retcode MIMPI_Recv(
                     for(int j=0; j<sizeof(int); j++)
                     {
                         count_bytes[j]=message_buffers[source][i][j];
-                        tag_bytes[j+sizeof(int)]=message_buffers[source][i][j+sizeof(int)];
+                        tag_bytes[j]=message_buffers[source][i][j+sizeof(int)];
                     }
                     int mess_count=0;
                     memcpy(&mess_count, count_bytes, sizeof(int));
