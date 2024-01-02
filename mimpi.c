@@ -218,7 +218,8 @@ MIMPI_Retcode MIMPI_send_sync_signal_to_both_children(int rank, int size, char s
 
 void *buffer_messages(void* source_pt)
 {
-    int source= *(int*)source_pt;
+    int source= *((int*)source_pt);
+    free(source_pt);
     printf("%d %d \n", source, MIMPI_World_rank());
     return 0;
 }
@@ -243,9 +244,11 @@ void MIMPI_Init(bool enable_deadlock_detection) {
             ASSERT_ZERO(pthread_mutex_init(&buffer_mutexes[i], &attr));
             ASSERT_ZERO(pthread_mutexattr_destroy(&attr));
 
+            int* source_pt = malloc(sizeof(int));
+            *source_pt = i;
             pthread_attr_t attr2;
             ASSERT_ZERO(pthread_attr_init(&attr2));
-            ASSERT_ZERO(pthread_create(&buffer_threads[i], &attr2, buffer_messages, &i));
+            ASSERT_ZERO(pthread_create(&buffer_threads[i], &attr2, buffer_messages, source_pt));
             ASSERT_ZERO(pthread_attr_destroy(&attr2));
         }
     }
