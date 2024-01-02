@@ -11,6 +11,7 @@
 uint8_t ***message_buffers;
 pthread_mutex_t *buffer_mutexes;
 pthread_t *buffer_threads;
+pthread_cond_t *buffer_conditions;
 
 
 MIMPI_Retcode MIMPI_sync_send(
@@ -220,8 +221,76 @@ void *buffer_messages(void* source_pt)
 {
     int source= *((int*)source_pt);
     free(source_pt);
-    printf("%d %d \n", source, MIMPI_World_rank());
-    fflush(stdout);
+    message_buffers[source]=malloc(sizeof(uint8_t*));
+    message_buffers[source][0]=NULL;
+
+    char* name = malloc(32*sizeof(char));
+    sprintf(name, "MIMPI_channel_from_%d",source);
+    int recv_fd=atoi(getenv(name));
+    free(name);
+
+    uint8_t* count_bytes=malloc(sizeof(int));
+    uint8_t* tag_bytes=malloc(sizeof(int));
+
+    while(true)
+    {
+        if(chrecv(recv_fd, count_bytes, sizeof(int))==0)
+        {
+            free(count_bytes);
+            free(count_tag);
+            pthread_mutex_lock(buffer_mutexes[source]);
+            for(int i=0; i<(sizeof(message_buffers[source])/sizeof(uint8_t*)); i++)
+            {
+                if(message_buffers[source][i]!=NULL)
+                {
+                    free(message_buffers[source][i]);
+                }
+            }
+            free(message_buffers[source]);
+            message_buffers[source]=NULL;
+            pthread_mutex_unlock(buffer_messages[source]);
+            return 0;
+        }
+        else
+        {
+            chrecv(recv_fd, tag_bytes, sizeof(int));
+            int count;
+            memcpy(&count, count_bytes, sizeof(int));
+            uint8_t* message=malloc(count);
+            chrecv(recv_fd, message, count);
+            pthread_mutex_lock(buffer_mutexes[source]);
+            int free_space = -1;
+            for(int i=0; i<(sizeof(message_buffers[source])/sizeof(uint8_t*)); i++)
+            {
+                if(buffer_messages[i]==NULL)
+                {
+                    free_space=i;
+                    break;
+                }
+            }
+            if(free_space==-1)
+            {
+                realloc(message_buffers[source], sizeof(message_buffers[source])+sizeof(uint8_t*));
+                free_space=(sizeof(message_buffers[source])/sizeof(uint8_t*))-1;
+            }
+            message_buffers[source][free_space] = malloc(count+2*sizeof(int));
+
+            for(int i=0; i<sizeof(int); i++)
+            {
+                message_buffers[source][free_space][i]=count_bytes[i];
+                message_buffers[source][free_space][i+sizeof(int)]=tag_bytes[i];
+            }
+            for(int i=0; i<count; i++)
+            {
+                message_buffers[source][free_space][i+2*sizeof(int)]=message[i];
+            }
+            pthread_mutex_unlock(buffer_mutexes[source]);
+            free(message);
+            free(tag_bytes);
+            free(count_bytes);
+        }
+    }
+
     return 0;
 }
 
@@ -235,6 +304,7 @@ void MIMPI_Init(bool enable_deadlock_detection) {
     message_buffers=malloc(size*sizeof(uint8_t**));
     buffer_mutexes=malloc(size*sizeof(pthread_mutex_t));
     buffer_threads=malloc(size*sizeof(pthread_t));
+    buffer_conditions=malloc(size*sizeof(pthread_cond_t));
 
     for(int i=0; i<size; i++)
     {
@@ -251,6 +321,8 @@ void MIMPI_Init(bool enable_deadlock_detection) {
             ASSERT_ZERO(pthread_attr_init(&attr2));
             ASSERT_ZERO(pthread_create(&buffer_threads[i], &attr2, buffer_messages, source_pt));
             ASSERT_ZERO(pthread_attr_destroy(&attr2));
+
+            ASSERT_ZERO(pthread_mutex_init(&buffer_conditions[i], NULL));
         }
     }
 
@@ -268,7 +340,7 @@ void MIMPI_Finalize() {
         if(i!=rank)
         {
             ASSERT_ZERO(pthread_mutex_destroy(&buffer_mutexes[i]));
-            ASSERT_ZERO(pthread_join(buffer_threads[i],NULL));
+            ASSERT_ZERO(pthread_cancel(buffer_threads[i]));
         }
     }
     free(buffer_mutexes);
@@ -299,23 +371,23 @@ MIMPI_Retcode MIMPI_Send(
     {
         return MIMPI_ERROR_NO_SUCH_RANK;
     }
-    uint8_t *count_bytes=malloc(4);
+    uint8_t *count_bytes=malloc(sizeof(int));
     memcpy(count_bytes, &count, sizeof(int));
-    uint8_t *tag_bytes=malloc(4);
+    uint8_t *tag_bytes=malloc(sizeof(int));
     memcpy(tag_bytes, &tag, sizeof(int));
 
-    uint8_t *data_to_send=malloc((count+8));
+    uint8_t *data_to_send=malloc((count+2*sizeof(int)));
 
-    for(int i=0; i<4; i++)
+    for(int i=0; i<sizeof(int); i++)
     {
         data_to_send[i]=count_bytes[i];
-        data_to_send[i+4]=tag_bytes[i];
+        data_to_send[i+sizeof(int)]=tag_bytes[i];
     }
     free(count_bytes);
     free(tag_bytes);
     for(int i=0; i<count; i++)
     {
-        data_to_send[i+8]=((uint8_t*)data)[i];
+        data_to_send[i+2*sizeof(int)]=((uint8_t*)data)[i];
     }
 
     char* name = malloc(32*sizeof(char));
@@ -323,7 +395,7 @@ MIMPI_Retcode MIMPI_Send(
     int send_fd=atoi(getenv(name));
     free(name);
     
-    if(chsend(send_fd, data_to_send, count+8)==-1)
+    if(chsend(send_fd, data_to_send, count+2*sizeof(int))==-1)
     {
         free(data_to_send);
         return MIMPI_ERROR_REMOTE_FINISHED;
@@ -349,18 +421,46 @@ MIMPI_Retcode MIMPI_Recv(
     {
         return MIMPI_ERROR_NO_SUCH_RANK;
     }
-    char* name = malloc(32*sizeof(char));
-    sprintf(name, "MIMPI_channel_from_%d",source);
-    int recv_fd=atoi(getenv(name));
-    free(name);
-
-    if(chrecv(recv_fd, data, count)==0)
+    
+    pthread_mutex_lock(buffer_mutexes[source]);
+    if(message_buffers[source]==NULL)
     {
         return MIMPI_ERROR_REMOTE_FINISHED;
     }
     else
     {
-        return MIMPI_SUCCESS;
+        while(true)
+        {
+            for(int i=0; i<sizeof(message_buffers[source]/sizeof(uint8_t*)); i++)
+            {
+                if(message_buffers[source][i]!=NULL)
+                {
+                    uint8_t *count_bytes=malloc(sizeof(int));
+                    uint8_t *tag_bytes=malloc(sizeof(int));
+                    for(int j=0; j<sizeof(int); j++)
+                    {
+                        count_bytes[j]=message_buffers[source][i][j];
+                        tag_bytes[j+sizeof(int)]=message_buffers[source][i][j+sizeof(int)];
+                    }
+                    int mess_count;
+                    memcpy(&count, count_bytes, sizeof(int));
+                    int mess_tag;
+                    memcpy(&tag, tag_bytes, sizeof(int));
+                    if(count==mess_count && tag==mess_tag)
+                    {
+                        for(int j=0; j<count; j++)
+                        {
+                            ((uint8_t*)data)[j]=message_buffers[source][i][j+2*sizeof(int)];
+                        }
+                        pthread_mutex_unlock(buffer_mutexes[source]);
+                        return MIMPI_SUCCESS;
+                    }
+                }
+            }
+            pthread_cond_wait(buffer_conditions[source],buffer_mutexes[source]);
+        }
+        
+        
     }
 }
 
