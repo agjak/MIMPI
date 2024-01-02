@@ -255,6 +255,7 @@ void *buffer_messages(void* source_pt)
         }
         else
         {
+            printf("Got a new message\n");
             chrecv(recv_fd, tag_bytes, sizeof(int));
             int count;
             memcpy(&count, count_bytes, sizeof(int));
@@ -289,6 +290,7 @@ void *buffer_messages(void* source_pt)
             }
             pthread_mutex_unlock(&buffer_mutexes[source]);
             pthread_cond_signal(&buffer_conditions[source]);
+            printf("Letting folks know about the message\n");
             free(message);
         }
     }
