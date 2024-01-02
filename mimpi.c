@@ -250,7 +250,7 @@ void *buffer_messages(void* source_pt)
             }
             free(message_buffers[source]);
             message_buffers[source]=NULL;
-            pthread_mutex_unlock(&(message_buffers[source]));
+            pthread_mutex_unlock(&(buffer_mutexes[source]));
             return 0;
         }
         else
@@ -448,9 +448,9 @@ MIMPI_Retcode MIMPI_Recv(
                         count_bytes[j]=message_buffers[source][i][j];
                         tag_bytes[j+sizeof(int)]=message_buffers[source][i][j+sizeof(int)];
                     }
-                    int mess_count;
+                    int mess_count=0;
                     memcpy(&count, count_bytes, sizeof(int));
-                    int mess_tag;
+                    int mess_tag=0;
                     memcpy(&tag, tag_bytes, sizeof(int));
                     if(count==mess_count && tag==mess_tag)
                     {
