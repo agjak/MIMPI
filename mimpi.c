@@ -454,6 +454,7 @@ MIMPI_Retcode MIMPI_Recv(
                     memcpy(&count, count_bytes, sizeof(int));
                     int mess_tag=0;
                     memcpy(&tag, tag_bytes, sizeof(int));
+                    printf("&d &d &d &d\n" tag, mess_tag, count, mess_count);
                     if(count==mess_count && tag==mess_tag)
                     {
                         for(int j=0; j<count; j++)
