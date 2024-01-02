@@ -237,9 +237,9 @@ void *buffer_messages(void* source_pt)
         if(chrecv(recv_fd, count_bytes, sizeof(int))==0)
         {
             free(count_bytes);
-            free(count_tag);
-            pthread_mutex_lock(buffer_mutexes[source]);
-            for(int i=0; i<(sizeof(message_buffers[source])/sizeof(uint8_t*)); i++)
+            free(tag_bytes);
+            pthread_mutex_lock(&buffer_mutexes[source]);
+            for(int i=0; i<((sizeof(message_buffers[source]))/(sizeof(uint8_t*))); i++)
             {
                 if(message_buffers[source][i]!=NULL)
                 {
@@ -248,7 +248,7 @@ void *buffer_messages(void* source_pt)
             }
             free(message_buffers[source]);
             message_buffers[source]=NULL;
-            pthread_mutex_unlock(buffer_messages[source]);
+            pthread_mutex_unlock(&buffer_messages[source]);
             return 0;
         }
         else
@@ -258,9 +258,9 @@ void *buffer_messages(void* source_pt)
             memcpy(&count, count_bytes, sizeof(int));
             uint8_t* message=malloc(count);
             chrecv(recv_fd, message, count);
-            pthread_mutex_lock(buffer_mutexes[source]);
+            pthread_mutex_lock(&buffer_mutexes[source]);
             int free_space = -1;
-            for(int i=0; i<(sizeof(message_buffers[source])/sizeof(uint8_t*)); i++)
+            for(int i=0; i<((sizeof(message_buffers[source]))/(sizeof(uint8_t*))); i++)
             {
                 if(buffer_messages[i]==NULL)
                 {
@@ -271,7 +271,7 @@ void *buffer_messages(void* source_pt)
             if(free_space==-1)
             {
                 realloc(message_buffers[source], sizeof(message_buffers[source])+sizeof(uint8_t*));
-                free_space=(sizeof(message_buffers[source])/sizeof(uint8_t*))-1;
+                free_space=((sizeof(message_buffers[source]))/(sizeof(uint8_t*)))-1;
             }
             message_buffers[source][free_space] = malloc(count+2*sizeof(int));
 
@@ -284,7 +284,7 @@ void *buffer_messages(void* source_pt)
             {
                 message_buffers[source][free_space][i+2*sizeof(int)]=message[i];
             }
-            pthread_mutex_unlock(buffer_mutexes[source]);
+            pthread_mutex_unlock(&buffer_mutexes[source]);
             free(message);
             free(tag_bytes);
             free(count_bytes);
@@ -322,7 +322,7 @@ void MIMPI_Init(bool enable_deadlock_detection) {
             ASSERT_ZERO(pthread_create(&buffer_threads[i], &attr2, buffer_messages, source_pt));
             ASSERT_ZERO(pthread_attr_destroy(&attr2));
 
-            ASSERT_ZERO(pthread_mutex_init(&buffer_conditions[i], NULL));
+            ASSERT_ZERO(pthread_cond_init(&buffer_conditions[i], NULL));
         }
     }
 
@@ -422,7 +422,7 @@ MIMPI_Retcode MIMPI_Recv(
         return MIMPI_ERROR_NO_SUCH_RANK;
     }
     
-    pthread_mutex_lock(buffer_mutexes[source]);
+    pthread_mutex_lock(&buffer_mutexes[source]);
     if(message_buffers[source]==NULL)
     {
         return MIMPI_ERROR_REMOTE_FINISHED;
@@ -431,7 +431,7 @@ MIMPI_Retcode MIMPI_Recv(
     {
         while(true)
         {
-            for(int i=0; i<sizeof(message_buffers[source]/sizeof(uint8_t*)); i++)
+            for(int i=0; i<(sizeof(message_buffers[source]))/(sizeof(uint8_t*)); i++)
             {
                 if(message_buffers[source][i]!=NULL)
                 {
@@ -452,12 +452,12 @@ MIMPI_Retcode MIMPI_Recv(
                         {
                             ((uint8_t*)data)[j]=message_buffers[source][i][j+2*sizeof(int)];
                         }
-                        pthread_mutex_unlock(buffer_mutexes[source]);
+                        pthread_mutex_unlock(&buffer_mutexes[source]);
                         return MIMPI_SUCCESS;
                     }
                 }
             }
-            pthread_cond_wait(buffer_conditions[source],buffer_mutexes[source]);
+            pthread_cond_wait(&buffer_conditions[source], &buffer_mutexes[source]);
         }
         
         
