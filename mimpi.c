@@ -346,7 +346,7 @@ void MIMPI_Finalize() {
     {
         if(i!=rank)
         {
-            ASSERT_ZERO(pthread_mutex_destroy(&buffer_mutexes[i]));
+            ASSERT_ZERO(pthread_mutex_destroy(buffer_mutexes[i]));
             ASSERT_ZERO(pthread_cancel(buffer_threads[i]));
         }
     }
