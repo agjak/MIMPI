@@ -338,7 +338,7 @@ void MIMPI_Finalize() {
     int size = MIMPI_World_size();
 
     MIMPI_close_all_program_channels(rank,size);
-    fprintf("Finalizing\n");
+    printf("Finalizing\n");
     
     for(int i=0; i<size; i++)
     {
@@ -348,7 +348,7 @@ void MIMPI_Finalize() {
             ASSERT_ZERO(pthread_cancel(buffer_threads[i]));
         }
     }
-    fprintf("Finalized\n");
+    printf("Finalized\n");
     free(buffer_mutexes);
     free(message_buffers);
     
