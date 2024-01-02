@@ -6,7 +6,9 @@
 #include "mimpi.h"
 #include "mimpi_common.h"
 
-
+uint8_t ***message_buffers;
+pthread_mutex_t *buffer_mutexes;
+pthread_t *buffer_threads;
 
 
 MIMPI_Retcode MIMPI_sync_send(
@@ -212,11 +214,37 @@ MIMPI_Retcode MIMPI_send_sync_signal_to_both_children(int rank, int size, char s
     }
 }
 
-
+void *buffer_messages(void* source)
+{
+    return 0;
+}
 
 
 void MIMPI_Init(bool enable_deadlock_detection) {
     channels_init();
+
+    int rank = MIMPI_World_rank();
+    int size = MIMPI_World_size();
+
+    message_buffers=malloc(size*sizeof(uint8_t**));
+    buffer_mutexes=malloc(size*sizeof(pthread_mutex_t));
+    buffer_threads=malloc(size*sizeof(pthread_t));
+
+    for(int i=0; i<size; i++)
+    {
+        if(i!=rank)
+        {
+            pthread_mutexattr_t attr;
+            ASSERT_ZERO(pthread_mutexattr_init(&attr));
+            ASSERT_ZERO(pthread_mutex_init(&buffer_mutexes[i], &attr));
+            ASSERT_ZERO(pthread_mutexattr_destroy(&attr));
+
+            pthread_attr_t attr2;
+            ASSERT_ZERO(pthread_attr_init(&attr2));
+            ASSERT_ZERO(pthread_create(&buffer_threads[i], &attr2, buffer_messages, &i));
+
+        }
+    }
 
 }
 
@@ -227,6 +255,16 @@ void MIMPI_Finalize() {
 
     MIMPI_close_all_program_channels(rank,size);
     
+    for(int i=0; i<size; i++)
+    {
+        if(i!=rank)
+        {
+            ASSERT_ZERO(pthread_mutex_destroy(&buffer_mutexes[i]));
+            
+        }
+    }
+    free(buffer_mutexes);
+    free(message_buffers);
     
     channels_finalize();
 }
@@ -253,17 +291,38 @@ MIMPI_Retcode MIMPI_Send(
     {
         return MIMPI_ERROR_NO_SUCH_RANK;
     }
+    uint8_t count_bytes[4];
+    memcpy(count_bytes, &count, sizeof(int));
+    uint8_t tag_bytes[4];
+    memcpy(tag_bytes, &tag, sizeof(int));
+
+    uint8_t *data_to_send=malloc((count+8));
+
+    for(int i=0; i<4; i++)
+    {
+        data_to_send[i]=count_bytes[i];
+        data_to_send[i+4]=tag_bytes[i];
+    }
+    free(count_bytes);
+    free(tag_bytes);
+    for(int i=0; i<count; i++)
+    {
+        data_to_send[i+8]=data[i];
+    }
+
     char* name = malloc(32*sizeof(char));
     sprintf(name, "MIMPI_channel_to_%d",destination);
     int send_fd=atoi(getenv(name));
     free(name);
     
-    if(chsend(send_fd, data, count)==-1)
+    if(chsend(send_fd, data_to_send, count+8)==-1)
     {
+        free(data_to_send);
         return MIMPI_ERROR_REMOTE_FINISHED;
     }
     else
     {
+        free(data_to_send);
         return MIMPI_SUCCESS;
     }
 }
