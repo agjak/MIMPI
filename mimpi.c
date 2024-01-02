@@ -338,7 +338,6 @@ void MIMPI_Finalize() {
     int size = MIMPI_World_size();
 
     MIMPI_close_all_program_channels(rank,size);
-    printf("Finalizing\n");
     
     for(int i=0; i<size; i++)
     {
@@ -348,7 +347,6 @@ void MIMPI_Finalize() {
             ASSERT_ZERO(pthread_cancel(buffer_threads[i]));
         }
     }
-    printf("Finalized\n");
     free(buffer_mutexes);
     free(message_buffers);
     
@@ -437,6 +435,7 @@ MIMPI_Retcode MIMPI_Recv(
     {
         while(true)
         {
+            printf("Looking for the message\n");
             for(int i=0; i<messages_buffered[source]; i++)
             {
                 if(message_buffers[source][i]!=NULL)
@@ -459,6 +458,7 @@ MIMPI_Retcode MIMPI_Recv(
                             ((uint8_t*)data)[j]=message_buffers[source][i][j+2*sizeof(int)];
                         }
                         pthread_mutex_unlock(&buffer_mutexes[source]);
+                        printf("Found the message\n");
                         return MIMPI_SUCCESS;
                     }
                 }
