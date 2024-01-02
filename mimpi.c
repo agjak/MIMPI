@@ -436,6 +436,7 @@ MIMPI_Retcode MIMPI_Recv(
     {
         while(true)
         {
+            printf("Looking for the message\n");
             for(int i=0; i<messages_buffered[source]; i++)
             {
                 if(message_buffers[source][i]!=NULL)
@@ -458,6 +459,7 @@ MIMPI_Retcode MIMPI_Recv(
                             ((uint8_t*)data)[j]=message_buffers[source][i][j+2*sizeof(int)];
                         }
                         pthread_mutex_unlock(&buffer_mutexes[source]);
+                        printf("Found the message\n");
                         return MIMPI_SUCCESS;
                     }
                 }
