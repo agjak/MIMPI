@@ -642,6 +642,10 @@ MIMPI_Retcode MIMPI_Bcast(
                         exit(0);
                     }
                 }
+                for(int i=0; i<size-1; i++)
+                {
+                    ASSERT_SYS_OK(wait(NULL));
+                }
             }
             else
             {
@@ -713,6 +717,10 @@ MIMPI_Retcode MIMPI_Bcast(
                                 }
                                 exit(0);
                             }
+                        }
+                        for(int i=0; i<size-1; i++)
+                        {
+                            ASSERT_SYS_OK(wait(NULL));
                         }
                     }
                     else
