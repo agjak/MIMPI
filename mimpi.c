@@ -13,6 +13,7 @@ pthread_mutex_t *buffer_mutexes;
 pthread_t *buffer_threads;
 pthread_cond_t *buffer_conditions;
 int *messages_buffered;
+bool *process_left_mimpi;
 
 
 MIMPI_Retcode MIMPI_sync_send(
@@ -241,16 +242,7 @@ void *buffer_messages(void* source_pt)
             free(count_bytes);
             free(tag_bytes);
             pthread_mutex_lock(&buffer_mutexes[source]);
-            for(int i=0; i<messages_buffered[source]; i++)
-            {
-                if(message_buffers[source][i]!=NULL)
-                {
-                    free(message_buffers[source][i]);
-                }
-            }
-            free(message_buffers[source]);
-            message_buffers[source]=NULL;
-            messages_buffered[source]=-1;
+            process_left_mimpi[source]=true;
             pthread_mutex_unlock(&(buffer_mutexes[source]));
             return 0;
         }
@@ -311,6 +303,7 @@ void MIMPI_Init(bool enable_deadlock_detection) {
     buffer_threads=malloc(size*sizeof(pthread_t));
     buffer_conditions=malloc(size*sizeof(pthread_cond_t));
     messages_buffered=malloc(size*sizeof(int));
+    process_left_mimpi=malloc(size*sizeof(bool));
 
     for(int i=0; i<size; i++)
     {
@@ -331,6 +324,7 @@ void MIMPI_Init(bool enable_deadlock_detection) {
             ASSERT_ZERO(pthread_cond_init(&buffer_conditions[i], NULL));
 
             messages_buffered[i]=0;
+            process_left_mimpi[i]=false;
         }
     }
 
@@ -431,46 +425,43 @@ MIMPI_Retcode MIMPI_Recv(
     }
     
     pthread_mutex_lock(&buffer_mutexes[source]);
-    if(messages_buffered[source]==-1)
+
+    while(true)
     {
-        pthread_mutex_unlock(&buffer_mutexes[source]);
-        return MIMPI_ERROR_REMOTE_FINISHED;
-    }
-    else
-    {
-        while(true)
+        for(int i=0; i<messages_buffered[source]; i++)
         {
-            for(int i=0; i<messages_buffered[source]; i++)
+            if(message_buffers[source][i]!=NULL)
             {
-                if(message_buffers[source][i]!=NULL)
+                uint8_t *count_bytes=malloc(sizeof(int));
+                uint8_t *tag_bytes=malloc(sizeof(int));
+                for(int j=0; j<sizeof(int); j++)
                 {
-                    uint8_t *count_bytes=malloc(sizeof(int));
-                    uint8_t *tag_bytes=malloc(sizeof(int));
-                    for(int j=0; j<sizeof(int); j++)
+                    count_bytes[j]=message_buffers[source][i][j];
+                    tag_bytes[j]=message_buffers[source][i][j+sizeof(int)];
+                }
+                int mess_count=0;
+                memcpy(&mess_count, count_bytes, sizeof(int));
+                int mess_tag=0;
+                memcpy(&mess_tag, tag_bytes, sizeof(int));
+                if(count==mess_count && (tag==mess_tag || tag==0))
+                {
+                    for(int j=0; j<count; j++)
                     {
-                        count_bytes[j]=message_buffers[source][i][j];
-                        tag_bytes[j]=message_buffers[source][i][j+sizeof(int)];
+                        ((uint8_t*)data)[j]=message_buffers[source][i][j+2*sizeof(int)];
                     }
-                    int mess_count=0;
-                    memcpy(&mess_count, count_bytes, sizeof(int));
-                    int mess_tag=0;
-                    memcpy(&mess_tag, tag_bytes, sizeof(int));
-                    if(count==mess_count && (tag==mess_tag || tag==0))
-                    {
-                        for(int j=0; j<count; j++)
-                        {
-                            ((uint8_t*)data)[j]=message_buffers[source][i][j+2*sizeof(int)];
-                        }
-                        pthread_mutex_unlock(&buffer_mutexes[source]);
-                        return MIMPI_SUCCESS;
-                    }
+                    pthread_mutex_unlock(&buffer_mutexes[source]);
+                    return MIMPI_SUCCESS;
                 }
             }
-            pthread_cond_wait(&buffer_conditions[source], &buffer_mutexes[source]);
         }
-        
-        
+        if(process_left_mimpi[source]==true)
+        {
+            pthread_mutex_unlock(&buffer_mutexes[source]);
+            return MIMPI_ERROR_REMOTE_FINISHED;
+        }
+        pthread_cond_wait(&buffer_conditions[source], &buffer_mutexes[source]);
     }
+
 }
 
 MIMPI_Retcode MIMPI_Barrier() 
