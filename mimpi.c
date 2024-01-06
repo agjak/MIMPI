@@ -932,6 +932,7 @@ MIMPI_Retcode MIMPI_Reduce(
             free(messch2);
             free(messpar);
             MIMPI_send_sync_signal_to_both_children(rank, size, 'F');   //FINISHED
+            printf("1 %d\n", rank);
             return MIMPI_ERROR_REMOTE_FINISHED;
         }
         else    //messch1[0]=='D' && messch2[0]=='D'
@@ -968,6 +969,7 @@ MIMPI_Retcode MIMPI_Reduce(
             {
                 MIMPI_send_sync_signal_to_both_children(rank,size,'F');
                 free(messpar);
+                printf("2 %d\n", rank);
                 return MIMPI_ERROR_REMOTE_FINISHED;
             }
             else
@@ -975,6 +977,7 @@ MIMPI_Retcode MIMPI_Reduce(
                 MIMPI_sync_recv(messpar,(rank-1)/2);
                 MIMPI_send_sync_signal_to_both_children(rank,size,'F');
                 free(messpar);
+                printf("3 %d\n", rank);
                 return MIMPI_ERROR_REMOTE_FINISHED;
             }
             
@@ -989,6 +992,7 @@ MIMPI_Retcode MIMPI_Reduce(
             {
                 MIMPI_send_sync_signal_to_both_children(rank,size,'F');
                 free(messpar);
+                printf("4 %d\n", rank);
                 return MIMPI_ERROR_REMOTE_FINISHED;
             }
             else
@@ -998,6 +1002,7 @@ MIMPI_Retcode MIMPI_Reduce(
                 {
                     MIMPI_send_sync_signal_to_both_children(rank,size,'F');
                     free(messpar);
+                    printf("5 %d\n", rank);
                     return MIMPI_ERROR_REMOTE_FINISHED;
                 }
                 else    //messpar[0]=='D'
