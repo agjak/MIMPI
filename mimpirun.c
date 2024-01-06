@@ -31,6 +31,7 @@ int main(int argc, char* argv[]) {
         write_sync_channels_between_programs[i] = malloc(world_size*sizeof(int));
     }
 
+    int free_fd=20;
     for(int i=0; i<world_size; i++)
     {
         for(int j=0; j<world_size; j++)
@@ -46,11 +47,23 @@ int main(int argc, char* argv[]) {
             {
                 int fds[2];
                 ASSERT_SYS_OK(channel(fds));
-                read_channels_between_programs[i][j]=fds[0];    //read and write ends of pipes from the ith process to the jth
-                write_channels_between_programs[i][j]=fds[1];   //process are saved here
+                dup2(fds[0],free_fd);
+                close(fds[0]);
+                read_channels_between_programs[i][j]=free_fd;    //read and write ends of pipes from the ith process to the jth
+                free_fd++;                                      //process are saved here
+                dup2(fds[1],free_fd);
+                close(fds[1]);
+                write_channels_between_programs[i][j]=free_fd; 
+                free_fd++;  
                 ASSERT_SYS_OK(channel(fds));
-                read_sync_channels_between_programs[i][j]=fds[0];       //the first pipe is for data transfer, the second is for synchronization
-                write_sync_channels_between_programs[i][j]=fds[1];   
+                dup2(fds[0],free_fd);
+                close(fds[0]);
+                read_sync_channels_between_programs[i][j]=free_fd;       //the first pipe is for data transfer, the second is for synchronization
+                free_fd++;
+                dup2(fds[1],free_fd);
+                close(fds[1]);
+                write_sync_channels_between_programs[i][j]=free_fd;
+                free_fd++;   
             }
             
         }
