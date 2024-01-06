@@ -264,7 +264,22 @@ void *buffer_messages(void* source_pt)
             int tag;
             memcpy(&tag, tag_bytes, sizeof(int));
             uint8_t* message=malloc(count);
-            chrecv(recv_fd, message, count);
+
+            if(count<=512)
+            {
+                chrecv(recv_fd, message, count);
+            }
+            else
+            {
+                int i=0;
+                for(; i<count/512; i++)
+                {
+                    chrecv(recv_fd,&message[512*i],512);
+                }
+                chrecv(recv_fd,&message[512*i],size%512);
+            }
+            
+
             pthread_mutex_lock(&buffer_mutexes[source]);
             int free_space = -1;
             for(int i=0; i<messages_buffered[source]; i++)
