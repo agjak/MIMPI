@@ -342,6 +342,12 @@ void MIMPI_Finalize() {
         if(i!=rank)
         {
             pthread_cond_signal(&buffer_conditions[i]);
+        }
+    }
+    for(int i=0; i<size; i++)
+    {
+        if(i!=rank)
+        {
             ASSERT_ZERO(pthread_join(buffer_threads[i],NULL));
             pthread_mutex_destroy(&buffer_mutexes[i]);
             pthread_cond_destroy(&buffer_conditions[i]);
