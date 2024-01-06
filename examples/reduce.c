@@ -15,10 +15,6 @@ int main(int argc, char **argv) {
     int world_size = MIMPI_World_size();
     int rank = MIMPI_World_rank();
     {
-        if(rank==0)
-        {
-            printf("1\n");
-        }
         uint8_t data[4] = {rank + 1, rank + 2, 2 * rank, root};
         uint8_t recv_data[4] = {0, 0, 0, 0};
         ASSERT_MIMPI_OK(MIMPI_Reduce(data, recv_data, 4, MIMPI_MAX, root));
@@ -32,10 +28,6 @@ int main(int argc, char **argv) {
         }
     }
     {
-        if(rank==0)
-        {
-            printf("2\n");
-        }
         uint8_t data[4] = {rank + 1, rank + 2, 2 * rank, 1};
         uint8_t recv_data[4] = {0, 0, 0, 0};
         ASSERT_MIMPI_OK(MIMPI_Reduce(data, recv_data, 4, MIMPI_MIN, root));
@@ -45,14 +37,11 @@ int main(int argc, char **argv) {
             assert(recv_data[0] == 1);
             assert(recv_data[1] == 2);
             assert(recv_data[2] == 0);
+            printf("%d\n",recv_data[3]);
             assert(recv_data[3] == 1);
         }
     }
     {
-        if(rank==0)
-        {
-            printf("3\n");
-        }
         uint8_t data[4] = {rank + 1, 1, 2 * rank, 0};
         uint8_t recv_data[4] = {0, 0, 0, 0};
         ASSERT_MIMPI_OK(MIMPI_Reduce(data, recv_data, 4, MIMPI_SUM, root));
@@ -66,9 +55,5 @@ int main(int argc, char **argv) {
         }
     }
     MIMPI_Finalize();
-    if(rank==0)
-    {
-        printf("root endin\n");
-    }
     return test_success();
 }
