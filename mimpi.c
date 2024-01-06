@@ -276,7 +276,7 @@ void *buffer_messages(void* source_pt)
                 {
                     chrecv(recv_fd,&message[512*i],512);
                 }
-                chrecv(recv_fd,&message[512*i],size%512);
+                chrecv(recv_fd,&message[512*i],count%512);
             }
             
 
