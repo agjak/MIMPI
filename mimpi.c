@@ -268,7 +268,7 @@ void *buffer_messages(void* source_pt)
                 chrecv(recv_fd, message, count);
                 if(tag==-2)
                 {
-                    printf("End of received message: %d\n",message[count-1]);
+                    printf("End of received message from %d: %d\n", source, message[count-1]);
                 }
             }
             else
