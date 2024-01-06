@@ -266,10 +266,6 @@ void *buffer_messages(void* source_pt)
             if(count<=512)
             {
                 chrecv(recv_fd, message, count);
-                if(tag==-2)
-                {
-                    printf("End of received message from %d: %d\n", source, message[count-1]);
-                }
             }
             else
             {
@@ -475,6 +471,8 @@ MIMPI_Retcode MIMPI_Recv(
                     {
                         ((uint8_t*)data)[j]=message_buffers[source][i][j+2*sizeof(int)];
                     }
+                    free(message_buffers[source][i]);
+                    message_buffers[source][i]=NULL;
                     pthread_mutex_unlock(&buffer_mutexes[source]);
                     return MIMPI_SUCCESS;
                 }
@@ -905,10 +903,6 @@ MIMPI_Retcode MIMPI_Reduce(
         }
         else if(messch1[0]=='D' && messch2[0]=='D')
         {
-            if(rank==0)
-            {
-                printf("%d %d %d\n",child_1_data[3], child_2_data[3], ((uint8_t*)send_data)[3]);
-            }
             perform_MIMPI_Op_3(child_1_data, child_2_data, (uint8_t*)send_data, data_to_send, count, op);
         }
     }
@@ -954,9 +948,7 @@ MIMPI_Retcode MIMPI_Reduce(
             {
                 for(int i=0; i<count; i++)
                 {
-                    printf("%d\n",data_to_send[i]);
                     ((uint8_t*)recv_data)[i]=data_to_send[i];
-                    printf("%d\n",((uint8_t*)recv_data)[i]);
                 }
             }
             else
