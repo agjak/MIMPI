@@ -237,7 +237,7 @@ void *buffer_messages(void* source_pt)
 
     while(true)
     {
-        if(chrecv(recv_fd, count_bytes, sizeof(int))==0)
+        if(chrecv(recv_fd, count_bytes, sizeof(int))<=0)
         {
             free(count_bytes);
             free(tag_bytes);
@@ -337,13 +337,6 @@ void MIMPI_Finalize() {
 
     MIMPI_close_all_program_channels(rank,size);
     
-    for(int i=0; i<size; i++)
-    {
-        if(i!=rank)
-        {
-            pthread_cond_signal(&buffer_conditions[i]);
-        }
-    }
     for(int i=0; i<size; i++)
     {
         if(i!=rank)
