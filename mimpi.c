@@ -873,8 +873,14 @@ MIMPI_Retcode MIMPI_Reduce(
     MIMPI_Op op,
     int root
 ) {
+    
     int rank = MIMPI_World_rank();
     int size = MIMPI_World_size();
+    if(rank==root)
+    {
+        printf("root reducin\n");
+    }
+    
 
     char* messch1 = malloc(1*sizeof(char));
     messch1[0] = 'E';                       //EMPTY
@@ -937,6 +943,10 @@ MIMPI_Retcode MIMPI_Reduce(
         }
         else    //messch1[0]=='D' && messch2[0]=='D'
         {
+            if(rank==root)
+            {
+                printf("root got data from children\n");
+            }
             free(messch1);
             free(messch2);
             free(messpar);
@@ -953,6 +963,10 @@ MIMPI_Retcode MIMPI_Reduce(
                 MIMPI_Send((void*)data_to_send,count,root,-2);
             }
             free(data_to_send);
+            if(rank==root)
+            {
+                printf("root exitin\n");
+            }
             return MIMPI_SUCCESS;
         }
     }
