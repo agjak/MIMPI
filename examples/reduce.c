@@ -37,7 +37,6 @@ int main(int argc, char **argv) {
             assert(recv_data[0] == 1);
             assert(recv_data[1] == 2);
             assert(recv_data[2] == 0);
-            printf("%d\n",recv_data[3]);
             assert(recv_data[3] == 1);
         }
     }

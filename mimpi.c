@@ -901,6 +901,10 @@ MIMPI_Retcode MIMPI_Reduce(
         }
         else if(messch1[0]=='D' && messch2[0]=='D')
         {
+            if(rank==0)
+            {
+                printf("%d %d %d\n",child_1_data[3], child_2_data[3], (uint8_t*)send_data[3]);
+            }
             perform_MIMPI_Op_3(child_1_data, child_2_data, (uint8_t*)send_data, data_to_send, count, op);
         }
     }
