@@ -15,7 +15,7 @@ int main(int argc, char **argv)
     memset(data, world_rank == 0 ? 42 : 7, sizeof(data));
 
     int const tag = 17;
-
+    printf("sending/receiving %d\n", world_rank);
     if (world_rank == 0) {
         
         ASSERT_MIMPI_OK(MIMPI_Send(data, sizeof(data), 1, tag));
@@ -30,7 +30,9 @@ int main(int argc, char **argv)
             assert(data[789] == 42);
         }
     }
+    printf("sent/received; finalizing %d\n", world_rank);
 
     MIMPI_Finalize();
+    printf("finalized %d\n", world_rank);
     return 0;
 }
