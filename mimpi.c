@@ -69,6 +69,7 @@ MIMPI_Retcode MIMPI_sync_reduce_send(
 {
     pid_t pid1;
     pid_t pid2;
+    printf("End of message sent to %d: %d\n", destination, data[count-1]);
     fflush(stdout);
     ASSERT_SYS_OK(pid1 = fork());
     if(!pid1)
