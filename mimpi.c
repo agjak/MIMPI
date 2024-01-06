@@ -237,7 +237,8 @@ void *buffer_messages(void* source_pt)
 
     while(true)
     {
-        if(chrecv(recv_fd, count_bytes, sizeof(int))<=0)
+        int result=chrecv(recv_fd, count_bytes, sizeof(int));
+        if(result==0)
         {
             free(count_bytes);
             free(tag_bytes);
@@ -245,6 +246,12 @@ void *buffer_messages(void* source_pt)
             process_left_mimpi[source]=true;
             pthread_mutex_unlock(&(buffer_mutexes[source]));
             pthread_cond_signal(&buffer_conditions[source]);
+            return 0;
+        }
+        else if(result==-1)
+        {
+            free(count_bytes);
+            free(tag_bytes);
             return 0;
         }
         else
