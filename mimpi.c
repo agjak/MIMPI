@@ -341,12 +341,15 @@ void MIMPI_Finalize() {
     {
         if(i!=rank)
         {
-            ASSERT_ZERO(pthread_cancel(buffer_threads[i]));
+            pthread_cond_signal(&buffer_conditions[i]);
+            ASSERT_ZERO(pthread_join(buffer_threads[i],NULL));
             pthread_mutex_destroy(&buffer_mutexes[i]);
+            pthread_cond_destroy(&buffer_conditions[i]);
         }
     }
     free(buffer_mutexes);
     free(message_buffers);
+    free(buffer_conditions);
     
     channels_finalize();
 }
