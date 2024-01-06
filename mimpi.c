@@ -237,7 +237,9 @@ void *buffer_messages(void* source_pt)
 
     while(true)
     {
+        printf("%d loop\n", 1-source);
         int result=chrecv(recv_fd, count_bytes, sizeof(int));
+        printf("%d got the memo\n", 1-source);
         if(result==0)
         {
             free(count_bytes);
@@ -350,9 +352,7 @@ void MIMPI_Finalize() {
         if(i!=rank)
         {
             ASSERT_ZERO(pthread_join(buffer_threads[i],NULL));
-            printf("%d 2a\n", rank);
             pthread_mutex_destroy(&buffer_mutexes[i]);
-            printf("%d 2b\n", rank);
             pthread_cond_destroy(&buffer_conditions[i]);
         }
     }
