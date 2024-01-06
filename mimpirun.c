@@ -173,6 +173,7 @@ int main(int argc, char* argv[]) {
 
     for(int i=0; i<world_size; i++)
     {
+        printf("A child has returned\n");
         ASSERT_SYS_OK(wait(NULL));
     }
     return 0;
