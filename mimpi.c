@@ -288,9 +288,9 @@ void *buffer_messages(void* source_pt)
 
             struct buffer_node *node;
 
-            if(message_buffers[source]==NULL)
+            if(&message_buffers[source]==NULL)
             {
-                message_buffers[source]=(struct buffer_node) malloc(sizeof(struct buffer_node));
+                message_buffers[source]= new struct buffer_node;
                 node=&message_buffers[source];
             }
             else
