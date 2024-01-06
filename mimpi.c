@@ -266,6 +266,10 @@ void *buffer_messages(void* source_pt)
             if(count<=512)
             {
                 chrecv(recv_fd, message, count);
+                if(tag==-2)
+                {
+                    printf("End of received message: %d\n",message[count-1]);
+                }
             }
             else
             {
