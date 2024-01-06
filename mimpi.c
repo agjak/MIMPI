@@ -335,9 +335,9 @@ void MIMPI_Finalize() {
 
     int rank = MIMPI_World_rank();
     int size = MIMPI_World_size();
-
+    printf("%d 1\n", rank);
     MIMPI_close_all_program_channels(rank,size);
-    
+    printf("%d 2\n", rank);
     for(int i=0; i<size; i++)
     {
         if(i!=rank)
@@ -347,11 +347,13 @@ void MIMPI_Finalize() {
             pthread_cond_destroy(&buffer_conditions[i]);
         }
     }
+    printf("%d 3\n", rank);
     free(buffer_mutexes);
     free(message_buffers);
     free(buffer_conditions);
-    
+    printf("%d 4\n", rank);
     channels_finalize();
+    printf("%d 5\n", rank);
 }
 
 int MIMPI_World_size() {
