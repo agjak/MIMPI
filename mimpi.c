@@ -480,6 +480,34 @@ MIMPI_Retcode MIMPI_Recv(
         }
         if(process_left_mimpi[source]==true)
         {
+            for(int i=0; i<messages_buffered[source]; i++)
+            {
+                if(message_buffers[source][i]!=NULL)
+                {
+                    uint8_t *count_bytes=malloc(sizeof(int));
+                    uint8_t *tag_bytes=malloc(sizeof(int));
+                    for(int j=0; j<sizeof(int); j++)
+                    {
+                        count_bytes[j]=message_buffers[source][i][j];
+                        tag_bytes[j]=message_buffers[source][i][j+sizeof(int)];
+                    }
+                    int mess_count=0;
+                    memcpy(&mess_count, count_bytes, sizeof(int));
+                    int mess_tag=0;
+                    memcpy(&mess_tag, tag_bytes, sizeof(int));
+                    if(count==mess_count && (tag==mess_tag || tag==0))
+                    {
+                        for(int j=0; j<count; j++)
+                        {
+                            ((uint8_t*)data)[j]=message_buffers[source][i][j+2*sizeof(int)];
+                        }
+                        free(message_buffers[source][i]);
+                        message_buffers[source][i]=NULL;
+                        pthread_mutex_unlock(&buffer_mutexes[source]);
+                        return MIMPI_SUCCESS;
+                    }
+                }
+            }
             pthread_mutex_unlock(&buffer_mutexes[source]);
             return MIMPI_ERROR_REMOTE_FINISHED;
         }
