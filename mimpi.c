@@ -288,7 +288,7 @@ void *buffer_messages(void* source_pt)
 
             struct buffer_node *node;
 
-            if(message_buffers.message==NULL)
+            if(message_buffers[source].message==NULL)
             {
                 node=&message_buffers[source];
             }
