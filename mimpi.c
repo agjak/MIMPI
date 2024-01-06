@@ -288,9 +288,9 @@ void *buffer_messages(void* source_pt)
 
             struct buffer_node *node;
 
-            if(&message_buffers[source]==NULL)
+            if(message_buffers[source]==NULL)
             {
-                &message_buffers[source]=(struct buffer_node *) malloc(sizeof(struct buffer_node *));
+                message_buffers[source]=(struct buffer_node) malloc(sizeof(struct buffer_node));
                 node=&message_buffers[source];
             }
             else
@@ -462,7 +462,7 @@ MIMPI_Retcode MIMPI_Recv(
     while(true)
     {
         struct buffer_node *last_node=NULL;
-        struct buffer_node *node=message_buffers[source];
+        struct buffer_node *node=&message_buffers[source];
         while(node!=NULL)
         {
             uint8_t *count_bytes=malloc(sizeof(int));
@@ -486,7 +486,7 @@ MIMPI_Retcode MIMPI_Recv(
                 
                 if(last_node==NULL)
                 {
-                    &message_buffers[source]=node->next;
+                    message_buffers[source]=*node->next;
                 }
                 else
                 {
