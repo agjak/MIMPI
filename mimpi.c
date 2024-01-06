@@ -876,10 +876,6 @@ MIMPI_Retcode MIMPI_Reduce(
     
     int rank = MIMPI_World_rank();
     int size = MIMPI_World_size();
-    if(rank==root)
-    {
-        printf("root reducin\n");
-    }
     
 
     char* messch1 = malloc(1*sizeof(char));
@@ -938,15 +934,10 @@ MIMPI_Retcode MIMPI_Reduce(
             free(messch2);
             free(messpar);
             MIMPI_send_sync_signal_to_both_children(rank, size, 'F');   //FINISHED
-            printf("1 %d\n", rank);
             return MIMPI_ERROR_REMOTE_FINISHED;
         }
         else    //messch1[0]=='D' && messch2[0]=='D'
         {
-            if(rank==root)
-            {
-                printf("root got data from children\n");
-            }
             free(messch1);
             free(messch2);
             free(messpar);
@@ -955,6 +946,7 @@ MIMPI_Retcode MIMPI_Reduce(
             {
                 for(int i=0; i<count; i++)
                 {
+                    printf("%d\n",data_to_send[i]);
                     ((uint8_t*)recv_data)[i]=data_to_send[i];
                 }
             }
@@ -963,10 +955,6 @@ MIMPI_Retcode MIMPI_Reduce(
                 MIMPI_Send((void*)data_to_send,count,root,-2);
             }
             free(data_to_send);
-            if(rank==root)
-            {
-                printf("root exitin\n");
-            }
             return MIMPI_SUCCESS;
         }
     }
@@ -983,7 +971,6 @@ MIMPI_Retcode MIMPI_Reduce(
             {
                 MIMPI_send_sync_signal_to_both_children(rank,size,'F');
                 free(messpar);
-                printf("2 %d\n", rank);
                 return MIMPI_ERROR_REMOTE_FINISHED;
             }
             else
@@ -991,7 +978,6 @@ MIMPI_Retcode MIMPI_Reduce(
                 MIMPI_sync_recv(messpar,(rank-1)/2);
                 MIMPI_send_sync_signal_to_both_children(rank,size,'F');
                 free(messpar);
-                printf("3 %d\n", rank);
                 return MIMPI_ERROR_REMOTE_FINISHED;
             }
             
@@ -1006,7 +992,6 @@ MIMPI_Retcode MIMPI_Reduce(
             {
                 MIMPI_send_sync_signal_to_both_children(rank,size,'F');
                 free(messpar);
-                printf("4 %d\n", rank);
                 return MIMPI_ERROR_REMOTE_FINISHED;
             }
             else
@@ -1016,7 +1001,6 @@ MIMPI_Retcode MIMPI_Reduce(
                 {
                     MIMPI_send_sync_signal_to_both_children(rank,size,'F');
                     free(messpar);
-                    printf("5 %d\n", rank);
                     return MIMPI_ERROR_REMOTE_FINISHED;
                 }
                 else    //messpar[0]=='D'
