@@ -350,7 +350,9 @@ void MIMPI_Finalize() {
         if(i!=rank)
         {
             ASSERT_ZERO(pthread_join(buffer_threads[i],NULL));
+            printf("%d 2a\n", rank);
             pthread_mutex_destroy(&buffer_mutexes[i]);
+            printf("%d 2b\n", rank);
             pthread_cond_destroy(&buffer_conditions[i]);
         }
     }
