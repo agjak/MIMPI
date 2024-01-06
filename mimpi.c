@@ -294,7 +294,9 @@ void *buffer_messages(void* source_pt)
             }
             pthread_mutex_unlock(&buffer_mutexes[source]);
             pthread_cond_signal(&buffer_conditions[source]);
+            printf("%d received\n", 1-source);
             free(message);
+            printf("%d cleaned\n", 1-source);
         }
     }
 
