@@ -948,6 +948,7 @@ MIMPI_Retcode MIMPI_Reduce(
                 {
                     printf("%d\n",data_to_send[i]);
                     ((uint8_t*)recv_data)[i]=data_to_send[i];
+                    printf("%d\n",((uint8_t*)recv_data)[i]);
                 }
             }
             else
