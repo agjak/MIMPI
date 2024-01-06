@@ -288,14 +288,14 @@ void *buffer_messages(void* source_pt)
 
             struct buffer_node *node;
 
-            if(message_buffers[source]==NULL)
+            if(&message_buffers[source]==NULL)
             {
-                message_buffers[source]=(struct buffer_node *) malloc(sizeof(struct buffer_node *));
-                node=message_buffers[source];
+                &message_buffers[source]=(struct buffer_node *) malloc(sizeof(struct buffer_node *));
+                node=&message_buffers[source];
             }
             else
             {
-                struct buffer_node *last_node=message_buffers[source];
+                struct buffer_node *last_node=&message_buffers[source];
                 while(last_node->next!=NULL)
                 {
                     last_node=last_node->next;
@@ -486,7 +486,7 @@ MIMPI_Retcode MIMPI_Recv(
                 
                 if(last_node==NULL)
                 {
-                    message_buffers[source]=node->next;
+                    &message_buffers[source]=node->next;
                 }
                 else
                 {
