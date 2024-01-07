@@ -35,6 +35,7 @@ void MIMPI_free_message_buffers(int rank)
         free(node);
         node=new_node;
     }
+    free(node);
 }
 
 
