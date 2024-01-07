@@ -483,6 +483,10 @@ MIMPI_Retcode MIMPI_Recv(
             memcpy(&mess_count, count_bytes, sizeof(int));
             int mess_tag=0;
             memcpy(&mess_tag, tag_bytes, sizeof(int));
+            if(MIMPI_World_rank()==8)
+            {
+                printf("3 %d\n", MIMPI_World_rank());
+            }
             if(count==mess_count && (tag==mess_tag || tag==MIMPI_ANY_TAG))
             {
                 for(int j=0; j<count; j++)
@@ -504,12 +508,24 @@ MIMPI_Retcode MIMPI_Recv(
                 pthread_mutex_unlock(&buffer_mutexes[source]);
                 return MIMPI_SUCCESS;
             }
+            if(MIMPI_World_rank()==8)
+            {
+                printf("4 %d\n", MIMPI_World_rank());
+            }
             last_node=node;
             if(node->next==NULL)
             {
                 node->next=(struct buffer_node *) malloc(sizeof(struct buffer_node *));
             }
             node=node->next;
+            if(MIMPI_World_rank()==8)
+            {
+                printf("5 %d\n", MIMPI_World_rank());
+            }
+        }
+        if(MIMPI_World_rank()==8)
+        {
+            printf("6 %d\n", MIMPI_World_rank());
         }
         if(process_left_mimpi[source]==true)
         {
