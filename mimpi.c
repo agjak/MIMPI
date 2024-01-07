@@ -469,8 +469,9 @@ MIMPI_Retcode MIMPI_Recv(
                 else
                 {
                     last_node->next=node->next;
+                    free(node);
                 }
-                free(node);
+                
 
                 pthread_mutex_unlock(&buffer_mutexes[source]);
                 return MIMPI_SUCCESS;
