@@ -502,11 +502,6 @@ MIMPI_Retcode MIMPI_Recv(
         }
         if(process_left_mimpi[source]==true)
         {
-            if(pom==0)
-            {
-                pom++;
-                continue;
-            }
             pthread_mutex_unlock(&buffer_mutexes[source]);
             return MIMPI_ERROR_REMOTE_FINISHED;
         }
