@@ -766,6 +766,7 @@ MIMPI_Retcode MIMPI_Bcast(
                     }
                     else
                     {
+                        printf("Synchronised, going to receiving %d\n",rank);
                         MIMPI_Recv(data,count,root,-1);
                     }
 
