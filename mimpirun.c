@@ -165,7 +165,7 @@ int main(int argc, char* argv[]) {
         free(read_sync_channels_between_programs[i]);
         free(write_sync_channels_between_programs[i]);
     }
-    free(read_channels_between_programs);
+    //(read_channels_between_programs);
     free(write_channels_between_programs);
     free(read_sync_channels_between_programs);
     free(write_sync_channels_between_programs);
