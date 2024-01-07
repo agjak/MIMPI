@@ -22,6 +22,22 @@ pthread_cond_t *buffer_conditions;
 bool *process_left_mimpi;
 
 
+void MIMPI_free_message_buffers(int rank)
+{
+    struct buffer_node *node = message_buffers[i];
+    while(node!=NULL)
+    {
+        if(node->message!=NULL)
+        {
+            free(node->message);
+        }
+        struct buffer_node *new_node = node->next;
+        free(node);
+        node=new_node;
+    }
+}
+
+
 void MIMPI_free_global_variables(bool final)
 {
     int size=MIMPI_World_size();
@@ -46,20 +62,7 @@ void MIMPI_free_global_variables(bool final)
     free(process_left_mimpi);
 }
 
-void MIMPI_free_message_buffers(int rank)
-{
-    struct buffer_node *node = message_buffers[i];
-    while(node!=NULL)
-    {
-        if(node->message!=NULL)
-        {
-            free(node->message);
-        }
-        struct buffer_node *new_node = node->next;
-        free(node);
-        node=new_node;
-    }
-}
+
 
 
 MIMPI_Retcode MIMPI_sync_send(
