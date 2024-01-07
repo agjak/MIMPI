@@ -127,21 +127,40 @@ MIMPI_Retcode MIMPI_sync_reduce_recv(
     int count
 ) 
 {
+    if(source!=0)
+    {
+        printf("a %d\n", source);
+    }
     MIMPI_Retcode result= MIMPI_sync_recv(signal,source);
+    if(source!=0)
+    {
+        printf("b\n");
+    }
     if(result==MIMPI_ERROR_REMOTE_FINISHED)
     {
+        if(source!=0)
+        {
+            printf("c\n");
+        }
         return MIMPI_ERROR_REMOTE_FINISHED;
     }
     else
     {
         if(signal[0]=='F')
         {
+            if(source!=0)
+            {
+                printf("d\n");
+            }
             return MIMPI_SUCCESS;
         }
         else
         {
-            MIMPI_Recv(data, count, source, -2);
-            return MIMPI_SUCCESS;
+            if(source!=0)
+            {
+                printf("e\n");
+            }
+            return MIMPI_Recv(data, count, source, -2);
         }
     }
 }
