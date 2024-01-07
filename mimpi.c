@@ -579,7 +579,7 @@ MIMPI_Retcode MIMPI_Recv(
             pthread_mutex_unlock(&buffer_mutexes[source]);
             return MIMPI_ERROR_REMOTE_FINISHED;
         }
-        pthread_cond_wait(&buffer_conditions[source], &buffer_mutexes[source]);
+        //pthread_cond_wait(&buffer_conditions[source], &buffer_mutexes[source]);
     }
 
 }
