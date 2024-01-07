@@ -601,8 +601,8 @@ MIMPI_Retcode MIMPI_Barrier()
             }
             else
             {
-                MIMPI_sync_recv(messpar,(rank-1)/2);
-                if(messpar[0]=='F')
+                MIMPI_Retcode result = MIMPI_sync_recv(messpar,(rank-1)/2);
+                if(messpar[0]=='F' || result==MIMPI_ERROR_REMOTE_FINISHED)
                 {
                     MIMPI_send_sync_signal_to_both_children(rank,size,'F');
                     free(messpar);
