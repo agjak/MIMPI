@@ -984,7 +984,7 @@ MIMPI_Retcode MIMPI_Reduce(
             }
             else
             {
-                MIMPI_Send((void*)data_to_send,count,root,-2);
+                MIMPI_Send(data_to_send,count,root,-2);
             }
             free(data_to_send);
             return MIMPI_SUCCESS;
