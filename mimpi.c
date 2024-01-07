@@ -320,7 +320,7 @@ void *buffer_messages(void* source_pt)
             }
             if(source>0)
             {
-                printf("0 received the whole message\n", tag, count);
+                printf("0 received the whole message\n");
             }
 
             pthread_mutex_lock(&buffer_mutexes[source]);
