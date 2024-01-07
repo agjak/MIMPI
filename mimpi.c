@@ -975,7 +975,7 @@ MIMPI_Retcode MIMPI_Reduce(
             }
             messch2[0] = 'F';
         }
-        else if(MIMPI_sync_reduce_recv(messch1,rank*2+1,child_1_data,count)==MIMPI_ERROR_REMOTE_FINISHED)
+        if(MIMPI_sync_reduce_recv(messch1,rank*2+1,child_1_data,count)==MIMPI_ERROR_REMOTE_FINISHED)
         {
             if(rank>2 && rank<8)
             {
@@ -983,7 +983,7 @@ MIMPI_Retcode MIMPI_Reduce(
             }
             messch1[0] = 'F';
         }
-        else if(messch1[0]=='D' && messch2[0]=='D')
+        if(messch1[0]=='D' && messch2[0]=='D')
         {
             if(rank>2 && rank<8)
             {
