@@ -24,7 +24,7 @@ bool *process_left_mimpi;
 
 void MIMPI_free_message_buffers(int rank)
 {
-    struct buffer_node *node = message_buffers[i];
+    struct buffer_node *node = message_buffers[rank];
     while(node!=NULL)
     {
         if(node->message!=NULL)
