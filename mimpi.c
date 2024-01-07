@@ -958,6 +958,7 @@ MIMPI_Retcode MIMPI_Reduce(
     free(child_1_data);
     free(child_2_data);
     
+    printf("%d got data from children\n", rank);
 
     if(rank==0)
     {
