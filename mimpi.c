@@ -277,7 +277,7 @@ void *buffer_messages(void* source_pt)
             pthread_mutex_lock(&buffer_mutexes[source]);
             process_left_mimpi[source]=true;
             pthread_mutex_unlock(&(buffer_mutexes[source]));
-            if(source<0)
+            if(source>0)
             {
                 printf("Sending cond signal to 0, 1 left mimpi\n");
             }
@@ -339,7 +339,7 @@ void *buffer_messages(void* source_pt)
                 node->message[i+2*sizeof(int)]=message[i];
             }
             pthread_mutex_unlock(&buffer_mutexes[source]);
-            if(source<0)
+            if(source>0)
             {
                 printf("Sending cond signal to 0, new message from 1\n");
             }
