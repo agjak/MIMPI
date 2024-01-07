@@ -975,6 +975,10 @@ MIMPI_Retcode MIMPI_Reduce(
             }
             messch2[0] = 'F';
         }
+        if(rank>2 && rank<8)
+        {
+            printf("%d A1.5\n", rank);
+        }
         if(MIMPI_sync_reduce_recv(messch1,rank*2+1,child_1_data,count)==MIMPI_ERROR_REMOTE_FINISHED)
         {
             if(rank>2 && rank<8)
@@ -982,6 +986,10 @@ MIMPI_Retcode MIMPI_Reduce(
                 printf("%d A2\n", rank);
             }
             messch1[0] = 'F';
+        }
+        if(rank>2 && rank<8)
+        {
+            printf("%d A2.5\n", rank);
         }
         if(messch1[0]=='D' && messch2[0]=='D')
         {
