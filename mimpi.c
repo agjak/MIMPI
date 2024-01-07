@@ -128,7 +128,7 @@ MIMPI_Retcode MIMPI_sync_reduce_recv(
 ) 
 {
 
-    if(MIMPI_Recv(signal, 1, source, -3)==0)
+    if(MIMPI_Recv(signal, 1, source, -3)==MIMPI_ERROR_REMOTE_FINISHED)
     {
         return MIMPI_ERROR_REMOTE_FINISHED;
     }
