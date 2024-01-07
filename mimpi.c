@@ -584,10 +584,6 @@ MIMPI_Retcode MIMPI_Recv(
                 printf("H\n");
             }
             last_node=node;
-            if(node->next==NULL)
-            {
-                node->next=(struct buffer_node *) malloc(sizeof(struct buffer_node *));
-            }
             node=node->next;
         }
         if(source!=0)
