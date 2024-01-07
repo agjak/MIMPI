@@ -462,7 +462,6 @@ MIMPI_Retcode MIMPI_Recv(
                     }
                     else
                     {
-                        free(node->message);
                         node->message=NULL;
                     }
                 }
