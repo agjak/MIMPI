@@ -909,7 +909,7 @@ MIMPI_Retcode MIMPI_Reduce(
     int rank = MIMPI_World_rank();
     int size = MIMPI_World_size();
     
-    if(op=MIMPI_MIN)
+    if(op==MIMPI_MIN)
     {
         printf("Started reducing %d\n", rank);
     }
@@ -962,7 +962,7 @@ MIMPI_Retcode MIMPI_Reduce(
     free(child_1_data);
     free(child_2_data);
     
-    if(op=MIMPI_MIN)
+    if(op==MIMPI_MIN)
     {
         printf("Got data to send %d\n", rank);
     }
@@ -971,7 +971,7 @@ MIMPI_Retcode MIMPI_Reduce(
     {
         if(messch1[0]=='F' || messch2[0]=='F')   //some descendant has already finished the MIMPI block
         {
-            if(op=MIMPI_MIN)
+            if(op==MIMPI_MIN)
             {
                 printf("A");
             }
@@ -983,9 +983,9 @@ MIMPI_Retcode MIMPI_Reduce(
         }
         else    //messch1[0]=='D' && messch2[0]=='D'
         {
-            if(op=MIMPI_MIN)
+            if(op==MIMPI_MIN)
             {
-                printf("A");
+                printf("B");
             }
             free(messch1);
             free(messch2);
