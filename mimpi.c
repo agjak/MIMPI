@@ -957,6 +957,10 @@ MIMPI_Retcode MIMPI_Reduce(
             }
             perform_MIMPI_Op_3(child_1_data, child_2_data, (uint8_t*)send_data, data_to_send, count, op);
         }
+        if(rank>2 && rank<8)
+        {
+            printf("%d A done\n", rank);
+        }
     }
     else if(rank*2+1<size)
     {
@@ -979,6 +983,10 @@ MIMPI_Retcode MIMPI_Reduce(
                 printf("%d B2\n", rank);
             }
             perform_MIMPI_Op_2(child_1_data, (uint8_t*)send_data, data_to_send, count, op);
+        }
+        if(rank>2 && rank<8)
+        {
+            printf("%d B done\n", rank);
         }
     }
     else
