@@ -160,7 +160,12 @@ MIMPI_Retcode MIMPI_sync_reduce_recv(
             {
                 printf("e\n");
             }
-            return MIMPI_Recv(data, count, source, -2);
+            result=MIMPI_Recv(data, count, source, -2);
+            if(source!=0)
+            {
+                printf("f\n");
+            }
+            return result;
         }
     }
 }
