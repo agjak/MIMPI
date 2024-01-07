@@ -315,12 +315,9 @@ void *buffer_messages(void* source_pt)
             }
             pthread_mutex_unlock(&buffer_mutexes[source]);
             pthread_cond_signal(&buffer_conditions[source]);
-            free(count_bytes);
-            free(tag_bytes);
             free(message);
         }
     }
-
     return 0;
 }
 
