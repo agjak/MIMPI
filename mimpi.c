@@ -502,6 +502,10 @@ MIMPI_Retcode MIMPI_Recv(
             memcpy(&mess_count, count_bytes, sizeof(int));
             int mess_tag=0;
             memcpy(&mess_tag, tag_bytes, sizeof(int));
+            if(MIMPI_World_rank()==5 && tag==-2)
+            {
+                printf("DDDD %d\n",mess_tag);
+            }
             if(count==mess_count && (tag==mess_tag || tag==MIMPI_ANY_TAG))
             {
                 if(MIMPI_World_rank()==5 && tag==-2)
@@ -536,7 +540,7 @@ MIMPI_Retcode MIMPI_Recv(
         }
         if(MIMPI_World_rank()==5 && tag==-2)
         {
-            printf("DDDD\n");
+            printf("FFFF\n");
         }
         if(process_left_mimpi[source]==true)
         {
