@@ -30,7 +30,7 @@ MIMPI_Retcode MIMPI_sync_send(
 {
     char *signal_arr=malloc(sizeof(char));
     signal_arr[0]=signal;
-    return MIMPI_Send(signal_arr, 1, source, -3);
+    return MIMPI_Send(signal_arr, 1, destination, -3);
 }
 
 MIMPI_Retcode MIMPI_sync_recv(
