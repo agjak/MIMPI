@@ -15,6 +15,7 @@ int main(int argc, char **argv)
         // Should exit with MIMPI_ERROR_REMOTE_FINISHED
         // during or after MIMPI_Finalize call in process 0.
         MIMPI_Retcode ret = MIMPI_Barrier();
+        printf("%d %d\n",ret,world_rank);
         test_assert(ret == MIMPI_ERROR_REMOTE_FINISHED);
     }
 
