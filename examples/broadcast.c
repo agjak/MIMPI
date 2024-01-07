@@ -24,7 +24,7 @@ int main(int argc, char **argv)
         number = 42;
     fflush(stdout);
     ASSERT_MIMPI_OK(MIMPI_Bcast(&number, 1, 0));
-    printf("Number: %d %d\n", number,world_rank);
+    printf("Number: %d\n", number);
     fflush(stdout);
 
     int res = unsetenv(WRITE_VAR);
