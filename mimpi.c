@@ -57,16 +57,16 @@ MIMPI_Retcode MIMPI_sync_recv(
     sprintf(name, "MIMPI_sync_channel_from_%d",source);
     int recv_fd=atoi(getenv(name));
     free(name);
-    printf("Y %d \n",recv_fd);
+    printf("Y %d %d %d\n",recv_fd,MIMPI_World_rank(),source);
 
     if(chrecv(recv_fd, (void*)signal, 1)==0)
     {
-        printf("Z1\n");
+        printf("Z1 %d %d\n",MIMPI_World_rank(),source);
         return MIMPI_ERROR_REMOTE_FINISHED;
     }
     else
     {
-        printf("Z2\n");
+        printf("Z2 %d %d\n",MIMPI_World_rank(),source);;
         return MIMPI_SUCCESS;
     }
 }
