@@ -300,6 +300,10 @@ void *buffer_messages(void* source_pt)
             int tag;
             memcpy(&tag, tag_bytes, sizeof(int));
             uint8_t* message=malloc(count);
+            if(source>0)
+            {
+                printf("0 received the tag and count %d %d\n", tag, count);
+            }
 
             if(count<=512)
             {
@@ -314,7 +318,10 @@ void *buffer_messages(void* source_pt)
                 }
                 chrecv(recv_fd,&message[512*i],count%512);
             }
-            
+            if(source>0)
+            {
+                printf("0 received the whole message\n", tag, count);
+            }
 
             pthread_mutex_lock(&buffer_mutexes[source]);
 
@@ -545,7 +552,14 @@ MIMPI_Retcode MIMPI_Recv(
                 
                 if(last_node==NULL)
                 {
-                    message_buffers[source]=node->next;
+                    if(node->next!=NULL)
+                    {
+                        message_buffers[source]=node->next;
+                    }
+                    else
+                    {
+                        free(node->message);
+                    }
                 }
                 else
                 {
