@@ -28,23 +28,9 @@ MIMPI_Retcode MIMPI_sync_send(
     int destination
 ) 
 {
-    char* name = malloc(40*sizeof(char));
-    sprintf(name, "MIMPI_channel_to_%d",destination);
-    int send_fd=atoi(getenv(name));
-    free(name);
-    char* mess = malloc(1*sizeof(char));
-    mess[0] = signal;
-    
-    if(chsend(send_fd, mess, -3)==-1)
-    {
-        free(mess);
-        return MIMPI_ERROR_REMOTE_FINISHED;
-    }
-    else
-    {
-        free(mess);
-        return MIMPI_SUCCESS;
-    }
+    char *signal_arr=malloc(sizeof(char));
+    signal_arr[0]=signal;
+    return MIMPI_Send(signal_arr, 1, source, -3);
 }
 
 MIMPI_Retcode MIMPI_sync_recv(
@@ -52,19 +38,7 @@ MIMPI_Retcode MIMPI_sync_recv(
     int source
 ) 
 {
-    char* name = malloc(40*sizeof(char));
-    sprintf(name, "MIMPI_channel_from_%d",source);
-    int recv_fd=atoi(getenv(name));
-    free(name);
-
-    if(chrecv(recv_fd, (void*)signal, -3)==0)
-    {
-        return MIMPI_ERROR_REMOTE_FINISHED;
-    }
-    else
-    {
-        return MIMPI_SUCCESS;
-    }
+    return MIMPI_Recv(signal, 1, source, -3);
 }
 
 MIMPI_Retcode MIMPI_sync_reduce_send(
