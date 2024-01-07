@@ -447,7 +447,6 @@ MIMPI_Retcode MIMPI_Recv(
     int source,
     int tag
 ) {
-    printf("2a %d\n",MIMPI_World_rank());
     if (source == MIMPI_World_rank())
     {
         return MIMPI_ERROR_ATTEMPTED_SELF_OP;
@@ -456,18 +455,15 @@ MIMPI_Retcode MIMPI_Recv(
     {
         return MIMPI_ERROR_NO_SUCH_RANK;
     }
-    printf("2b %d\n",MIMPI_World_rank());
     pthread_mutex_lock(&buffer_mutexes[source]);
 
     int pom=0;
     while(true)
     {
-        printf("2c %d\n",MIMPI_World_rank());
         struct buffer_node *last_node=NULL;
         struct buffer_node *node=&message_buffers[source];
         while(node->message!=NULL)
         {
-            printf("2d %d\n",MIMPI_World_rank());
             uint8_t *count_bytes=malloc(sizeof(int));
             uint8_t *tag_bytes=malloc(sizeof(int));
             for(int j=0; j<sizeof(int); j++)
@@ -479,7 +475,6 @@ MIMPI_Retcode MIMPI_Recv(
             memcpy(&mess_count, count_bytes, sizeof(int));
             int mess_tag=0;
             memcpy(&mess_tag, tag_bytes, sizeof(int));
-            printf("2e %d\n",MIMPI_World_rank());
             if(count==mess_count && (tag==mess_tag || tag==MIMPI_ANY_TAG))
             {
                 for(int j=0; j<count; j++)
