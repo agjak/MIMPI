@@ -14,6 +14,7 @@ int main(int argc, char **argv) {
     MIMPI_Init(false);
     int world_size = MIMPI_World_size();
     int rank = MIMPI_World_rank();
+    printf("%d before first reduce\n",rank);
     {
         uint8_t data[4] = {rank + 1, rank + 2, 2 * rank, root};
         uint8_t recv_data[4] = {0, 0, 0, 0};
@@ -27,6 +28,7 @@ int main(int argc, char **argv) {
             assert(recv_data[3] == root);
         }
     }
+    printf("%d after first reduce\n",rank);
     {
         uint8_t data[4] = {rank + 1, rank + 2, 2 * rank, 1};
         uint8_t recv_data[4] = {0, 0, 0, 0};
