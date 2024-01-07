@@ -357,6 +357,7 @@ void MIMPI_Init(bool enable_deadlock_detection) {
 
             messages_buffered[i]=0;
             process_left_mimpi[i]=false;
+            message_buffers[i]=(struct buffer_node*)malloc(sizeof(struct buffer_node*));
         }
     }
 
@@ -465,7 +466,7 @@ MIMPI_Retcode MIMPI_Recv(
             printf("0 %d\n", MIMPI_World_rank());
         }
         struct buffer_node *last_node=NULL;
-        struct buffer_node *node=&message_buffers[source];
+        struct buffer_node *node=message_buffers[source];
         while(node->message!=NULL)
         {
             if(MIMPI_World_rank()==8)
