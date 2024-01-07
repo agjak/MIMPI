@@ -270,7 +270,7 @@ void *buffer_messages(void* source_pt)
     while(true)
     {
         int result=chrecv(recv_fd, count_bytes, sizeof(int));
-        if(result==0)
+        if(result<=0)
         {
             free(count_bytes);
             free(tag_bytes);
@@ -278,12 +278,6 @@ void *buffer_messages(void* source_pt)
             process_left_mimpi[source]=true;
             pthread_mutex_unlock(&(buffer_mutexes[source]));
             pthread_cond_signal(&buffer_conditions[source]);
-            return 0;
-        }
-        else if(result==-1)
-        {
-            free(count_bytes);
-            free(tag_bytes);
             return 0;
         }
         else
@@ -579,7 +573,7 @@ MIMPI_Retcode MIMPI_Recv(
             pthread_mutex_unlock(&buffer_mutexes[source]);
             return MIMPI_ERROR_REMOTE_FINISHED;
         }
-        //pthread_cond_wait(&buffer_conditions[source], &buffer_mutexes[source]);
+        pthread_cond_wait(&buffer_conditions[source], &buffer_mutexes[source]);
     }
 
 }
