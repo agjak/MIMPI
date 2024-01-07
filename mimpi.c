@@ -581,7 +581,15 @@ MIMPI_Retcode MIMPI_Recv(
             pthread_mutex_unlock(&buffer_mutexes[source]);
             return MIMPI_ERROR_REMOTE_FINISHED;
         }
+        if(source!=0)
+        {
+            printf("0 waiting for cond\n");
+        }
         ASSERT_SYS_OK(pthread_cond_wait(&buffer_conditions[source], &buffer_mutexes[source]));
+        if(source!=0)
+        {
+            printf("0 woken up by cond\n");
+        }
     }
 
 }
