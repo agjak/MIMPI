@@ -457,25 +457,13 @@ MIMPI_Retcode MIMPI_Recv(
         return MIMPI_ERROR_NO_SUCH_RANK;
     }
     pthread_mutex_lock(&buffer_mutexes[source]);
-    if(true)
-    {
-        printf("AAAA\n");
-    }
     int pom=0;
     while(true)
     {
-        if(true)
-        {
-            printf("BBBB\n");
-        }
         struct buffer_node *last_node=NULL;
         struct buffer_node *node=message_buffers[source];
         while(node!=NULL && node->message!=NULL)
         {
-            if(true)
-            {
-                printf("CCCC\n");
-            }
             uint8_t *count_bytes=malloc(sizeof(int));
             uint8_t *tag_bytes=malloc(sizeof(int));
             for(int j=0; j<sizeof(int); j++)
@@ -487,16 +475,8 @@ MIMPI_Retcode MIMPI_Recv(
             memcpy(&mess_count, count_bytes, sizeof(int));
             int mess_tag=0;
             memcpy(&mess_tag, tag_bytes, sizeof(int));
-            if(true)
-            {
-                printf("DDDD %d\n",mess_tag);
-            }
             if(count==mess_count && (tag==mess_tag || tag==MIMPI_ANY_TAG))
             {
-                if(true)
-                {
-                    printf("EEEE\n");
-                }
                 for(int j=0; j<count; j++)
                 {
                     ((uint8_t*)data)[j]=node->message[j+2*sizeof(int)];
@@ -522,10 +502,6 @@ MIMPI_Retcode MIMPI_Recv(
                 node->next=(struct buffer_node *) malloc(sizeof(struct buffer_node *));
             }
             node=node->next;
-        }
-        if(true)
-        {
-            printf("FFFF\n");
         }
         if(process_left_mimpi[source]==true)
         {
@@ -945,87 +921,35 @@ MIMPI_Retcode MIMPI_Reduce(
     uint8_t* child_2_data=malloc((count+1)*sizeof(uint8_t));
     uint8_t* data_to_send=malloc((count+1)*sizeof(uint8_t));
 
-    if(true)
-    {
-        printf("%d started reducing\n", rank);
-    }
 
     if(rank*2+2<size)
     {
-        if(true)
-        {
-            printf("%d A\n", rank);
-        }
         if(MIMPI_sync_reduce_recv(messch2,rank*2+2,child_2_data,count)==MIMPI_ERROR_REMOTE_FINISHED)
         {
-            if(true)
-            {
-                printf("%d A1\n", rank);
-            }
             messch2[0] = 'F';
-        }
-        if(true)
-        {
-            printf("%d A1.5\n", rank);
         }
         if(MIMPI_sync_reduce_recv(messch1,rank*2+1,child_1_data,count)==MIMPI_ERROR_REMOTE_FINISHED)
         {
-            if(true)
-            {
-                printf("%d A2\n", rank);
-            }
             messch1[0] = 'F';
-        }
-        if(true)
-        {
-            printf("%d A2.5\n", rank);
         }
         if(messch1[0]=='D' && messch2[0]=='D')
         {
-            if(true)
-            {
-                printf("%d A3\n", rank);
-            }
             perform_MIMPI_Op_3(child_1_data, child_2_data, (uint8_t*)send_data, data_to_send, count, op);
-        }
-        if(true)
-        {
-            printf("%d A done\n", rank);
         }
     }
     else if(rank*2+1<size)
     {
-        if(true)
-        {
-            printf("%d B\n", rank);
-        }
         if(MIMPI_sync_reduce_recv(messch1,rank*2+1,child_1_data,count)==MIMPI_ERROR_REMOTE_FINISHED)
         {
-            if(true)
-            {
-                printf("%d B1\n", rank);
-            }
             messch1[0] = 'F';
         }
         else if(messch1[0]=='D')
         {
-            if(true)
-            {
-                printf("%d B2\n", rank);
-            }
             perform_MIMPI_Op_2(child_1_data, (uint8_t*)send_data, data_to_send, count, op);
-        }
-        if(true)
-        {
-            printf("%d B done\n", rank);
         }
     }
     else
     {
-        if(true)
-        {
-            printf("%d C\n", rank);
-        }
         for(int i=0; i<count; i++)
         {
             data_to_send[i]=((uint8_t*)send_data)[i];
@@ -1033,10 +957,6 @@ MIMPI_Retcode MIMPI_Reduce(
     }
     free(child_1_data);
     free(child_2_data);
-    if(true)
-    {
-        printf("%d got data from children\n", rank);
-    }
     
 
     if(rank==0)
@@ -1104,6 +1024,7 @@ MIMPI_Retcode MIMPI_Reduce(
             {
                 MIMPI_send_sync_signal_to_both_children(rank,size,'F');
                 free(messpar);
+                printf("E %d\n",rank);
                 return MIMPI_ERROR_REMOTE_FINISHED;
             }
             else
@@ -1112,6 +1033,7 @@ MIMPI_Retcode MIMPI_Reduce(
                 if(messpar[0]=='F' || result==MIMPI_ERROR_REMOTE_FINISHED)
                 {
                     MIMPI_send_sync_signal_to_both_children(rank,size,'F');
+                    printf("F %c %d\n",messpar[0],rank);
                     free(messpar);
                     return MIMPI_ERROR_REMOTE_FINISHED;
                 }
