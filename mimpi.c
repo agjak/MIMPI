@@ -22,7 +22,7 @@ pthread_cond_t *buffer_conditions;
 bool *process_left_mimpi;
 
 
-void MIMPI_free_global_variables()
+void MIMPI_free_global_variables(bool final)
 {
     int size=MIMPI_World_size();
     int rank=MIMPI_World_rank();
@@ -30,7 +30,10 @@ void MIMPI_free_global_variables()
     {
         if(i!=rank)
         {
-            ASSERT_ZERO(pthread_join(buffer_threads[i],NULL));
+            if(final)
+            {
+                ASSERT_ZERO(pthread_join(buffer_threads[i],NULL));
+            }
             pthread_mutex_destroy(&buffer_mutexes[i]);
             pthread_cond_destroy(&buffer_conditions[i]);
             free(message_buffers[i]->next);
@@ -81,12 +84,12 @@ MIMPI_Retcode MIMPI_sync_reduce_send(
         MIMPI_Retcode status = MIMPI_sync_send(signal, destination);
         if (status==MIMPI_SUCCESS)
         {
-            //MIMPI_free_global_variables();
+            MIMPI_free_global_variables(false);
             exit(0);
         }
         else
         {
-            //MIMPI_free_global_variables();
+            MIMPI_free_global_variables(false);
             exit(1);
         }
     }
@@ -98,12 +101,12 @@ MIMPI_Retcode MIMPI_sync_reduce_send(
             MIMPI_Retcode status = MIMPI_Send(data, count, destination, -2);
             if (status==MIMPI_SUCCESS)
             {
-                //MIMPI_free_global_variables();
+                MIMPI_free_global_variables(false);
                 exit(0);
             }
             else
             {
-                //MIMPI_free_global_variables();
+                MIMPI_free_global_variables(false);
                 exit(1);
             }
         }
@@ -187,12 +190,12 @@ MIMPI_Retcode MIMPI_send_sync_signal_to_both_children(int rank, int size, char s
         MIMPI_Retcode status = MIMPI_send_sync_signal_to_left_child(rank,size,signal);
         if (status==MIMPI_SUCCESS)
         {
-            //MIMPI_free_global_variables();
+            MIMPI_free_global_variables(false);
             exit(0);
         }
         else
         {
-            //MIMPI_free_global_variables();
+            MIMPI_free_global_variables(false);
             exit(1);
         }
     }
@@ -204,12 +207,12 @@ MIMPI_Retcode MIMPI_send_sync_signal_to_both_children(int rank, int size, char s
             MIMPI_Retcode status = MIMPI_send_sync_signal_to_right_child(rank,size,signal);
             if (status==MIMPI_SUCCESS)
             {
-                //MIMPI_free_global_variables();
+                MIMPI_free_global_variables(false);
                 exit(0);
             }
             else
             {
-                //MIMPI_free_global_variables();
+                MIMPI_free_global_variables(false);
                 exit(1);
             }
         }
@@ -369,7 +372,7 @@ void MIMPI_Finalize() {
     int rank = MIMPI_World_rank();
     int size = MIMPI_World_size();
     MIMPI_close_all_program_channels(rank,size);
-    MIMPI_free_global_variables();
+    MIMPI_free_global_variables(true);
     fflush(stdout);
     channels_finalize();
 }
@@ -680,7 +683,7 @@ MIMPI_Retcode MIMPI_Bcast(
                         {
                             MIMPI_Send(data,count,i,-1);
                         }
-                        //MIMPI_free_global_variables();
+                        MIMPI_free_global_variables(false);
                         exit(0);
                     }
                 }
@@ -757,7 +760,7 @@ MIMPI_Retcode MIMPI_Bcast(
                                 {
                                     MIMPI_Send(data,count,i,-1);
                                 }
-                                //MIMPI_free_global_variables();
+                                MIMPI_free_global_variables(false);
                                 exit(0);
                             }
                         }
