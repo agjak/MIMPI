@@ -29,13 +29,13 @@ MIMPI_Retcode MIMPI_sync_send(
 ) 
 {
     char* name = malloc(40*sizeof(char));
-    sprintf(name, "MIMPI_sync_channel_to_%d",destination);
+    sprintf(name, "MIMPI_channel_to_%d",destination);
     int send_fd=atoi(getenv(name));
     free(name);
     char* mess = malloc(1*sizeof(char));
     mess[0] = signal;
     
-    if(chsend(send_fd, mess, 1)==-1)
+    if(chsend(send_fd, mess, -3)==-1)
     {
         free(mess);
         return MIMPI_ERROR_REMOTE_FINISHED;
@@ -53,11 +53,11 @@ MIMPI_Retcode MIMPI_sync_recv(
 ) 
 {
     char* name = malloc(40*sizeof(char));
-    sprintf(name, "MIMPI_sync_channel_from_%d",source);
+    sprintf(name, "MIMPI_channel_from_%d",source);
     int recv_fd=atoi(getenv(name));
     free(name);
 
-    if(chrecv(recv_fd, (void*)signal, 1)==0)
+    if(chrecv(recv_fd, (void*)signal, -3)==0)
     {
         return MIMPI_ERROR_REMOTE_FINISHED;
     }
@@ -128,11 +128,11 @@ MIMPI_Retcode MIMPI_sync_reduce_recv(
 ) 
 {
     char* name = malloc(40*sizeof(char));
-    sprintf(name, "MIMPI_sync_channel_from_%d",source);
+    sprintf(name, "MIMPI_channel_from_%d",source);
     int recv_fd=atoi(getenv(name));
     free(name);
 
-    if(chrecv(recv_fd, (void*)signal, 1)==0)
+    if(chrecv(recv_fd, (void*)signal, -3)==0)
     {
         return MIMPI_ERROR_REMOTE_FINISHED;
     }
