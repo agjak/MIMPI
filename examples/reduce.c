@@ -41,6 +41,7 @@ int main(int argc, char **argv) {
             assert(recv_data[3] == 1);
         }
     }
+    printf("Ended second block %d\n",rank);
     {
         uint8_t data[4] = {rank + 1, 1, 2 * rank, 0};
         uint8_t recv_data[4] = {0, 0, 0, 0};
@@ -54,6 +55,7 @@ int main(int argc, char **argv) {
             assert(recv_data[3] == 0);
         }
     }
+    printf("Ended third block %d\n",rank);
     MIMPI_Finalize();
     return test_success();
 }
