@@ -23,19 +23,16 @@ int main() {
     } if (rank == 1) {
         printf("2 %d\n",rank);
         ASSERT_MIMPI_OK(MIMPI_Recv(&a, sizeof(int), 0, 2));
-        printf("2a %d\n",rank);
         assert(a == 2);
         printf("3 %d\n",rank);
     } else if (rank == 2) {
         printf("2 %d\n",rank);
         ASSERT_MIMPI_OK(MIMPI_Recv(&b, sizeof(int), 0, 1));
-        printf("2a %d\n",rank);
         assert(b == 1);
         printf("3 %d\n",rank);
     } else if (rank == 3) {
         printf("2 %d\n",rank);
         ASSERT_MIMPI_OK(MIMPI_Recv(&b, sizeof(int), 0, MIMPI_ANY_TAG));
-        printf("2a %d\n",rank);
         assert(b == 1);
         printf("3 %d\n",rank);
     }
