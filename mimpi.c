@@ -59,7 +59,9 @@ MIMPI_Retcode MIMPI_sync_recv(
     free(name);
     printf("Y %d %d %d\n",recv_fd,MIMPI_World_rank(),source);
 
-    if(chrecv(recv_fd, (void*)signal, 1)==0)
+    int result=chrecv(recv_fd, (void*)signal, 1);
+    printf("Z %d %d\n",MIMPI_World_rank(),source);
+    if(result==0)
     {
         printf("Z1 %d %d\n",MIMPI_World_rank(),source);
         return MIMPI_ERROR_REMOTE_FINISHED;
