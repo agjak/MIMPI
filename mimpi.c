@@ -19,7 +19,6 @@ struct buffer_node **message_buffers;
 pthread_mutex_t *buffer_mutexes;
 pthread_t *buffer_threads;
 pthread_cond_t *buffer_conditions;
-int *messages_buffered;
 bool *process_left_mimpi;
 
 
@@ -201,7 +200,6 @@ void *buffer_messages(void* source_pt)
     int source= *((int*)source_pt);
     free(source_pt);
     
-    messages_buffered[source]=0;
 
     char* name = malloc(32*sizeof(char));
     sprintf(name, "MIMPI_channel_from_%d",source);
@@ -302,7 +300,6 @@ void MIMPI_Init(bool enable_deadlock_detection) {
     buffer_mutexes=malloc(size*sizeof(pthread_mutex_t));
     buffer_threads=malloc(size*sizeof(pthread_t));
     buffer_conditions=malloc(size*sizeof(pthread_cond_t));
-    messages_buffered=malloc(size*sizeof(int));
     process_left_mimpi=malloc(size*sizeof(bool));
 
     for(int i=0; i<size; i++)
@@ -323,7 +320,6 @@ void MIMPI_Init(bool enable_deadlock_detection) {
 
             ASSERT_ZERO(pthread_cond_init(&buffer_conditions[i], NULL));
 
-            messages_buffered[i]=0;
             process_left_mimpi[i]=false;
             message_buffers[i]=(struct buffer_node*)malloc(sizeof(struct buffer_node*));
         }
@@ -343,11 +339,14 @@ void MIMPI_Finalize() {
             ASSERT_ZERO(pthread_join(buffer_threads[i],NULL));
             pthread_mutex_destroy(&buffer_mutexes[i]);
             pthread_cond_destroy(&buffer_conditions[i]);
+            free(message_buffers[i]);
         }
     }
     free(buffer_mutexes);
     free(message_buffers);
     free(buffer_conditions);
+    free(buffer_threads);
+    free(process_left_mimpi);
     fflush(stdout);
     channels_finalize();
 }
@@ -443,6 +442,8 @@ MIMPI_Retcode MIMPI_Recv(
             memcpy(&mess_count, count_bytes, sizeof(int));
             int mess_tag=0;
             memcpy(&mess_tag, tag_bytes, sizeof(int));
+            free(count_bytes);
+            free(tag_bytes);
             if(count==mess_count && (tag==mess_tag || tag==MIMPI_ANY_TAG))
             {
                 for(int j=0; j<count; j++)
