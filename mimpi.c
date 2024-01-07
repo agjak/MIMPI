@@ -52,17 +52,21 @@ MIMPI_Retcode MIMPI_sync_recv(
     int source
 ) 
 {
+    printf("X\n");
     char* name = malloc(40*sizeof(char));
     sprintf(name, "MIMPI_sync_channel_from_%d",source);
     int recv_fd=atoi(getenv(name));
     free(name);
+    printf("Y %d \n",recv_fd);
 
     if(chrecv(recv_fd, (void*)signal, 1)==0)
     {
+        printf("Z1\n");
         return MIMPI_ERROR_REMOTE_FINISHED;
     }
     else
     {
+        printf("Z2 %d \n");
         return MIMPI_SUCCESS;
     }
 }
