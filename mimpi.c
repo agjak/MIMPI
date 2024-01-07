@@ -928,13 +928,25 @@ MIMPI_Retcode MIMPI_Reduce(
 
     if(rank*2+2<size)
     {
+        if(op==MIMPI_MIN)
+        {
+            printf("1\n");
+        }
         if(MIMPI_sync_reduce_recv(messch2,rank*2+2,child_2_data,count)==MIMPI_ERROR_REMOTE_FINISHED)
         {
             messch2[0] = 'F';
         }
+        if(op==MIMPI_MIN)
+        {
+            printf("2\n");
+        }
         if(MIMPI_sync_reduce_recv(messch1,rank*2+1,child_1_data,count)==MIMPI_ERROR_REMOTE_FINISHED)
         {
             messch1[0] = 'F';
+        }
+        if(op==MIMPI_MIN)
+        {
+            printf("3\n");
         }
         if(messch1[0]=='D' && messch2[0]=='D')
         {
