@@ -465,7 +465,7 @@ MIMPI_Retcode MIMPI_Recv(
             printf("0 %d\n", MIMPI_World_rank());
         }
         struct buffer_node *last_node=NULL;
-        struct buffer_node *node=message_buffers[source];
+        struct buffer_node *node=&message_buffers[source];
         while(node->message!=NULL)
         {
             if(MIMPI_World_rank()==8)
