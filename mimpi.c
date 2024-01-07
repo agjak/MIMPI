@@ -29,7 +29,9 @@ MIMPI_Retcode MIMPI_sync_send(
 {
     char *signal_arr=malloc(sizeof(char));
     signal_arr[0]=signal;
-    return MIMPI_Send(signal_arr, 1, destination, -3);
+    MIMPI_Retcode result= MIMPI_Send(signal_arr, 1, destination, -3);
+    free(signal_arr);
+    return result;
 }
 
 MIMPI_Retcode MIMPI_sync_recv(
@@ -450,7 +452,7 @@ MIMPI_Retcode MIMPI_Recv(
                 {
                     ((uint8_t*)data)[j]=node->message[j+2*sizeof(int)];
                 }
-                //free(node->message);
+                free(node->message);
                 
                 if(last_node==NULL)
                 {
@@ -468,7 +470,7 @@ MIMPI_Retcode MIMPI_Recv(
                 {
                     last_node->next=node->next;
                 }
-                //free(node);
+                free(node);
 
                 pthread_mutex_unlock(&buffer_mutexes[source]);
                 return MIMPI_SUCCESS;
