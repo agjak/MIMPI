@@ -327,6 +327,11 @@ void *buffer_messages(void* source_pt)
 
             struct buffer_node *node;
 
+            if(message_buffers[source]==NULL)
+            {
+                message_buffers[source]==(struct buffer_node *) malloc(sizeof(struct buffer_node *));
+            }
+
             if(message_buffers[source]->message==NULL)
             {
                 node=message_buffers[source];
@@ -356,7 +361,7 @@ void *buffer_messages(void* source_pt)
             pthread_mutex_unlock(&buffer_mutexes[source]);
             if(source>0)
             {
-                printf("Sending cond signal to 0, new message from 1\n");
+                printf("Sending cond signal to 0, new message from 1 %s\n", (char*)node->message);
             }
             pthread_cond_signal(&buffer_conditions[source]);
             free(message);
