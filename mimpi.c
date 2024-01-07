@@ -66,7 +66,7 @@ MIMPI_Retcode MIMPI_sync_recv(
     }
     else
     {
-        printf("Z2 %d \n");
+        printf("Z2\n");
         return MIMPI_SUCCESS;
     }
 }
