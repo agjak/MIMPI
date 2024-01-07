@@ -344,6 +344,7 @@ void MIMPI_Finalize() {
             ASSERT_ZERO(pthread_join(buffer_threads[i],NULL));
             pthread_mutex_destroy(&buffer_mutexes[i]);
             pthread_cond_destroy(&buffer_conditions[i]);
+            free(message_buffers[i]->next);
             free(message_buffers[i]);
         }
     }
