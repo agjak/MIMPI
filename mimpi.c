@@ -460,18 +460,24 @@ MIMPI_Retcode MIMPI_Recv(
     int pom=0;
     while(true)
     {
-        printf("Receiving message %d\n", MIMPI_World_rank());
         struct buffer_node *last_node=NULL;
         struct buffer_node *node=&message_buffers[source];
         while(node->message!=NULL)
         {
-            printf("Searching for message %d\n", MIMPI_World_rank());
+            if(MIMPI_World_rank()==8)
+            {
+                printf("1 %d\n", MIMPI_World_rank());
+            }
             uint8_t *count_bytes=malloc(sizeof(int));
             uint8_t *tag_bytes=malloc(sizeof(int));
             for(int j=0; j<sizeof(int); j++)
             {
                 count_bytes[j]=node->message[j];
                 tag_bytes[j]=node->message[j+sizeof(int)];
+            }
+            if(MIMPI_World_rank()==8)
+            {
+                printf("2 %d\n", MIMPI_World_rank());
             }
             int mess_count=0;
             memcpy(&mess_count, count_bytes, sizeof(int));
@@ -499,6 +505,10 @@ MIMPI_Retcode MIMPI_Recv(
                 return MIMPI_SUCCESS;
             }
             last_node=node;
+            if(node->next==NULL)
+            {
+                node->next=(struct buffer_node *) malloc(sizeof(struct buffer_node *));
+            }
             node=node->next;
         }
         if(process_left_mimpi[source]==true)
@@ -768,7 +778,6 @@ MIMPI_Retcode MIMPI_Bcast(
                     }
                     else
                     {
-                        printf("Synchronised, going to receiving %d\n",rank);
                         MIMPI_Recv(data,count,root,-1);
                     }
 
