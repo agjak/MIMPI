@@ -329,7 +329,7 @@ void *buffer_messages(void* source_pt)
 
             if(message_buffers[source]==NULL)
             {
-                message_buffers[source]==(struct buffer_node *) malloc(sizeof(struct buffer_node *));
+                message_buffers[source]=(struct buffer_node *) malloc(sizeof(struct buffer_node *));
             }
 
             if(message_buffers[source]->message==NULL)
