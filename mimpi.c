@@ -127,51 +127,23 @@ MIMPI_Retcode MIMPI_sync_reduce_recv(
     int count
 ) 
 {
-    if(MIMPI_World_rank()==5)
-    {
-        printf("AAAA\n");
-    }
     char* name = malloc(40*sizeof(char));
     sprintf(name, "MIMPI_sync_channel_from_%d",source);
     int recv_fd=atoi(getenv(name));
     free(name);
-    if(MIMPI_World_rank()==5)
-    {
-        printf("BBBB\n");
-    }
     if(chrecv(recv_fd, (void*)signal, 1)==0)
     {
-        if(MIMPI_World_rank()==5)
-        {
-            printf("CCCC\n");
-        }
         return MIMPI_ERROR_REMOTE_FINISHED;
     }
     else
     {
-        if(MIMPI_World_rank()==5)
-        {
-            printf("DDDD\n");
-        }
         if(signal[0]=='F')
         {
-            if(MIMPI_World_rank()==5)
-            {
-                printf("EEEE\n");
-            }
             return MIMPI_SUCCESS;
         }
         else
         {
-            if(MIMPI_World_rank()==5)
-            {
-                printf("FFFF\n");
-            }
             MIMPI_Recv(data, count, source, -2);
-            if(MIMPI_World_rank()==5)
-            {
-                printf("GGGG\n");
-            }
             return MIMPI_SUCCESS;
         }
     }
@@ -484,14 +456,25 @@ MIMPI_Retcode MIMPI_Recv(
         return MIMPI_ERROR_NO_SUCH_RANK;
     }
     pthread_mutex_lock(&buffer_mutexes[source]);
-
+    if(MIMPI_World_rank()==5 && tag==-2)
+    {
+        printf("AAAA\n");
+    }
     int pom=0;
     while(true)
     {
+        if(MIMPI_World_rank()==5 && tag==-2)
+        {
+            printf("BBBB\n");
+        }
         struct buffer_node *last_node=NULL;
         struct buffer_node *node=message_buffers[source];
         while(node->message!=NULL)
         {
+            if(MIMPI_World_rank()==5 && tag==-2)
+            {
+                printf("CCCC\n");
+            }
             uint8_t *count_bytes=malloc(sizeof(int));
             uint8_t *tag_bytes=malloc(sizeof(int));
             for(int j=0; j<sizeof(int); j++)
@@ -505,6 +488,10 @@ MIMPI_Retcode MIMPI_Recv(
             memcpy(&mess_tag, tag_bytes, sizeof(int));
             if(count==mess_count && (tag==mess_tag || tag==MIMPI_ANY_TAG))
             {
+                if(MIMPI_World_rank()==5 && tag==-2)
+                {
+                    printf("EEEE\n");
+                }
                 for(int j=0; j<count; j++)
                 {
                     ((uint8_t*)data)[j]=node->message[j+2*sizeof(int)];
@@ -530,6 +517,10 @@ MIMPI_Retcode MIMPI_Recv(
                 node->next=(struct buffer_node *) malloc(sizeof(struct buffer_node *));
             }
             node=node->next;
+        }
+        if(MIMPI_World_rank()==5 && tag==-2)
+        {
+            printf("DDDD\n");
         }
         if(process_left_mimpi[source]==true)
         {
