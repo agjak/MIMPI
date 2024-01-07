@@ -379,6 +379,7 @@ void MIMPI_Finalize() {
     free(buffer_mutexes);
     free(message_buffers);
     free(buffer_conditions);
+    fflush(stdout);
     channels_finalize();
 }
 
