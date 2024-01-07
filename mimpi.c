@@ -127,10 +127,18 @@ MIMPI_Retcode MIMPI_sync_reduce_recv(
     int count
 ) 
 {
+    if(MIMPI_World_rank()==5)
+    {
+        printf("A\n");
+    }
     char* name = malloc(40*sizeof(char));
     sprintf(name, "MIMPI_sync_channel_from_%d",source);
     int recv_fd=atoi(getenv(name));
     free(name);
+    if(MIMPI_World_rank()==5)
+    {
+        printf("B\n");
+    }
     if(chrecv(recv_fd, (void*)signal, 1)==0)
     {
         return MIMPI_ERROR_REMOTE_FINISHED;
@@ -143,7 +151,15 @@ MIMPI_Retcode MIMPI_sync_reduce_recv(
         }
         else
         {
+            if(MIMPI_World_rank()==5)
+            {
+                printf("C\n");
+            }
             MIMPI_Recv(data, count, source, -2);
+            if(MIMPI_World_rank()==5)
+            {
+                printf("D\n");
+            }
             return MIMPI_SUCCESS;
         }
     }
