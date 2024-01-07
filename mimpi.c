@@ -139,7 +139,7 @@ MIMPI_Retcode MIMPI_sync_reduce_recv(
     {
         printf("B\n");
     }
-    if(chrecv(recv_fd, (void*)signal, 1)==0)
+    if(chrecv(recv_fd, (void*)signal, 1)<=0)
     {
         return MIMPI_ERROR_REMOTE_FINISHED;
     }
