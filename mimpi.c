@@ -481,7 +481,7 @@ MIMPI_Retcode MIMPI_Recv(
                 {
                     ((uint8_t*)data)[j]=node->message[j+2*sizeof(int)];
                 }
-                free(node->message);
+                //free(node->message);
                 
                 if(last_node==NULL)
                 {
@@ -491,7 +491,7 @@ MIMPI_Retcode MIMPI_Recv(
                 {
                     last_node->next=node->next;
                 }
-                free(node);
+                //free(node);
 
                 pthread_mutex_unlock(&buffer_mutexes[source]);
                 return MIMPI_SUCCESS;
