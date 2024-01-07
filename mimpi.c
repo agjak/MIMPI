@@ -502,16 +502,14 @@ MIMPI_Retcode MIMPI_Recv(
             last_node=node;
             node=node->next;
         }
+        printf("2d %d\n",MIMPI_World_rank());
         if(process_left_mimpi[source]==true)
         {
-            if(pom==0)
-            {
-                pom++;
-                continue;
-            }
+            printf("2e %d\n",MIMPI_World_rank());
             pthread_mutex_unlock(&buffer_mutexes[source]);
             return MIMPI_ERROR_REMOTE_FINISHED;
         }
+        printf("2f %d\n",MIMPI_World_rank());
         pthread_cond_wait(&buffer_conditions[source], &buffer_mutexes[source]);
     }
 
