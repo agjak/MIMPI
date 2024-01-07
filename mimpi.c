@@ -81,12 +81,12 @@ MIMPI_Retcode MIMPI_sync_reduce_send(
         MIMPI_Retcode status = MIMPI_sync_send(signal, destination);
         if (status==MIMPI_SUCCESS)
         {
-            MIMPI_free_global_variables();
+            //MIMPI_free_global_variables();
             exit(0);
         }
         else
         {
-            MIMPI_free_global_variables();
+            //MIMPI_free_global_variables();
             exit(1);
         }
     }
@@ -98,12 +98,12 @@ MIMPI_Retcode MIMPI_sync_reduce_send(
             MIMPI_Retcode status = MIMPI_Send(data, count, destination, -2);
             if (status==MIMPI_SUCCESS)
             {
-                MIMPI_free_global_variables();
+                //MIMPI_free_global_variables();
                 exit(0);
             }
             else
             {
-                MIMPI_free_global_variables();
+                //MIMPI_free_global_variables();
                 exit(1);
             }
         }
@@ -187,12 +187,12 @@ MIMPI_Retcode MIMPI_send_sync_signal_to_both_children(int rank, int size, char s
         MIMPI_Retcode status = MIMPI_send_sync_signal_to_left_child(rank,size,signal);
         if (status==MIMPI_SUCCESS)
         {
-            MIMPI_free_global_variables();
+            //MIMPI_free_global_variables();
             exit(0);
         }
         else
         {
-            MIMPI_free_global_variables();
+            //MIMPI_free_global_variables();
             exit(1);
         }
     }
@@ -204,12 +204,12 @@ MIMPI_Retcode MIMPI_send_sync_signal_to_both_children(int rank, int size, char s
             MIMPI_Retcode status = MIMPI_send_sync_signal_to_right_child(rank,size,signal);
             if (status==MIMPI_SUCCESS)
             {
-                MIMPI_free_global_variables();
+                //MIMPI_free_global_variables();
                 exit(0);
             }
             else
             {
-                MIMPI_free_global_variables();
+                //MIMPI_free_global_variables();
                 exit(1);
             }
         }
@@ -680,7 +680,7 @@ MIMPI_Retcode MIMPI_Bcast(
                         {
                             MIMPI_Send(data,count,i,-1);
                         }
-                        MIMPI_free_global_variables();
+                        //MIMPI_free_global_variables();
                         exit(0);
                     }
                 }
@@ -757,7 +757,7 @@ MIMPI_Retcode MIMPI_Bcast(
                                 {
                                     MIMPI_Send(data,count,i,-1);
                                 }
-                                MIMPI_free_global_variables();
+                                //MIMPI_free_global_variables();
                                 exit(0);
                             }
                         }
