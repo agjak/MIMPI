@@ -127,12 +127,8 @@ MIMPI_Retcode MIMPI_sync_reduce_recv(
     int count
 ) 
 {
-    char* name = malloc(40*sizeof(char));
-    sprintf(name, "MIMPI_channel_from_%d",source);
-    int recv_fd=atoi(getenv(name));
-    free(name);
 
-    if(chrecv(recv_fd, (void*)signal, -3)==0)
+    if(MIMPI_Recv(signal, 1, source, -3)==0)
     {
         return MIMPI_ERROR_REMOTE_FINISHED;
     }
