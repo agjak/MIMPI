@@ -22,6 +22,29 @@ pthread_cond_t *buffer_conditions;
 bool *process_left_mimpi;
 
 
+void MIMPI_free_global_variables()
+{
+    int size=MIMPI_World_size();
+    int rank=MIMPI_World_rank();
+    for(int i=0; i<size; i++)
+    {
+        if(i!=rank)
+        {
+            ASSERT_ZERO(pthread_join(buffer_threads[i],NULL));
+            pthread_mutex_destroy(&buffer_mutexes[i]);
+            pthread_cond_destroy(&buffer_conditions[i]);
+            free(message_buffers[i]->next);
+            free(message_buffers[i]);
+        }
+    }
+    free(buffer_mutexes);
+    free(message_buffers);
+    free(buffer_conditions);
+    free(buffer_threads);
+    free(process_left_mimpi);
+}
+
+
 MIMPI_Retcode MIMPI_sync_send(
     char signal,
     int destination
@@ -342,25 +365,7 @@ void MIMPI_Init(bool enable_deadlock_detection) {
 
 }
 
-void MIMPI_free_global_variables()
-{
-    for(int i=0; i<size; i++)
-    {
-        if(i!=rank)
-        {
-            ASSERT_ZERO(pthread_join(buffer_threads[i],NULL));
-            pthread_mutex_destroy(&buffer_mutexes[i]);
-            pthread_cond_destroy(&buffer_conditions[i]);
-            free(message_buffers[i]->next);
-            free(message_buffers[i]);
-        }
-    }
-    free(buffer_mutexes);
-    free(message_buffers);
-    free(buffer_conditions);
-    free(buffer_threads);
-    free(process_left_mimpi);
-}
+
 
 void MIMPI_Finalize() {
 
