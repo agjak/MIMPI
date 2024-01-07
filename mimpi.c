@@ -469,7 +469,7 @@ MIMPI_Retcode MIMPI_Recv(
         }
         struct buffer_node *last_node=NULL;
         struct buffer_node *node=message_buffers[source];
-        while(node->message!=NULL)
+        while(node!=NULL && node->message!=NULL)
         {
             if(MIMPI_World_rank()==5 && tag==-2)
             {
