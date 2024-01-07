@@ -22,7 +22,6 @@ int main(int argc, char **argv)
     char number = 0;
     if (world_rank == 0)
         number = 42;
-    printf("Going into broadcast %d\n", world_rank);
     fflush(stdout);
     ASSERT_MIMPI_OK(MIMPI_Bcast(&number, 1, 0));
     printf("Number: %d %d\n", number,world_rank);
