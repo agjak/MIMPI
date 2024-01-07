@@ -489,19 +489,39 @@ MIMPI_Retcode MIMPI_Recv(
             }
             if(count==mess_count && (tag==mess_tag || tag==MIMPI_ANY_TAG))
             {
+                if(MIMPI_World_rank()==8)
+                {
+                    printf("3a %d\n", MIMPI_World_rank());
+                }
                 for(int j=0; j<count; j++)
                 {
                     ((uint8_t*)data)[j]=node->message[j+2*sizeof(int)];
                 }
                 //free(node->message);
+                if(MIMPI_World_rank()==8)
+                {
+                    printf("3b %d\n", MIMPI_World_rank());
+                }
                 
                 if(last_node==NULL)
                 {
+                    if(MIMPI_World_rank()==8)
+                    {
+                        printf("3c %d\n", MIMPI_World_rank());
+                    }
                     message_buffers[source]=*node->next;
                 }
                 else
                 {
+                    if(MIMPI_World_rank()==8)
+                    {
+                        printf("3d %d\n", MIMPI_World_rank());
+                    }
                     last_node->next=node->next;
+                }
+                if(MIMPI_World_rank()==8)
+                {
+                    printf("3e %d\n", MIMPI_World_rank());
                 }
                 //free(node);
 
