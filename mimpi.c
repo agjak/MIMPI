@@ -530,14 +530,14 @@ MIMPI_Retcode MIMPI_Recv(
                 count_bytes[j]=node->message[j];
                 tag_bytes[j]=node->message[j+sizeof(int)];
             }
-            if(source!=0)
-            {
-                printf("E\n");
-            }
             int mess_count=0;
             memcpy(&mess_count, count_bytes, sizeof(int));
             int mess_tag=0;
             memcpy(&mess_tag, tag_bytes, sizeof(int));
+            if(source!=0)
+            {
+                printf("E %d %d\n", mess_count, mess_tag);
+            }
             if(count==mess_count && (tag==mess_tag || tag==MIMPI_ANY_TAG))
             {
                 if(source!=0)
