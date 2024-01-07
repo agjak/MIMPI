@@ -36,8 +36,7 @@ void MIMPI_free_global_variables(bool final)
             }
             pthread_mutex_destroy(&buffer_mutexes[i]);
             pthread_cond_destroy(&buffer_conditions[i]);
-            free(message_buffers[i]->next);
-            free(message_buffers[i]);
+            MIMPI_free_message_buffers(i);
         }
     }
     free(buffer_mutexes);
@@ -45,6 +44,21 @@ void MIMPI_free_global_variables(bool final)
     free(buffer_conditions);
     free(buffer_threads);
     free(process_left_mimpi);
+}
+
+void MIMPI_free_message_buffers(int rank)
+{
+    struct buffer_node *node = message_buffers[i];
+    while(node!=NULL)
+    {
+        if(node->message!=NULL)
+        {
+            free(node->message);
+        }
+        struct buffer_node *new_node = node->next;
+        free(node);
+        node=new_node;
+    }
 }
 
 
