@@ -136,10 +136,6 @@ int main(int argc, char* argv[]) {
 
             execvp(prog_name, prog_args);
         }
-        else
-        {
-            printf("A child was made %d\n",pid);
-        }
     }
 
     free(name1);
@@ -177,7 +173,7 @@ int main(int argc, char* argv[]) {
 
     for(int i=0; i<world_size; i++)
     {
-        printf("A child has returned %d\n", wait(NULL));
+        ASSERT_SYS_OK(wait(NULL));
     }
     return 0;
 }
