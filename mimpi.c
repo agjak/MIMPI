@@ -509,7 +509,8 @@ MIMPI_Retcode MIMPI_Recv(
                     {
                         printf("3c %d\n", MIMPI_World_rank());
                     }
-                    &message_buffers[source]=node->next;
+                    message_buffers[source]->message=node->next->message;
+                    message_buffers[source]->next=node->next->next;
                 }
                 else
                 {
