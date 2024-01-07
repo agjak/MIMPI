@@ -460,12 +460,12 @@ MIMPI_Retcode MIMPI_Recv(
     int pom=0;
     while(true)
     {
-        print("Receiving message %d\n", MIMPI_World_rank());
+        printf("Receiving message %d\n", MIMPI_World_rank());
         struct buffer_node *last_node=NULL;
         struct buffer_node *node=&message_buffers[source];
         while(node->message!=NULL)
         {
-            print("Searching for message %d\n", MIMPI_World_rank());
+            printf("Searching for message %d\n", MIMPI_World_rank());
             uint8_t *count_bytes=malloc(sizeof(int));
             uint8_t *tag_bytes=malloc(sizeof(int));
             for(int j=0; j<sizeof(int); j++)
