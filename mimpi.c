@@ -478,12 +478,28 @@ MIMPI_Retcode MIMPI_Recv(
     }
     pthread_mutex_lock(&buffer_mutexes[source]);
     int pom=0;
+    if(source!=0)
+    {
+        printf("A\n");
+    }
     while(true)
     {
+        if(source!=0)
+        {
+            printf("B\n");
+        }
         struct buffer_node *last_node=NULL;
         struct buffer_node *node=message_buffers[source];
+        if(source!=0)
+        {
+            printf("C\n");
+        }
         while(node!=NULL && node->message!=NULL)
         {
+            if(source!=0)
+            {
+                printf("D\n");
+            }
             uint8_t *count_bytes=malloc(sizeof(int));
             uint8_t *tag_bytes=malloc(sizeof(int));
             for(int j=0; j<sizeof(int); j++)
@@ -491,12 +507,20 @@ MIMPI_Retcode MIMPI_Recv(
                 count_bytes[j]=node->message[j];
                 tag_bytes[j]=node->message[j+sizeof(int)];
             }
+            if(source!=0)
+            {
+                printf("E\n");
+            }
             int mess_count=0;
             memcpy(&mess_count, count_bytes, sizeof(int));
             int mess_tag=0;
             memcpy(&mess_tag, tag_bytes, sizeof(int));
             if(count==mess_count && (tag==mess_tag || tag==MIMPI_ANY_TAG))
             {
+                if(source!=0)
+                {
+                    printf("F\n");
+                }
                 for(int j=0; j<count; j++)
                 {
                     ((uint8_t*)data)[j]=node->message[j+2*sizeof(int)];
@@ -512,9 +536,17 @@ MIMPI_Retcode MIMPI_Recv(
                     last_node->next=node->next;
                 }
                 //free(node);
+                if(source!=0)
+                {
+                    printf("G\n");
+                }
 
                 pthread_mutex_unlock(&buffer_mutexes[source]);
                 return MIMPI_SUCCESS;
+            }
+            if(source!=0)
+            {
+                printf("H\n");
             }
             last_node=node;
             if(node->next==NULL)
@@ -523,8 +555,16 @@ MIMPI_Retcode MIMPI_Recv(
             }
             node=node->next;
         }
+        if(source!=0)
+        {
+            printf("I\n");
+        }
         if(process_left_mimpi[source]==true)
         {
+            if(source!=0)
+            {
+                printf("J\n");
+            }
             if(pom==0)
             {
                 pom++;
