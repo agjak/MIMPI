@@ -912,6 +912,7 @@ MIMPI_Retcode MIMPI_Barrier()
             free(messch2);
             free(messpar);
             MIMPI_send_sync_signal_to_both_children(rank, size, 'F');   //FINISHED
+            printf("1 %d\n",rank);
             return MIMPI_ERROR_REMOTE_FINISHED;
         }
         else    //messch1[0]=='B' && messch2[0]=='B'
@@ -935,6 +936,7 @@ MIMPI_Retcode MIMPI_Barrier()
             {
                 MIMPI_send_sync_signal_to_both_children(rank,size,'F');
                 free(messpar);
+                printf("2 %d\n",rank);
                 return MIMPI_ERROR_REMOTE_FINISHED;
             }
             else
@@ -942,6 +944,7 @@ MIMPI_Retcode MIMPI_Barrier()
                 MIMPI_sync_recv(messpar,(rank-1)/2);
                 MIMPI_send_sync_signal_to_both_children(rank,size,'F');
                 free(messpar);
+                printf("3 %d\n",rank);
                 return MIMPI_ERROR_REMOTE_FINISHED;
             }
             
@@ -955,6 +958,7 @@ MIMPI_Retcode MIMPI_Barrier()
             {
                 MIMPI_send_sync_signal_to_both_children(rank,size,'F');
                 free(messpar);
+                printf("4 %d\n",rank);
                 return MIMPI_ERROR_REMOTE_FINISHED;
             }
             else
@@ -964,6 +968,7 @@ MIMPI_Retcode MIMPI_Barrier()
                 {
                     MIMPI_send_sync_signal_to_both_children(rank,size,'F');
                     free(messpar);
+                    printf("5 %d\n",rank);
                     return MIMPI_ERROR_REMOTE_FINISHED;
                 }
                 else    //messpar[0]=='B'
