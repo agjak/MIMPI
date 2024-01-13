@@ -532,13 +532,13 @@ MIMPI_Retcode MIMPI_Recv(
         char sync_signal=MIMPI_Recv_R_or_S_deadlock_message(source,count,tag);
         if(sync_signal=='F')
         {
-            printf("2 %d\n", MIMPI_World_rank());
+            //printf("2 %d\n", MIMPI_World_rank());
             return MIMPI_ERROR_REMOTE_FINISHED;
         }
         else if(sync_signal=='R')
         {
             pthread_cond_signal(&buffer_conditions[source]);
-            printf("deadlock detected %d\n", MIMPI_World_rank());
+            //printf("deadlock detected %d\n", MIMPI_World_rank());
             return MIMPI_ERROR_DEADLOCK_DETECTED;
         }
         else
@@ -604,7 +604,7 @@ MIMPI_Retcode MIMPI_Recv(
                         continue;
                     }
                     pthread_mutex_unlock(&buffer_mutexes[source]);
-                    printf("3 %d\n", MIMPI_World_rank());
+                    //printf("3 %d\n", MIMPI_World_rank());
                     return MIMPI_ERROR_REMOTE_FINISHED;
                 }
                 ASSERT_SYS_OK(pthread_cond_wait(&buffer_conditions[source], &buffer_mutexes[source]));
