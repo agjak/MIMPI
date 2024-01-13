@@ -673,11 +673,10 @@ MIMPI_Retcode MIMPI_Recv(
                 if(pom==0)
                 {
                     pom++;
-                    pthread_mutex_unlock(&buffer_mutexes[source]);
-                    pthread_mutex_lock(&buffer_mutexes[source]);
                     continue;
                 }
                 pthread_mutex_unlock(&buffer_mutexes[source]);
+                printf("remote %d finished\n", source);
                 return MIMPI_ERROR_REMOTE_FINISHED;
             }
             ASSERT_SYS_OK(pthread_cond_wait(&buffer_conditions[source], &buffer_mutexes[source]));
