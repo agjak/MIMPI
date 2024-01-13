@@ -20,6 +20,7 @@ pthread_mutex_t *buffer_mutexes;
 pthread_t *buffer_threads;
 pthread_cond_t *buffer_conditions;
 bool *process_left_mimpi;
+bool deadlock_detection;
 
 
 void MIMPI_free_message_buffers(int rank)
@@ -355,6 +356,15 @@ void MIMPI_Init(bool enable_deadlock_detection) {
     buffer_conditions=malloc(size*sizeof(pthread_cond_t));
     process_left_mimpi=malloc(size*sizeof(bool));
 
+    if(enable_deadlock_detection)
+    {
+        deadlock_detection=true;
+    }
+    else
+    {
+        deadlock_detection=false;
+    }
+
     for(int i=0; i<size; i++)
     {
         if(i!=rank)
@@ -403,6 +413,9 @@ int MIMPI_World_rank() {
     return atoi(getenv("MIMPI_world_rank"));
 }
 
+void* MIMPI_Recv_R_deadlock_message(void* var_pt);
+char MIMPI_Recv_R_or_S_deadlock_message(int source,int expected_count,int expected_tag);
+
 MIMPI_Retcode MIMPI_Send(
     void const *data,
     int count,
@@ -417,6 +430,33 @@ MIMPI_Retcode MIMPI_Send(
     {
         return MIMPI_ERROR_NO_SUCH_RANK;
     }
+
+    if(deadlock_detection && tag!=-4)   //No recursion!
+    {
+        char *signal_arr=malloc(sizeof(char)+2*sizeof(int));
+        signal_arr[0]='S';
+        memcpy(&signal_arr[1], &count, sizeof(int));
+        memcpy(&signal_arr[sizeof(int)+1], &tag, sizeof(int));
+        MIMPI_Retcode result= MIMPI_Send(signal_arr, sizeof(char)+2*sizeof(int), destination, -4);
+        free(signal_arr);
+        if(result==MIMPI_ERROR_REMOTE_FINISHED)
+        {
+            return result;
+        }
+
+        int* var_pt=malloc(3*sizeof(int));
+        var_pt[0]=destination;
+        var_pt[1]=count;
+        var_pt[2]=tag;
+        pthread_t thread;
+        pthread_attr_t attr;
+        ASSERT_ZERO(pthread_attr_init(&attr));
+        ASSERT_ZERO(pthread_create(&thread, &attr, MIMPI_Recv_R_deadlock_message, var_pt));
+        ASSERT_ZERO(pthread_attr_destroy(&attr));
+
+
+    }
+    
     uint8_t *count_bytes=malloc(sizeof(int));
     memcpy(count_bytes, &count, sizeof(int));
     uint8_t *tag_bytes=malloc(sizeof(int));
@@ -451,6 +491,7 @@ MIMPI_Retcode MIMPI_Send(
         free(data_to_send);
         return MIMPI_SUCCESS;
     }
+
 }
 
 MIMPI_Retcode MIMPI_Recv(
@@ -466,6 +507,202 @@ MIMPI_Retcode MIMPI_Recv(
     if (source < 0 || source >= MIMPI_World_size())
     {
         return MIMPI_ERROR_NO_SUCH_RANK;
+    }
+
+    if(deadlock_detection)
+    {
+        char *signal_arr=malloc(sizeof(char)+2*sizeof(int));
+        signal_arr[0]='R';
+        uint8_t *count_arr=malloc(sizeof(int));
+        uint8_t *tag_arr=malloc(sizeof(int));
+        memcpy(count_arr, &count, sizeof(int));
+        memcpy(tag_arr, &tag, sizeof(int));
+
+        for(int i=0;i<sizeof(int);i++)
+        {
+            signal_arr[1+i]=count_arr[i];
+            signal_arr[1+i+sizeof(int)]=tag_arr[i];
+        }
+        free(count_arr);
+        free(tag_arr);
+
+        MIMPI_Send(signal_arr, sizeof(char)+2*sizeof(int), source, -4);
+        free(signal_arr);
+
+        char sync_signal=MIMPI_Recv_R_or_S_deadlock_message(source,count,tag);
+        if(sync_signal=='F')
+        {
+            printf("2 %d\n", MIMPI_World_rank());
+            return MIMPI_ERROR_REMOTE_FINISHED;
+        }
+        else if(sync_signal=='R')
+        {
+            pthread_cond_signal(&buffer_conditions[source]);
+            printf("deadlock detected %d\n", MIMPI_World_rank());
+            return MIMPI_ERROR_DEADLOCK_DETECTED;
+        }
+        else
+        {
+            pthread_mutex_lock(&buffer_mutexes[source]);
+            int pom=0;
+            while(true)
+            {
+                struct buffer_node *last_node=NULL;
+                struct buffer_node *node=message_buffers[source];
+                while(node!=NULL && node->message!=NULL)
+                {
+                    uint8_t *count_bytes=malloc(sizeof(int));
+                    uint8_t *tag_bytes=malloc(sizeof(int));
+                    for(int j=0; j<sizeof(int); j++)
+                    {
+                        count_bytes[j]=node->message[j];
+                        tag_bytes[j]=node->message[j+sizeof(int)];
+                    }
+                    int mess_count=0;
+                    memcpy(&mess_count, count_bytes, sizeof(int));
+                    int mess_tag=0;
+                    memcpy(&mess_tag, tag_bytes, sizeof(int));
+                    free(count_bytes);
+                    free(tag_bytes);
+                    if(count==mess_count && (tag==mess_tag || tag==MIMPI_ANY_TAG))
+                    {
+                        for(int j=0; j<count; j++)
+                        {
+                            ((uint8_t*)data)[j]=node->message[j+2*sizeof(int)];
+                        }
+                        free(node->message);
+                        
+                        if(last_node==NULL)
+                        {
+                            if(node->next!=NULL)
+                            {
+                                message_buffers[source]=node->next;
+                            }
+                            else
+                            {
+                                node->message=NULL;
+                            }
+                        }
+                        else
+                        {
+                            last_node->next=node->next;
+                            free(node);
+                        }
+                        
+
+                        pthread_mutex_unlock(&buffer_mutexes[source]);
+                        return MIMPI_SUCCESS;
+                    }
+                    last_node=node;
+                    node=node->next;
+                }
+                if(process_left_mimpi[source]==true)
+                {
+                    if(pom==0)
+                    {
+                        pom++;
+                        continue;
+                    }
+                    pthread_mutex_unlock(&buffer_mutexes[source]);
+                    printf("3 %d\n", MIMPI_World_rank());
+                    return MIMPI_ERROR_REMOTE_FINISHED;
+                }
+                ASSERT_SYS_OK(pthread_cond_wait(&buffer_conditions[source], &buffer_mutexes[source]));
+            }
+
+        }
+
+    }
+    else
+    {
+        pthread_mutex_lock(&buffer_mutexes[source]);
+        int pom=0;
+        while(true)
+        {
+            struct buffer_node *last_node=NULL;
+            struct buffer_node *node=message_buffers[source];
+            while(node!=NULL && node->message!=NULL)
+            {
+                uint8_t *count_bytes=malloc(sizeof(int));
+                uint8_t *tag_bytes=malloc(sizeof(int));
+                for(int j=0; j<sizeof(int); j++)
+                {
+                    count_bytes[j]=node->message[j];
+                    tag_bytes[j]=node->message[j+sizeof(int)];
+                }
+                int mess_count=0;
+                memcpy(&mess_count, count_bytes, sizeof(int));
+                int mess_tag=0;
+                memcpy(&mess_tag, tag_bytes, sizeof(int));
+                free(count_bytes);
+                free(tag_bytes);
+                if(count==mess_count && (tag==mess_tag || tag==MIMPI_ANY_TAG))
+                {
+                    for(int j=0; j<count; j++)
+                    {
+                        ((uint8_t*)data)[j]=node->message[j+2*sizeof(int)];
+                    }
+                    free(node->message);
+                    
+                    if(last_node==NULL)
+                    {
+                        if(node->next!=NULL)
+                        {
+                            message_buffers[source]=node->next;
+                        }
+                        else
+                        {
+                            node->message=NULL;
+                        }
+                    }
+                    else
+                    {
+                        last_node->next=node->next;
+                        free(node);
+                    }
+                    
+
+                    pthread_mutex_unlock(&buffer_mutexes[source]);
+                    return MIMPI_SUCCESS;
+                }
+                last_node=node;
+                node=node->next;
+            }
+            if(process_left_mimpi[source]==true)
+            {
+                if(pom==0)
+                {
+                    pom++;
+                    pthread_mutex_unlock(&buffer_mutexes[source]);
+                    pthread_mutex_lock(&buffer_mutexes[source]);
+                    continue;
+                }
+                pthread_mutex_unlock(&buffer_mutexes[source]);
+                return MIMPI_ERROR_REMOTE_FINISHED;
+            }
+            ASSERT_SYS_OK(pthread_cond_wait(&buffer_conditions[source], &buffer_mutexes[source]));
+        }
+    }
+
+}
+
+
+void* MIMPI_Recv_R_deadlock_message(
+    void* var_pt
+) {
+    int source= ((int*)var_pt)[0];
+    int expected_count=((int*)var_pt)[1];
+    int expected_tag=((int*)var_pt)[2];
+    free(var_pt);
+
+
+    if (source == MIMPI_World_rank())
+    {
+        return 0;
+    }
+    if (source < 0 || source >= MIMPI_World_size())
+    {
+        return 0;
     }
     pthread_mutex_lock(&buffer_mutexes[source]);
     int pom=0;
@@ -488,34 +725,47 @@ MIMPI_Retcode MIMPI_Recv(
             memcpy(&mess_tag, tag_bytes, sizeof(int));
             free(count_bytes);
             free(tag_bytes);
-            if(count==mess_count && (tag==mess_tag || tag==MIMPI_ANY_TAG))
+            if(mess_count==sizeof(char)+2*sizeof(int) && mess_tag==-4 && node->message[2*sizeof(int)]=='R')
             {
-                for(int j=0; j<count; j++)
+                uint8_t *count_bytes=malloc(sizeof(int));
+                uint8_t *tag_bytes=malloc(sizeof(int));
+                for(int j=0; j<sizeof(int); j++)
                 {
-                    ((uint8_t*)data)[j]=node->message[j+2*sizeof(int)];
+                    count_bytes[j]=node->message[j+1+2*sizeof(int)];
+                    tag_bytes[j]=node->message[j+1+3*sizeof(int)];
                 }
-                free(node->message);
-                
-                if(last_node==NULL)
+                int r_count=0;
+                memcpy(&r_count, count_bytes, sizeof(int));
+                int r_tag=0;
+                memcpy(&r_tag, tag_bytes, sizeof(int));
+                free(count_bytes);
+                free(tag_bytes);
+
+                if(r_tag==expected_tag && r_count==expected_count)
                 {
-                    if(node->next!=NULL)
+                    free(node->message);
+                    
+                    if(last_node==NULL)
                     {
-                        message_buffers[source]=node->next;
+                        if(node->next!=NULL)
+                        {
+                            message_buffers[source]=node->next;
+                        }
+                        else
+                        {
+                            node->message=NULL;
+                        }
                     }
                     else
                     {
-                        node->message=NULL;
+                        last_node->next=node->next;
+                        free(node);
                     }
-                }
-                else
-                {
-                    last_node->next=node->next;
-                    free(node);
-                }
-                
+                    
 
-                pthread_mutex_unlock(&buffer_mutexes[source]);
-                return MIMPI_SUCCESS;
+                    pthread_mutex_unlock(&buffer_mutexes[source]);
+                    return 0;
+                }
             }
             last_node=node;
             node=node->next;
@@ -528,12 +778,104 @@ MIMPI_Retcode MIMPI_Recv(
                 continue;
             }
             pthread_mutex_unlock(&buffer_mutexes[source]);
-            return MIMPI_ERROR_REMOTE_FINISHED;
+            return 0;
         }
         ASSERT_SYS_OK(pthread_cond_wait(&buffer_conditions[source], &buffer_mutexes[source]));
     }
-
 }
+
+
+char MIMPI_Recv_R_or_S_deadlock_message(
+    int source,
+    int expected_count,
+    int expected_tag
+) {
+
+    pthread_mutex_lock(&buffer_mutexes[source]);
+    int pom=0;
+    while(true)
+    {   
+        for(int i=0;i<2;i++)
+        {
+            struct buffer_node *last_node=NULL;
+            struct buffer_node *node=message_buffers[source];
+            while(node!=NULL && node->message!=NULL)
+            {
+
+                uint8_t *count_bytes=malloc(sizeof(int));
+                uint8_t *tag_bytes=malloc(sizeof(int));
+                for(int j=0; j<sizeof(int); j++)
+                {
+                    count_bytes[j]=node->message[j];
+                    tag_bytes[j]=node->message[j+sizeof(int)];
+                }
+                int mess_count=0;
+                memcpy(&mess_count, count_bytes, sizeof(int));
+                int mess_tag=0;
+                memcpy(&mess_tag, tag_bytes, sizeof(int));
+                free(count_bytes);
+                free(tag_bytes);
+                if(mess_count==sizeof(char)+2*sizeof(int) && mess_tag==-4 && ((node->message[2*sizeof(int)]=='R' && i==1) || (node->message[2*sizeof(int)]=='S')))
+                {
+                    uint8_t *count_bytes=malloc(sizeof(int));
+                    uint8_t *tag_bytes=malloc(sizeof(int));
+                    for(int j=0; j<sizeof(int); j++)
+                    {
+                        count_bytes[j]=node->message[2*sizeof(int)+1+j];
+                        tag_bytes[j]=node->message[3*sizeof(int)+1+j];
+                    }
+                    int r_count=0;
+                    memcpy(&r_count, count_bytes, sizeof(int));
+                    int r_tag=0;
+                    memcpy(&r_tag, tag_bytes, sizeof(int));
+                    free(count_bytes);
+                    free(tag_bytes);
+
+                    if((r_tag==expected_tag && r_count==expected_count && node->message[2*sizeof(int)]=='S') || node->message[2*sizeof(int)]=='R')
+                    {
+                        char result=node->message[2*sizeof(int)];
+                        free(node->message);
+                        
+                        if(last_node==NULL)
+                        {
+                            if(node->next!=NULL)
+                            {
+                                message_buffers[source]=node->next;
+                            }
+                            else
+                            {
+                                node->message=NULL;
+                            }
+                        }
+                        else
+                        {
+                            last_node->next=node->next;
+                            free(node);
+                        }
+                        
+
+                        pthread_mutex_unlock(&buffer_mutexes[source]);
+                        return result;
+                    }
+                }
+                last_node=node;
+                node=node->next;
+            }
+        }
+        if(process_left_mimpi[source]==true)
+        {
+            if(pom==0)
+            {
+                pom++;
+                continue;
+            }
+            pthread_mutex_unlock(&buffer_mutexes[source]);
+            return 'F';
+        }
+        ASSERT_SYS_OK(pthread_cond_wait(&buffer_conditions[source], &buffer_mutexes[source]));
+    }
+}
+
 
 MIMPI_Retcode MIMPI_Barrier() 
 {
@@ -1067,4 +1409,3 @@ MIMPI_Retcode MIMPI_Reduce(
         }
     }
 }
-
