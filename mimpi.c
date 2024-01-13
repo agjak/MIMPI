@@ -968,7 +968,7 @@ MIMPI_Retcode MIMPI_Barrier()
                 {
                     MIMPI_send_sync_signal_to_both_children(rank,size,'F');
                     free(messpar);
-                    printf("5 %d\n",rank);
+                    printf("5 %c %d\n",messpar[0],rank);
                     return MIMPI_ERROR_REMOTE_FINISHED;
                 }
                 else    //messpar[0]=='B'
