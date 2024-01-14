@@ -318,14 +318,17 @@ void *buffer_messages(void* source_pt)
             else
             {
                 int count_recvd=0;
-                int i=0;
-                for(; i<count/512; i++)
+                while(count_recvd!=count)
                 {
-                    int recv=chrecv(recv_fd,&message[512*i],512);
-                    count_recvd=count_recvd+recv;
+                    if(count-count_recvd<=512)
+                    {
+                        count_recvd=count_recvd+chrecv(recv_fd,&message[count_recvd],count-count_recvd);
+                    }
+                    else
+                    {
+                        count_recvd=count_recvd+chrecv(recv_fd,&message[count_recvd],512);
+                    }
                 }
-                int recv=chrecv(recv_fd,&message[512*i],(count%512));
-                count_recvd=count_recvd+recv;
                 printf("These should be equal: %d %d\n", count, count_recvd);
             }
             pthread_mutex_lock(&buffer_mutexes[source]);
