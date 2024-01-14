@@ -13,3 +13,4 @@ for i in {1..100} ; do
     echo 6
     ./run_test 5 2 examples_build/deadlock6
 done
+echo "done"
