@@ -33,18 +33,10 @@ void MIMPI_free_message_buffers(int rank)
         if(node->message!=NULL)
         {
             free(node->message);
-            node->message=NULL;
         }
-        if(node->next!=NULL)
-        {
-            struct buffer_node *new_node = node->next;
-            free(node);
-            node=new_node;
-        }
-        else
-        {
-            break;
-        }
+        struct buffer_node *new_node = node->next;
+        free(node);
+        node=new_node;
     }
     free(node);
 }
@@ -134,14 +126,12 @@ MIMPI_Retcode MIMPI_sync_reduce_send(
         MIMPI_Retcode status = MIMPI_sync_send(signal, destination);
         if (status==MIMPI_SUCCESS)
         {
-            MIMPI_free_global_variables(true);
-            free(data);
+            MIMPI_free_global_variables(false);
             exit(0);
         }
         else
         {
-            MIMPI_free_global_variables(true);
-            free(data);
+            MIMPI_free_global_variables(false);
             exit(1);
         }
     }
@@ -153,14 +143,12 @@ MIMPI_Retcode MIMPI_sync_reduce_send(
             MIMPI_Retcode status = MIMPI_Send(data, count, destination, -2);
             if (status==MIMPI_SUCCESS)
             {
-                MIMPI_free_global_variables(true);
-                free(data);
+                MIMPI_free_global_variables(false);
                 exit(0);
             }
             else
             {
-                MIMPI_free_global_variables(true);
-                free(data);
+                MIMPI_free_global_variables(false);
                 exit(1);
             }
         }
@@ -233,7 +221,7 @@ MIMPI_Retcode MIMPI_send_sync_signal_to_right_child(int rank, int size, char sig
 }
 
 
-MIMPI_Retcode MIMPI_send_sync_signal_to_both_children(int rank, int size, char signal, void* pointer_to_free)
+MIMPI_Retcode MIMPI_send_sync_signal_to_both_children(int rank, int size, char signal)
 {
     pid_t pid1;
     pid_t pid2;
@@ -242,23 +230,14 @@ MIMPI_Retcode MIMPI_send_sync_signal_to_both_children(int rank, int size, char s
     if(!pid1)
     {
         MIMPI_Retcode status = MIMPI_send_sync_signal_to_left_child(rank,size,signal);
-        
         if (status==MIMPI_SUCCESS)
         {
-            if(pointer_to_free!=NULL)
-            {
-                free(pointer_to_free);
-            }
-            MIMPI_free_global_variables(true);
+            MIMPI_free_global_variables(false);
             exit(0);
         }
         else
         {
-            if(pointer_to_free!=NULL)
-            {
-                free(pointer_to_free);
-            }
-            MIMPI_free_global_variables(true);
+            MIMPI_free_global_variables(false);
             exit(1);
         }
     }
@@ -270,20 +249,12 @@ MIMPI_Retcode MIMPI_send_sync_signal_to_both_children(int rank, int size, char s
             MIMPI_Retcode status = MIMPI_send_sync_signal_to_right_child(rank,size,signal);
             if (status==MIMPI_SUCCESS)
             {
-                if(pointer_to_free!=NULL)
-                {
-                    free(pointer_to_free);
-                }
-                MIMPI_free_global_variables(true);
+                MIMPI_free_global_variables(false);
                 exit(0);
             }
             else
             {
-                if(pointer_to_free!=NULL)
-                {
-                    free(pointer_to_free);
-                }
-                MIMPI_free_global_variables(true);
+                MIMPI_free_global_variables(false);
                 exit(1);
             }
         }
@@ -361,8 +332,7 @@ void *buffer_messages(void* source_pt)
 
             if(message_buffers[source]==NULL)
             {
-                message_buffers[source]=(struct buffer_node *) malloc(sizeof(struct buffer_node));
-                message_buffers[source]->message=NULL;
+                message_buffers[source]=(struct buffer_node *) malloc(sizeof(struct buffer_node *));
             }
             if(message_buffers[source]->message==NULL)
             {
@@ -375,7 +345,7 @@ void *buffer_messages(void* source_pt)
                 {
                     last_node=last_node->next;
                 }
-                last_node->next=(struct buffer_node *) malloc(sizeof(struct buffer_node));
+                last_node->next=(struct buffer_node *) malloc(sizeof(struct buffer_node *));
                 node=last_node->next;
             }
             node->message = malloc(count+2*sizeof(int));
@@ -436,12 +406,11 @@ void MIMPI_Init(bool enable_deadlock_detection) {
             ASSERT_ZERO(pthread_attr_init(&attr2));
             ASSERT_ZERO(pthread_create(&buffer_threads[i], &attr2, buffer_messages, source_pt));
             ASSERT_ZERO(pthread_attr_destroy(&attr2));
-            //free(source_pt);
 
             ASSERT_ZERO(pthread_cond_init(&buffer_conditions[i], NULL));
 
             process_left_mimpi[i]=false;
-            message_buffers[i]=(struct buffer_node*)malloc(sizeof(struct buffer_node));
+            message_buffers[i]=(struct buffer_node*)malloc(sizeof(struct buffer_node*));
             //message_buffers[i]->next=(struct buffer_node*)malloc(sizeof(struct buffer_node*));
             message_buffers[i]->next=NULL;
             message_buffers[i]->message=NULL;
@@ -542,7 +511,7 @@ MIMPI_Retcode MIMPI_Send(
     {
         if((count+2*sizeof(int))-count_sent<=512)
         {
-            int sent=chsend(send_fd,&data_to_send[count_sent],(count+2*sizeof(int))-count_sent);
+            int sent=chsend(send_fd,&message[count_sent],(count+2*sizeof(int))-count_sent);
             if(sent==-1)
             {
                 free(data_to_send);
@@ -552,7 +521,7 @@ MIMPI_Retcode MIMPI_Send(
         }
         else
         {
-            int sent=chsend(send_fd,&data_to_send[count_sent],512);
+            int sent=chsend(send_fd,&message[count_sent],512);
             if(sent==-1)
             {
                 free(data_to_send);
@@ -979,7 +948,7 @@ MIMPI_Retcode MIMPI_Barrier()
             free(messch1);
             free(messch2);
             free(messpar);
-            MIMPI_send_sync_signal_to_both_children(rank, size, 'F', NULL);   //FINISHED
+            MIMPI_send_sync_signal_to_both_children(rank, size, 'F');   //FINISHED
             return MIMPI_ERROR_REMOTE_FINISHED;
         }
         else    //messch1[0]=='B' && messch2[0]=='B'
@@ -987,7 +956,7 @@ MIMPI_Retcode MIMPI_Barrier()
             free(messch1);
             free(messch2);
             free(messpar);
-            MIMPI_send_sync_signal_to_both_children(rank, size, 'B', NULL);   //BARRIER
+            MIMPI_send_sync_signal_to_both_children(rank, size, 'B');   //BARRIER
             return MIMPI_SUCCESS;
         }
     }
@@ -1001,14 +970,14 @@ MIMPI_Retcode MIMPI_Barrier()
             MIMPI_Retcode result = MIMPI_send_sync_signal_to_parent(rank, 'F');    //FINISHED
             if(result==MIMPI_ERROR_REMOTE_FINISHED) //parent has finished
             {
-                MIMPI_send_sync_signal_to_both_children(rank,size,'F', NULL);
+                MIMPI_send_sync_signal_to_both_children(rank,size,'F');
                 free(messpar);
                 return MIMPI_ERROR_REMOTE_FINISHED;
             }
             else
             {
                 MIMPI_sync_recv(messpar,(rank-1)/2);
-                MIMPI_send_sync_signal_to_both_children(rank,size,'F', NULL);
+                MIMPI_send_sync_signal_to_both_children(rank,size,'F');
                 free(messpar);
                 return MIMPI_ERROR_REMOTE_FINISHED;
             }
@@ -1021,7 +990,7 @@ MIMPI_Retcode MIMPI_Barrier()
             MIMPI_Retcode result = MIMPI_send_sync_signal_to_parent(rank,'B');    //BARRIER
             if(result==MIMPI_ERROR_REMOTE_FINISHED) //parent has finished
             {
-                MIMPI_send_sync_signal_to_both_children(rank,size,'F', NULL);
+                MIMPI_send_sync_signal_to_both_children(rank,size,'F');
                 free(messpar);
                 return MIMPI_ERROR_REMOTE_FINISHED;
             }
@@ -1030,13 +999,13 @@ MIMPI_Retcode MIMPI_Barrier()
                 MIMPI_Retcode result = MIMPI_sync_recv(messpar,(rank-1)/2);
                 if(messpar[0]=='F' || result==MIMPI_ERROR_REMOTE_FINISHED)
                 {
-                    MIMPI_send_sync_signal_to_both_children(rank,size,'F', NULL);
+                    MIMPI_send_sync_signal_to_both_children(rank,size,'F');
                     free(messpar);
                     return MIMPI_ERROR_REMOTE_FINISHED;
                 }
                 else    //messpar[0]=='B'
                 {
-                    MIMPI_send_sync_signal_to_both_children(rank,size,'B', NULL);
+                    MIMPI_send_sync_signal_to_both_children(rank,size,'B');
                     free(messpar);
                     return MIMPI_SUCCESS;
                 }
@@ -1089,7 +1058,7 @@ MIMPI_Retcode MIMPI_Bcast(
             free(messch1);
             free(messch2);
             free(messpar);
-            MIMPI_send_sync_signal_to_both_children(rank, size, 'F', NULL);   //FINISHED
+            MIMPI_send_sync_signal_to_both_children(rank, size, 'F');   //FINISHED
             return MIMPI_ERROR_REMOTE_FINISHED;
         }
         else    //(messch1[0]=='R'||messch1[0]=='E') && (messch2[0]=='R'||messch2[0]=='E')
@@ -1097,7 +1066,7 @@ MIMPI_Retcode MIMPI_Bcast(
             free(messch1);
             free(messch2);
             free(messpar);
-            MIMPI_send_sync_signal_to_both_children(rank, size, 'R', NULL);   //BROADCAST
+            MIMPI_send_sync_signal_to_both_children(rank, size, 'R');   //BROADCAST
 
             if(rank==root)
             {
@@ -1111,7 +1080,7 @@ MIMPI_Retcode MIMPI_Bcast(
                         {
                             MIMPI_Send(data,count,i,-1);
                         }
-                        MIMPI_free_global_variables(true);
+                        MIMPI_free_global_variables(false);
                         exit(0);
                     }
                 }
@@ -1138,14 +1107,14 @@ MIMPI_Retcode MIMPI_Bcast(
             MIMPI_Retcode result = MIMPI_send_sync_signal_to_parent(rank, 'F');    //FINISHED
             if(result==MIMPI_ERROR_REMOTE_FINISHED) //parent has finished
             {
-                MIMPI_send_sync_signal_to_both_children(rank,size,'F', NULL);
+                MIMPI_send_sync_signal_to_both_children(rank,size,'F');
                 free(messpar);
                 return MIMPI_ERROR_REMOTE_FINISHED;
             }
             else
             {
                 MIMPI_sync_recv(messpar,(rank-1)/2);
-                MIMPI_send_sync_signal_to_both_children(rank,size,'F', NULL);
+                MIMPI_send_sync_signal_to_both_children(rank,size,'F');
                 free(messpar);
                 return MIMPI_ERROR_REMOTE_FINISHED;
             }
@@ -1158,7 +1127,7 @@ MIMPI_Retcode MIMPI_Bcast(
             MIMPI_Retcode result = MIMPI_send_sync_signal_to_parent(rank, 'R');    //BROADCAST
             if(result==MIMPI_ERROR_REMOTE_FINISHED) //parent has finished
             {
-                MIMPI_send_sync_signal_to_both_children(rank,size,'F', NULL);
+                MIMPI_send_sync_signal_to_both_children(rank,size,'F');
                 free(messpar);
                 return MIMPI_ERROR_REMOTE_FINISHED;
             }
@@ -1167,13 +1136,13 @@ MIMPI_Retcode MIMPI_Bcast(
                 MIMPI_sync_recv(messpar,(rank-1)/2);
                 if(messpar[0]=='F')
                 {
-                    MIMPI_send_sync_signal_to_both_children(rank,size,'F', NULL);
+                    MIMPI_send_sync_signal_to_both_children(rank,size,'F');
                     free(messpar);
                     return MIMPI_ERROR_REMOTE_FINISHED;
                 }
                 else    //messpar[0]=='R'
                 {
-                    MIMPI_send_sync_signal_to_both_children(rank,size,'R', NULL);
+                    MIMPI_send_sync_signal_to_both_children(rank,size,'R');
                     free(messpar);
 
                     if(rank==root)
@@ -1188,7 +1157,7 @@ MIMPI_Retcode MIMPI_Bcast(
                                 {
                                     MIMPI_Send(data,count,i,-1);
                                 }
-                                MIMPI_free_global_variables(true);
+                                MIMPI_free_global_variables(false);
                                 exit(0);
                             }
                         }
@@ -1393,8 +1362,7 @@ MIMPI_Retcode MIMPI_Reduce(
             free(messch1);
             free(messch2);
             free(messpar);
-            free(data_to_send);
-            MIMPI_send_sync_signal_to_both_children(rank, size, 'F', NULL);   //FINISHED
+            MIMPI_send_sync_signal_to_both_children(rank, size, 'F');   //FINISHED
             return MIMPI_ERROR_REMOTE_FINISHED;
         }
         else    //messch1[0]=='D' && messch2[0]=='D'
@@ -1402,7 +1370,7 @@ MIMPI_Retcode MIMPI_Reduce(
             free(messch1);
             free(messch2);
             free(messpar);
-            MIMPI_send_sync_signal_to_both_children(rank, size, 'D', data_to_send);   //REDUCE
+            MIMPI_send_sync_signal_to_both_children(rank, size, 'D');   //REDUCE
             if(root==0)
             {
                 for(int i=0; i<count; i++)
@@ -1429,15 +1397,15 @@ MIMPI_Retcode MIMPI_Reduce(
             MIMPI_Retcode result = MIMPI_send_sync_signal_to_parent(rank, 'F');    //FINISHED
             if(result==MIMPI_ERROR_REMOTE_FINISHED) //parent has finished
             {
+                MIMPI_send_sync_signal_to_both_children(rank,size,'F');
                 free(messpar);
-                MIMPI_send_sync_signal_to_both_children(rank,size,'F', NULL);
                 return MIMPI_ERROR_REMOTE_FINISHED;
             }
             else
             {
                 MIMPI_sync_recv(messpar,(rank-1)/2);
+                MIMPI_send_sync_signal_to_both_children(rank,size,'F');
                 free(messpar);
-                MIMPI_send_sync_signal_to_both_children(rank,size,'F', NULL);
                 return MIMPI_ERROR_REMOTE_FINISHED;
             }
             
@@ -1450,8 +1418,8 @@ MIMPI_Retcode MIMPI_Reduce(
             free(data_to_send);
             if(result==MIMPI_ERROR_REMOTE_FINISHED) //parent has finished
             {
+                MIMPI_send_sync_signal_to_both_children(rank,size,'F');
                 free(messpar);
-                MIMPI_send_sync_signal_to_both_children(rank,size,'F', NULL);
                 return MIMPI_ERROR_REMOTE_FINISHED;
             }
             else
@@ -1459,14 +1427,14 @@ MIMPI_Retcode MIMPI_Reduce(
                 MIMPI_Retcode result = MIMPI_sync_recv(messpar,(rank-1)/2);
                 if(messpar[0]=='F' || result==MIMPI_ERROR_REMOTE_FINISHED)
                 {
+                    MIMPI_send_sync_signal_to_both_children(rank,size,'F');
                     free(messpar);
-                    MIMPI_send_sync_signal_to_both_children(rank,size,'F', NULL);
                     return MIMPI_ERROR_REMOTE_FINISHED;
                 }
                 else    //messpar[0]=='D'
                 {
+                    MIMPI_send_sync_signal_to_both_children(rank,size,'D');
                     free(messpar);
-                    MIMPI_send_sync_signal_to_both_children(rank,size,'D', NULL);
                     if(rank==root)
                     {
                         MIMPI_Recv(recv_data,count,0,-2);
