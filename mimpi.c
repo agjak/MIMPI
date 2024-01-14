@@ -271,7 +271,7 @@ void *buffer_messages(void* source_pt)
         {
             if(source==0)
             {
-                printf("Process 0 ended, done with buffering\n", count, tag);
+                printf("Process 0 ended, done with buffering\n");
             }
             free(count_bytes);
             free(tag_bytes);
