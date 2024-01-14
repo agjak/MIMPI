@@ -44,19 +44,23 @@ void MIMPI_free_global_variables(bool final)
 {
     int size=MIMPI_World_size();
     int rank=MIMPI_World_rank();
+    printf("Freeing 1 %d\n", rank);
     for(int i=0; i<size; i++)
     {
         if(i!=rank)
         {
             if(final)
             {
+                printf("Freeing 2a %d\n", rank);
                 ASSERT_ZERO(pthread_join(buffer_threads[i],NULL));
+                printf("Freeing 2b %d\n", rank);
             }
             pthread_mutex_destroy(&buffer_mutexes[i]);
             pthread_cond_destroy(&buffer_conditions[i]);
             MIMPI_free_message_buffers(i);
         }
     }
+    printf("Freeing 2 %d\n", rank);
     free(buffer_mutexes);
     free(message_buffers);
     free(buffer_conditions);
