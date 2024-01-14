@@ -303,7 +303,7 @@ void *buffer_messages(void* source_pt)
     free(name);
 
     uint8_t* count_bytes=malloc(sizeof(int));
-    uint8_t* tag_bytes=malloc(sizeof(int));
+    
 
     while(true)
     {
@@ -311,7 +311,6 @@ void *buffer_messages(void* source_pt)
         if(result<=0)
         {
             free(count_bytes);
-            free(tag_bytes);
             pthread_mutex_lock(&buffer_mutexes[source]);
             process_left_mimpi[source]=true;
             pthread_mutex_unlock(&(buffer_mutexes[source]));
@@ -320,11 +319,17 @@ void *buffer_messages(void* source_pt)
         }
         else
         {
-            chrecv(recv_fd, tag_bytes, sizeof(int));
             int count;
             memcpy(&count, count_bytes, sizeof(int));
+            free(count_bytes);
+
+            uint8_t* tag_bytes=malloc(sizeof(int));
+            chrecv(recv_fd, tag_bytes, sizeof(int));
             int tag;
             memcpy(&tag, tag_bytes, sizeof(int));
+            free(tag_bytes);
+            
+            
             uint8_t* message=malloc(count);
             if(count<=512)
             {
@@ -370,11 +375,17 @@ void *buffer_messages(void* source_pt)
             node->message = malloc(count+2*sizeof(int));
             node->next=NULL;
 
+            uint8_t* count_bytes=malloc(sizeof(int));
+            uint8_t* tag_bytes=malloc(sizeof(int));
+            memcpy(count_bytes, &count, sizeof(int));
+            memcpy(tag_bytes, &tag, sizeof(int));
             for(int i=0; i<sizeof(int); i++)
             {
                 node->message[i]=count_bytes[i];
                 node->message[i+sizeof(int)]=tag_bytes[i];
             }
+            free(count_bytes);
+            free(tag_bytes);
             for(int i=0; i<count; i++)
             {
                 node->message[i+2*sizeof(int)]=message[i];
