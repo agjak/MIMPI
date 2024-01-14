@@ -18,19 +18,19 @@ int main(int argc, char **argv)
 
     if (world_rank == 0) {
         
-        //ASSERT_MIMPI_OK(MIMPI_Send(data, sizeof(data), 1, tag));
-        //for (int i = 0; i < sizeof(data); i += 789) {
-        //    test_assert(data[i] == 42);
-        //}
+        ASSERT_MIMPI_OK(MIMPI_Send(data, sizeof(data), 1, tag));
+        for (int i = 0; i < sizeof(data); i += 789) {
+            test_assert(data[i] == 42);
+        }
         ASSERT_MIMPI_OK(MIMPI_Barrier());
     }
     else if (world_rank == 1)
     {
         ASSERT_MIMPI_OK(MIMPI_Barrier());
-        //ASSERT_MIMPI_OK(MIMPI_Recv(data, sizeof(data), 0, tag));
-        //for (int i = 0; i < sizeof(data); i += 789) {
-        //    test_assert(data[i] == 42);
-        //}
+        ASSERT_MIMPI_OK(MIMPI_Recv(data, sizeof(data), 0, tag));
+        for (int i = 0; i < sizeof(data); i += 789) {
+            test_assert(data[i] == 42);
+        }
     } else {
         ASSERT_MIMPI_OK(MIMPI_Barrier());
     }
