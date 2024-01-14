@@ -491,7 +491,7 @@ MIMPI_Retcode MIMPI_Send(
 
     if(destination==1 && MIMPI_World_rank()==0)
     {
-        printf("0 sending a message to 1: count, tag\n")
+        printf("0 sending a message to 1: count, tag\n");
     }
     
     if(chsend(send_fd, data_to_send, count+2*sizeof(int))==-1)
