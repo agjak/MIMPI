@@ -206,6 +206,7 @@ MIMPI_Retcode MIMPI_send_sync_signal_to_both_children(int rank, int size, char s
     ASSERT_SYS_OK(pid1 = fork());
     if(!pid1)
     {
+        printf("remote %d sending %c to left child\n", rank, signal);
         MIMPI_Retcode status = MIMPI_send_sync_signal_to_left_child(rank,size,signal);
         if (status==MIMPI_SUCCESS)
         {
@@ -223,6 +224,7 @@ MIMPI_Retcode MIMPI_send_sync_signal_to_both_children(int rank, int size, char s
         ASSERT_SYS_OK(pid2 = fork());
         if(!pid2)
         {
+            printf("remote %d sending %c to right child\n", rank, signal);
             MIMPI_Retcode status = MIMPI_send_sync_signal_to_right_child(rank,size,signal);
             if (status==MIMPI_SUCCESS)
             {
