@@ -635,6 +635,7 @@ MIMPI_Retcode MIMPI_Recv(
                             if(node->next!=NULL)
                             {
                                 message_buffers[source]=node->next;
+                                free(node);
                             }
                             else
                             {
@@ -1098,7 +1099,7 @@ MIMPI_Retcode MIMPI_Bcast(
                         {
                             MIMPI_Send(data,count,i,-1);
                         }
-                        MIMPI_free_global_variables(true);
+                        MIMPI_free_global_variables(false);
                         exit(0);
                     }
                 }
@@ -1175,7 +1176,7 @@ MIMPI_Retcode MIMPI_Bcast(
                                 {
                                     MIMPI_Send(data,count,i,-1);
                                 }
-                                MIMPI_free_global_variables(true);
+                                MIMPI_free_global_variables(false);
                                 exit(0);
                             }
                         }
