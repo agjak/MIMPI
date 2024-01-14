@@ -308,7 +308,7 @@ void *buffer_messages(void* source_pt)
             memcpy(&tag, tag_bytes, sizeof(int));
             if(source==0)
             {
-                printf("New message in buffer: %d %d\n", count, tag);
+                printf("New message in buffer: %d (%c %c %c %c) %d (%c %c %c %c)\n", count, count_bytes[0], count_bytes[1], count_bytes[2], count_bytes[3], tag, tag_bytes[0], tag_bytes[1], tag_bytes[2], tag_bytes[3]);
             }
             uint8_t* message=malloc(count);
             if(count<=512)
@@ -479,8 +479,6 @@ MIMPI_Retcode MIMPI_Send(
         ASSERT_ZERO(pthread_attr_init(&attr));
         ASSERT_ZERO(pthread_create(&deadlock_threads[deadlock_threads_num-1], &attr, MIMPI_Recv_R_deadlock_message, var_pt));
         ASSERT_ZERO(pthread_attr_destroy(&attr));
-
-
     }
     
     uint8_t *count_bytes=malloc(sizeof(int));
