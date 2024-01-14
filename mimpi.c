@@ -326,6 +326,7 @@ void *buffer_messages(void* source_pt)
                 }
                 chrecv(recv_fd,&message[512*i],(count%512));
                 count_recvd=count_recvd+(count%512);
+                printf("These should be equal: %d %d\n", count, count_recvd);
             }
             pthread_mutex_lock(&buffer_mutexes[source]);
             struct buffer_node *node;
@@ -539,7 +540,6 @@ MIMPI_Retcode MIMPI_Send(
         else
         {
             count_sent=count_sent+(count%512);
-            printf("These should be equal: %d %d\n", count, count_sent);
             free(data_to_send);
             return MIMPI_SUCCESS;
         }
