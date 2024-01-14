@@ -506,26 +506,12 @@ MIMPI_Retcode MIMPI_Send(
     int send_fd=atoi(getenv(name));
     free(name);
 
-    if(count+2*sizeof(int)<=512)
+    int count_sent=0;
+    while(count_sent!=(count+2*sizeof(int)))
     {
-        if(chsend(send_fd, data_to_send, count+2*sizeof(int))==-1)
+        if((count+2*sizeof(int))-count_sent<=512)
         {
-            free(data_to_send);
-            return MIMPI_ERROR_REMOTE_FINISHED;
-        }
-        else
-        {
-            free(data_to_send);
-            return MIMPI_SUCCESS;
-        }
-    }
-    else
-    {
-        int count_sent=0;
-        int i=0;
-        for(; i<(count+2*sizeof(int))/512; i++)
-        {
-            int sent=chsend(send_fd, &data_to_send[512*i], 512);
+            int sent=chsend(send_fd,&message[count_sent],(count+2*sizeof(int))-count_sent);
             if(sent==-1)
             {
                 free(data_to_send);
@@ -533,22 +519,20 @@ MIMPI_Retcode MIMPI_Send(
             }
             count_sent=count_sent+sent;
         }
-        int sent=chsend(send_fd, &data_to_send[512*i], ((count+2*sizeof(int))%512));
-        if(sent==-1)
-        {
-            free(data_to_send);
-            return MIMPI_ERROR_REMOTE_FINISHED;
-        }
         else
         {
+            int sent=chsend(send_fd,&message[count_sent],512);
+            if(sent==-1)
+            {
+                free(data_to_send);
+                return MIMPI_ERROR_REMOTE_FINISHED;
+            }
             count_sent=count_sent+sent;
-            free(data_to_send);
-            return MIMPI_SUCCESS;
         }
-        
     }
+    free(data_to_send);
+    return MIMPI_SUCCESS;
     
-
 }
 
 MIMPI_Retcode MIMPI_Recv(
