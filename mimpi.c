@@ -295,7 +295,7 @@ void *buffer_messages(void* source_pt)
             uint8_t* message=malloc(count);
             if(source==0)
             {
-                printf("Buffering message from 0 to 1: %d %d\n", count, tag);
+                printf("Receiving message from 0 to 1: %d %d\n", count, tag);
             }
             if(count<=512)
             {
@@ -313,9 +313,9 @@ void *buffer_messages(void* source_pt)
                 chrecv(recv_fd,&message[512*i],(count%512));
                 count_recvd=count_recvd+(count%512);
             }
-            printf("Buffered message succesfully\n");
+            printf("Received message succesfully\n");
             pthread_mutex_lock(&buffer_mutexes[source]);
-
+            printf("Saving the message in a buffer\n");
             struct buffer_node *node;
 
             if(message_buffers[source]==NULL)
@@ -349,6 +349,7 @@ void *buffer_messages(void* source_pt)
             {
                 node->message[i+2*sizeof(int)]=message[i];
             }
+            printf("Saved the message in a buffer\n");
             pthread_mutex_unlock(&buffer_mutexes[source]);
             pthread_cond_signal(&buffer_conditions[source]);
             free(message);
