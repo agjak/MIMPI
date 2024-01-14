@@ -33,6 +33,7 @@ void MIMPI_free_message_buffers(int rank)
         if(node->message!=NULL)
         {
             free(node->message);
+            node->message=NULL;
         }
         if(node->next!=NULL)
         {
@@ -350,6 +351,7 @@ void *buffer_messages(void* source_pt)
             if(message_buffers[source]==NULL)
             {
                 message_buffers[source]=(struct buffer_node *) malloc(sizeof(struct buffer_node *));
+                message_buffers[source]->message=NULL;
             }
             if(message_buffers[source]->message==NULL)
             {
