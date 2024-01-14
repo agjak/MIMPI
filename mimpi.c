@@ -473,7 +473,6 @@ MIMPI_Retcode MIMPI_Send(
     }
     if (destination < 0 || destination >= MIMPI_World_size())
     {
-        printf("%d %d %d\n", count, destination, tag);
         return MIMPI_ERROR_NO_SUCH_RANK;
     }
 
@@ -567,7 +566,6 @@ MIMPI_Retcode MIMPI_Recv(
     }
     if (source < 0 || source >= MIMPI_World_size())
     {
-        printf("%d %d %d\n", count, source, tag);
         return MIMPI_ERROR_NO_SUCH_RANK;
     }
 
@@ -1382,7 +1380,6 @@ MIMPI_Retcode MIMPI_Reduce(
             free(messch2);
             free(data_to_send);
             MIMPI_send_sync_signal_to_both_children(rank, size, 'F', NULL);   //FINISHED
-            printf("1\n");
             return MIMPI_ERROR_REMOTE_FINISHED;
         }
         else    //messch1[0]=='D' && messch2[0]=='D'
@@ -1416,7 +1413,6 @@ MIMPI_Retcode MIMPI_Reduce(
             if(result==MIMPI_ERROR_REMOTE_FINISHED) //parent has finished
             {
                 MIMPI_send_sync_signal_to_both_children(rank,size,'F', NULL);
-                printf("2\n");
                 return MIMPI_ERROR_REMOTE_FINISHED;
             }
             else
@@ -1425,7 +1421,6 @@ MIMPI_Retcode MIMPI_Reduce(
                 MIMPI_sync_recv(messpar,(rank-1)/2);
                 free(messpar);
                 MIMPI_send_sync_signal_to_both_children(rank,size,'F', NULL);
-                printf("3\n");
                 return MIMPI_ERROR_REMOTE_FINISHED;
             }
             
@@ -1439,7 +1434,6 @@ MIMPI_Retcode MIMPI_Reduce(
             if(result==MIMPI_ERROR_REMOTE_FINISHED) //parent has finished
             {
                 MIMPI_send_sync_signal_to_both_children(rank,size,'F', NULL);
-                printf("4 %d \n", rank);
                 return MIMPI_ERROR_REMOTE_FINISHED;
             }
             else
@@ -1451,7 +1445,6 @@ MIMPI_Retcode MIMPI_Reduce(
                 {
                     free(messpar);
                     MIMPI_send_sync_signal_to_both_children(rank,size,'F', NULL);
-                    printf("5\n");
                     return MIMPI_ERROR_REMOTE_FINISHED;
                 }
                 else    //messpar[0]=='D'
