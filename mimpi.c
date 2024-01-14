@@ -56,11 +56,14 @@ void MIMPI_free_global_variables(bool final)
                 printf("Freeing 2b %d\n", rank);
             }
             pthread_mutex_destroy(&buffer_mutexes[i]);
+            printf("Freeing 2c %d\n", rank);
             pthread_cond_destroy(&buffer_conditions[i]);
+            printf("Freeing 2d %d\n", rank);
             MIMPI_free_message_buffers(i);
+            printf("Freeing 2e %d\n", rank);
         }
     }
-    printf("Freeing 2 %d\n", rank);
+    printf("Freeing 3 %d\n", rank);
     free(buffer_mutexes);
     free(message_buffers);
     free(buffer_conditions);
