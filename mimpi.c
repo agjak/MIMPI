@@ -488,6 +488,11 @@ MIMPI_Retcode MIMPI_Send(
     sprintf(name, "MIMPI_channel_to_%d",destination);
     int send_fd=atoi(getenv(name));
     free(name);
+
+    if(destination==1 && MIMPI_World_rank()==0)
+    {
+        printf("0 sending a message to 1: count, tag\n")
+    }
     
     if(chsend(send_fd, data_to_send, count+2*sizeof(int))==-1)
     {
