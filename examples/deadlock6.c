@@ -25,6 +25,7 @@ int main(int argc, char **argv)
         MIMPI_Send(data, sizeof(int) * 1000000, partner_rank, 2);
         MIMPI_Send(data, sizeof(int) * 1000000, partner_rank, 2);
     }
+    printf("waitin %d\n", world_rank);
     ASSERT_MIMPI_RETCODE(MIMPI_Recv(data, sizeof(int) * 1000000, partner_rank, 1), MIMPI_ERROR_DEADLOCK_DETECTED);
     printf("done %d\n", world_rank);
     MIMPI_Finalize();
