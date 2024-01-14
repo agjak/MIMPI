@@ -410,7 +410,7 @@ void MIMPI_Init(bool enable_deadlock_detection) {
     buffer_conditions=malloc(size*sizeof(pthread_cond_t));
     process_left_mimpi=malloc(size*sizeof(bool));
     deadlock_threads_num=0;
-    count_bytes_arr=(uint8_t *)malloc(size*sizeof(uint8_t *));
+    count_bytes_arr=(uint8_t **)malloc(size*sizeof(uint8_t *));
 
     if(enable_deadlock_detection)
     {
@@ -1155,7 +1155,6 @@ MIMPI_Retcode MIMPI_Bcast(
             MIMPI_Retcode result = MIMPI_send_sync_signal_to_parent(rank, 'R');    //BROADCAST
             if(result==MIMPI_ERROR_REMOTE_FINISHED) //parent has finished
             {
-                free(messpar);
                 MIMPI_send_sync_signal_to_both_children(rank,size,'F', NULL);
                 return MIMPI_ERROR_REMOTE_FINISHED;
             }
