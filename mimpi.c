@@ -306,10 +306,6 @@ void *buffer_messages(void* source_pt)
             memcpy(&count, count_bytes, sizeof(int));
             int tag;
             memcpy(&tag, tag_bytes, sizeof(int));
-            if(source==0)
-            {
-                printf("New message in buffer: %d (%d %d %d %d) %d (%d %d %d %d)\n", count, count_bytes[0], count_bytes[1], count_bytes[2], count_bytes[3], tag, tag_bytes[0], tag_bytes[1], tag_bytes[2], tag_bytes[3]);
-            }
             uint8_t* message=malloc(count);
             if(count<=512)
             {
@@ -329,7 +325,6 @@ void *buffer_messages(void* source_pt)
                         count_recvd=count_recvd+chrecv(recv_fd,&message[count_recvd],512);
                     }
                 }
-                printf("These should be equal: %d %d\n", count, count_recvd);
             }
             pthread_mutex_lock(&buffer_mutexes[source]);
             struct buffer_node *node;
@@ -545,7 +540,6 @@ MIMPI_Retcode MIMPI_Send(
         else
         {
             count_sent=count_sent+sent;
-            printf("This should be equal (s): %d %d\n", (count+8), count_sent);
             free(data_to_send);
             return MIMPI_SUCCESS;
         }
@@ -593,7 +587,6 @@ MIMPI_Retcode MIMPI_Recv(
         char sync_signal=MIMPI_Recv_R_or_S_deadlock_message(source,count,tag);
         if(sync_signal=='F')
         {
-            printf("Here %d!\n", MIMPI_World_rank());
             return MIMPI_ERROR_REMOTE_FINISHED;
         }
         else if(sync_signal=='R')
@@ -872,10 +865,6 @@ char MIMPI_Recv_R_or_S_deadlock_message(
                 memcpy(&mess_tag, tag_bytes, sizeof(int));
                 free(count_bytes);
                 free(tag_bytes);
-                if(pom==1 && source==0)
-                {
-                    printf("Last round of 1 looking for R or S. Message in buffer %d %d\n", mess_count, mess_tag);
-                }
                 if(mess_count==sizeof(char)+2*sizeof(int) && mess_tag==-4 && ((node->message[2*sizeof(int)]=='R' && i==1) || (node->message[2*sizeof(int)]=='S')))
                 {
                     uint8_t *count_bytes=malloc(sizeof(int));
