@@ -523,7 +523,7 @@ MIMPI_Retcode MIMPI_Send(
     {
         int count_sent=0;
         int i=0;
-        for(; i<count/512; i++)
+        for(; i<(count+2*sizeof(int))/512; i++)
         {
             int sent=chsend(send_fd, &data_to_send[512*i], 512);
             if(sent==-1)
@@ -533,7 +533,7 @@ MIMPI_Retcode MIMPI_Send(
             }
             count_sent=count_sent+sent;
         }
-        int sent=chsend(send_fd, &data_to_send[512*i], (count%512));
+        int sent=chsend(send_fd, &data_to_send[512*i], ((count+2*sizeof(int))%512));
         if(sent==-1)
         {
             free(data_to_send);
@@ -542,7 +542,7 @@ MIMPI_Retcode MIMPI_Send(
         else
         {
             count_sent=count_sent+sent;
-            printf("This should be equal (s): %d %d\n", count, count_sent);
+            printf("This should be equal (s): %d %d\n", (count+2*sizeof(int)), count_sent);
             free(data_to_send);
             return MIMPI_SUCCESS;
         }
