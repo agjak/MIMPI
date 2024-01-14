@@ -863,6 +863,10 @@ char MIMPI_Recv_R_or_S_deadlock_message(
                 memcpy(&mess_tag, tag_bytes, sizeof(int));
                 free(count_bytes);
                 free(tag_bytes);
+                if(pom==1 && source==0)
+                {
+                    printf("Last round of 1 looking for R or S. Message in buffer %d %d\n", mess_count, mess_tag);
+                }
                 if(mess_count==sizeof(char)+2*sizeof(int) && mess_tag==-4 && ((node->message[2*sizeof(int)]=='R' && i==1) || (node->message[2*sizeof(int)]=='S')))
                 {
                     uint8_t *count_bytes=malloc(sizeof(int));
