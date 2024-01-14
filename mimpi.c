@@ -308,7 +308,7 @@ void *buffer_messages(void* source_pt)
             memcpy(&tag, tag_bytes, sizeof(int));
             if(source==0)
             {
-                printf("New message in buffer: %d (%c %c %c %c) %d (%c %c %c %c)\n", count, count_bytes[0], count_bytes[1], count_bytes[2], count_bytes[3], tag, tag_bytes[0], tag_bytes[1], tag_bytes[2], tag_bytes[3]);
+                printf("New message in buffer: %d (%d %d %d %d) %d (%d %d %d %d)\n", count, count_bytes[0], count_bytes[1], count_bytes[2], count_bytes[3], tag, tag_bytes[0], tag_bytes[1], tag_bytes[2], tag_bytes[3]);
             }
             uint8_t* message=malloc(count);
             if(count<=512)
