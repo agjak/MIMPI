@@ -425,7 +425,7 @@ void MIMPI_Init(bool enable_deadlock_detection) {
             ASSERT_ZERO(pthread_attr_init(&attr2));
             ASSERT_ZERO(pthread_create(&buffer_threads[i], &attr2, buffer_messages, source_pt));
             ASSERT_ZERO(pthread_attr_destroy(&attr2));
-            //free(source_pt);
+            free(source_pt);
 
             ASSERT_ZERO(pthread_cond_init(&buffer_conditions[i], NULL));
 
@@ -1331,7 +1331,8 @@ MIMPI_Retcode MIMPI_Reduce(
     messch1[0] = 'E';                       //EMPTY
     char* messch2 = malloc(1*sizeof(char));
     messch2[0] = 'E';                       //EMPTY
-    
+    char* messpar = malloc(1*sizeof(char));
+    messpar[0] = 'E';                       //EMPTY
 
     uint8_t* child_1_data=malloc((count+1)*sizeof(uint8_t));
     uint8_t* child_2_data=malloc((count+1)*sizeof(uint8_t));
@@ -1380,6 +1381,7 @@ MIMPI_Retcode MIMPI_Reduce(
         {
             free(messch1);
             free(messch2);
+            free(messpar);
             free(data_to_send);
             MIMPI_send_sync_signal_to_both_children(rank, size, 'F', NULL);   //FINISHED
             return MIMPI_ERROR_REMOTE_FINISHED;
@@ -1388,6 +1390,7 @@ MIMPI_Retcode MIMPI_Reduce(
         {
             free(messch1);
             free(messch2);
+            free(messpar);
             MIMPI_send_sync_signal_to_both_children(rank, size, 'D', data_to_send);   //REDUCE
             if(root==0)
             {
@@ -1411,6 +1414,7 @@ MIMPI_Retcode MIMPI_Reduce(
             free(messch1);
             free(messch2);
             free(data_to_send);
+            free(messpar);
             MIMPI_Retcode result = MIMPI_send_sync_signal_to_parent(rank, 'F');    //FINISHED
             if(result==MIMPI_ERROR_REMOTE_FINISHED) //parent has finished
             {
@@ -1419,7 +1423,6 @@ MIMPI_Retcode MIMPI_Reduce(
             }
             else
             {
-                char* messpar = malloc(1*sizeof(char));
                 MIMPI_sync_recv(messpar,(rank-1)/2);
                 free(messpar);
                 MIMPI_send_sync_signal_to_both_children(rank,size,'F', NULL);
@@ -1435,13 +1438,12 @@ MIMPI_Retcode MIMPI_Reduce(
             free(data_to_send);
             if(result==MIMPI_ERROR_REMOTE_FINISHED) //parent has finished
             {
+                free(messpar);
                 MIMPI_send_sync_signal_to_both_children(rank,size,'F', NULL);
                 return MIMPI_ERROR_REMOTE_FINISHED;
             }
             else
             {
-                char* messpar = malloc(1*sizeof(char));
-                messpar[0] = 'E';                       //EMPTY
                 MIMPI_Retcode result = MIMPI_sync_recv(messpar,(rank-1)/2);
                 if(messpar[0]=='F' || result==MIMPI_ERROR_REMOTE_FINISHED)
                 {
