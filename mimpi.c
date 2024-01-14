@@ -301,12 +301,11 @@ void *buffer_messages(void* source_pt)
     sprintf(name, "MIMPI_channel_from_%d",source);
     int recv_fd=atoi(getenv(name));
     free(name);
-
-    uint8_t* count_bytes=malloc(sizeof(int));
     
 
     while(true)
     {
+        uint8_t* count_bytes=malloc(sizeof(int));
         int result=chrecv(recv_fd, count_bytes, sizeof(int));
         if(result<=0)
         {
