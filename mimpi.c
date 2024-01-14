@@ -584,7 +584,7 @@ MIMPI_Retcode MIMPI_Recv(
         char sync_signal=MIMPI_Recv_R_or_S_deadlock_message(source,count,tag);
         if(sync_signal=='F')
         {
-            printf("Here!\n");
+            printf("Here %d!\n", MIMPI_World_rank());
             return MIMPI_ERROR_REMOTE_FINISHED;
         }
         else if(sync_signal=='R')
