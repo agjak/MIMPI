@@ -47,6 +47,28 @@ void MIMPI_free_global_variables(bool final)
     int size=MIMPI_World_size();
     int rank=MIMPI_World_rank();
     printf("Freeing 1 %d\n", rank);
+    if(final)
+    {
+        for(int i=0; i<size; i++)
+        {
+            process_left_mimpi[i]=true;
+        }
+    }
+    printf("Freeing 1a %d\n", rank);
+    for(int j=0;j<deadlock_threads_num; j++)
+    {
+        for(int i=0; i<size; i++)
+        {
+            if(i!=rank)
+            {
+                pthread_cond_signal(&buffer_conditions[i]);
+            }
+        }
+        printf("Freeing 1b %d\n", rank);
+        ASSERT_ZERO(pthread_join(deadlock_threads[j],NULL));
+        printf("Freeing 1c %d\n", rank);
+    }
+    printf("Freeing 2 %d\n", rank);
     for(int i=0; i<size; i++)
     {
         if(i!=rank)
@@ -57,12 +79,7 @@ void MIMPI_free_global_variables(bool final)
                 pthread_cond_signal(&buffer_conditions[i]);
                 ASSERT_ZERO(pthread_join(buffer_threads[i],NULL));
                 printf("Freeing 2b %d\n", rank);
-                process_left_mimpi[i]=true;
-                for(int j=0;j<deadlock_threads_num; j++)
-                {
-                    pthread_cond_signal(&buffer_conditions[i]);
-                    ASSERT_ZERO(pthread_join(deadlock_threads[j],NULL));
-                }
+                
             }
             pthread_mutex_destroy(&buffer_mutexes[i]);
             printf("Freeing 2c %d\n", rank);
