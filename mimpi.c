@@ -54,12 +54,12 @@ void MIMPI_free_global_variables(bool final)
             if(final)
             {
                 printf("Freeing 2a %d\n", rank);
-                pthread_cond_signal(&buffer_conditions[i])
+                pthread_cond_signal(&buffer_conditions[i]);
                 ASSERT_ZERO(pthread_join(buffer_threads[i],NULL));
                 printf("Freeing 2b %d\n", rank);
                 for(int j=0;j<deadlock_threads_num; j++)
                 {
-                    pthread_cond_signal(&buffer_conditions[j])
+                    pthread_cond_signal(&buffer_conditions[j]);
                     ASSERT_ZERO(pthread_join(deadlock_threads[j],NULL));
                 }
             }
