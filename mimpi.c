@@ -425,7 +425,7 @@ void MIMPI_Init(bool enable_deadlock_detection) {
             ASSERT_ZERO(pthread_attr_init(&attr2));
             ASSERT_ZERO(pthread_create(&buffer_threads[i], &attr2, buffer_messages, source_pt));
             ASSERT_ZERO(pthread_attr_destroy(&attr2));
-            free(source_pt);
+            //free(source_pt);
 
             ASSERT_ZERO(pthread_cond_init(&buffer_conditions[i], NULL));
 
@@ -1414,10 +1414,11 @@ MIMPI_Retcode MIMPI_Reduce(
             free(messch1);
             free(messch2);
             free(data_to_send);
-            free(messpar);
+            
             MIMPI_Retcode result = MIMPI_send_sync_signal_to_parent(rank, 'F');    //FINISHED
             if(result==MIMPI_ERROR_REMOTE_FINISHED) //parent has finished
             {
+                free(messpar);
                 MIMPI_send_sync_signal_to_both_children(rank,size,'F', NULL);
                 return MIMPI_ERROR_REMOTE_FINISHED;
             }
