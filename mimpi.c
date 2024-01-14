@@ -1404,15 +1404,15 @@ MIMPI_Retcode MIMPI_Reduce(
             MIMPI_Retcode result = MIMPI_send_sync_signal_to_parent(rank, 'F');    //FINISHED
             if(result==MIMPI_ERROR_REMOTE_FINISHED) //parent has finished
             {
-                MIMPI_send_sync_signal_to_both_children(rank,size,'F', NULL);
                 free(messpar);
+                MIMPI_send_sync_signal_to_both_children(rank,size,'F', NULL);
                 return MIMPI_ERROR_REMOTE_FINISHED;
             }
             else
             {
                 MIMPI_sync_recv(messpar,(rank-1)/2);
-                MIMPI_send_sync_signal_to_both_children(rank,size,'F', NULL);
                 free(messpar);
+                MIMPI_send_sync_signal_to_both_children(rank,size,'F', NULL);
                 return MIMPI_ERROR_REMOTE_FINISHED;
             }
             
@@ -1425,8 +1425,8 @@ MIMPI_Retcode MIMPI_Reduce(
             free(data_to_send);
             if(result==MIMPI_ERROR_REMOTE_FINISHED) //parent has finished
             {
-                MIMPI_send_sync_signal_to_both_children(rank,size,'F', NULL);
                 free(messpar);
+                MIMPI_send_sync_signal_to_both_children(rank,size,'F', NULL);
                 return MIMPI_ERROR_REMOTE_FINISHED;
             }
             else
@@ -1434,14 +1434,14 @@ MIMPI_Retcode MIMPI_Reduce(
                 MIMPI_Retcode result = MIMPI_sync_recv(messpar,(rank-1)/2);
                 if(messpar[0]=='F' || result==MIMPI_ERROR_REMOTE_FINISHED)
                 {
-                    MIMPI_send_sync_signal_to_both_children(rank,size,'F', NULL);
                     free(messpar);
+                    MIMPI_send_sync_signal_to_both_children(rank,size,'F', NULL);
                     return MIMPI_ERROR_REMOTE_FINISHED;
                 }
                 else    //messpar[0]=='D'
                 {
-                    MIMPI_send_sync_signal_to_both_children(rank,size,'D', NULL);
                     free(messpar);
+                    MIMPI_send_sync_signal_to_both_children(rank,size,'D', NULL);
                     if(rank==root)
                     {
                         MIMPI_Recv(recv_data,count,0,-2);
