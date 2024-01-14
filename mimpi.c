@@ -642,7 +642,7 @@ MIMPI_Retcode MIMPI_Recv(
                 free(tag_bytes);
                 if(source==0 && pom==1 && MIMPI_World_rank()==1)
                 {
-                    printf("Buffered messages from 0 to 1, right before ending:%d %d\n", count, tag);
+                    printf("Buffered messages from 0 to 1, right before ending:%d %d\n", mess_count, mess_tag);
                 }
                 if(count==mess_count && (tag==mess_tag || tag==MIMPI_ANY_TAG))
                 {
