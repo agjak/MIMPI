@@ -410,7 +410,7 @@ void MIMPI_Init(bool enable_deadlock_detection) {
     buffer_conditions=malloc(size*sizeof(pthread_cond_t));
     process_left_mimpi=malloc(size*sizeof(bool));
     deadlock_threads_num=0;
-    count_bytes=malloc(size*sizeof(uint8_t *));
+    count_bytes_arr=malloc(size*sizeof(uint8_t *));
 
     if(enable_deadlock_detection)
     {
@@ -445,7 +445,7 @@ void MIMPI_Init(bool enable_deadlock_detection) {
             //message_buffers[i]->next=(struct buffer_node*)malloc(sizeof(struct buffer_node*));
             message_buffers[i]->next=NULL;
             message_buffers[i]->message=NULL;
-            count_bytes[i]=(uint8_t*)malloc(sizeof(int));
+            count_bytes_arr[i]=(uint8_t*)malloc(sizeof(int));
         }
     }
 
