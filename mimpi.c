@@ -321,11 +321,11 @@ void *buffer_messages(void* source_pt)
                 int i=0;
                 for(; i<count/512; i++)
                 {
-                    chrecv(recv_fd,&message[512*i],512);
-                    count_recvd=count_recvd+512;
+                    int recv=chrecv(recv_fd,&message[512*i],512);
+                    count_recvd=count_recvd+recv;
                 }
-                chrecv(recv_fd,&message[512*i],(count%512));
-                count_recvd=count_recvd+(count%512);
+                int recv=chrecv(recv_fd,&message[512*i],(count%512));
+                count_recvd=count_recvd+recv;
                 printf("These should be equal: %d %d\n", count, count_recvd);
             }
             pthread_mutex_lock(&buffer_mutexes[source]);
@@ -525,21 +525,24 @@ MIMPI_Retcode MIMPI_Send(
         int i=0;
         for(; i<count/512; i++)
         {
-            if(chsend(send_fd, &data_to_send[512*i], 512)==-1)
+            int sent=chsend(send_fd, &data_to_send[512*i], 512)
+            if(sent==-1)
             {
                 free(data_to_send);
                 return MIMPI_ERROR_REMOTE_FINISHED;
             }
-            count_sent=count_sent+512;
+            count_sent=count_sent+sent;
         }
-        if(chsend(send_fd, &data_to_send[512*i], (count%512))==-1)
+        int sent=chsend(send_fd, &data_to_send[512*i], (count%512))
+        if(sent==-1)
         {
             free(data_to_send);
             return MIMPI_ERROR_REMOTE_FINISHED;
         }
         else
         {
-            count_sent=count_sent+(count%512);
+            count_sent=count_sent+sent;
+            printf("This should be equal (s): %d %d\n", count, count_sent);
             free(data_to_send);
             return MIMPI_SUCCESS;
         }
