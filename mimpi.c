@@ -308,7 +308,7 @@ void *buffer_messages(void* source_pt)
 
     while(true)
     {
-        int result=chrecv(recv_fd, &count_bytes_arr[source][0], sizeof(int));
+        int result=chrecv(recv_fd, count_bytes_arr[source], sizeof(int));
         if(result<=0)
         {
             pthread_mutex_lock(&buffer_mutexes[source]);
@@ -445,9 +445,9 @@ void MIMPI_Init(bool enable_deadlock_detection) {
             //message_buffers[i]->next=(struct buffer_node*)malloc(sizeof(struct buffer_node*));
             message_buffers[i]->next=NULL;
             message_buffers[i]->message=NULL;
-            count_bytes_arr[i]=(uint8_t*)malloc(sizeof(int));
-            memset(count_bytes_arr[i],0,4);
         }
+        count_bytes_arr[i]=(uint8_t*)malloc(sizeof(int));
+        memset(count_bytes_arr[i],0,4);
     }
 
 }
