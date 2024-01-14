@@ -308,7 +308,7 @@ void *buffer_messages(void* source_pt)
 
     while(true)
     {
-        int result=chrecv(recv_fd, count_bytes_arr[source], sizeof(int));
+        int result=chrecv(recv_fd, &count_bytes_arr[source][0], sizeof(int));
         if(result<=0)
         {
             pthread_mutex_lock(&buffer_mutexes[source]);
