@@ -999,15 +999,15 @@ MIMPI_Retcode MIMPI_Barrier()
             MIMPI_Retcode result = MIMPI_send_sync_signal_to_parent(rank, 'F');    //FINISHED
             if(result==MIMPI_ERROR_REMOTE_FINISHED) //parent has finished
             {
-                MIMPI_send_sync_signal_to_both_children(rank,size,'F', NULL);
                 free(messpar);
+                MIMPI_send_sync_signal_to_both_children(rank,size,'F', NULL);
                 return MIMPI_ERROR_REMOTE_FINISHED;
             }
             else
             {
                 MIMPI_sync_recv(messpar,(rank-1)/2);
-                MIMPI_send_sync_signal_to_both_children(rank,size,'F', NULL);
                 free(messpar);
+                MIMPI_send_sync_signal_to_both_children(rank,size,'F', NULL);
                 return MIMPI_ERROR_REMOTE_FINISHED;
             }
             
