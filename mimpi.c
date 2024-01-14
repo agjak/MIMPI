@@ -495,17 +495,52 @@ MIMPI_Retcode MIMPI_Send(
     {
         printf("0 sending a message to 1: %d, %d\n", count, tag);
     }
-    
-    if(chsend(send_fd, data_to_send, count+2*sizeof(int))==-1)
+
+    if(count+2*sizeof(int)<=512)
     {
-        free(data_to_send);
-        return MIMPI_ERROR_REMOTE_FINISHED;
+        if(chsend(send_fd, data_to_send, count+2*sizeof(int))==-1)
+        {
+            free(data_to_send);
+            return MIMPI_ERROR_REMOTE_FINISHED;
+        }
+        else
+        {
+            free(data_to_send);
+            return MIMPI_SUCCESS;
+        }
     }
     else
     {
-        free(data_to_send);
-        return MIMPI_SUCCESS;
+        int count_sent=0;
+        int i=0;
+        for(; i<count/512; i++)
+        {
+            if(chsend(send_fd, &data_to_send[512*i], 512)==-1)
+            {
+                free(data_to_send);
+                return MIMPI_ERROR_REMOTE_FINISHED;
+            }
+            else
+            {
+                free(data_to_send);
+                return MIMPI_SUCCESS;
+            }
+            count_sent=count_sent+512;
+        }
+        if(chsend(send_fd, &data_to_send[512*i], (count%512))==-1)
+        {
+            free(data_to_send);
+            return MIMPI_ERROR_REMOTE_FINISHED;
+        }
+        else
+        {
+            free(data_to_send);
+            return MIMPI_SUCCESS;
+        }
+        count_sent=count_sent+(count%512);
+        printf("these should be equal (sent): %d %d\n", count, count_sent);
     }
+    
 
 }
 
