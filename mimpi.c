@@ -344,6 +344,7 @@ void *buffer_messages(void* source_pt)
             }
             printf("B\n");
             node->message = malloc(count+2*sizeof(int));
+            node->next=NULL;
 
             for(int i=0; i<sizeof(int); i++)
             {
