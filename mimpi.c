@@ -425,7 +425,7 @@ void MIMPI_Init(bool enable_deadlock_detection) {
             ASSERT_ZERO(pthread_attr_init(&attr2));
             ASSERT_ZERO(pthread_create(&buffer_threads[i], &attr2, buffer_messages, source_pt));
             ASSERT_ZERO(pthread_attr_destroy(&attr2));
-            free(source_pt);
+            //free(source_pt);
 
             ASSERT_ZERO(pthread_cond_init(&buffer_conditions[i], NULL));
 
