@@ -301,10 +301,10 @@ void *buffer_messages(void* source_pt)
                 for(; i<count/512; i++)
                 {
                     chrecv(recv_fd,&message[512*i],512);
-                    count_recvd=+512;
+                    count_recvd=count_recvd+512;
                 }
                 chrecv(recv_fd,&message[512*i],count%512);
-                count_recvd=+count%512;
+                count_recvd=count_recvd+(count%512);
                 printf("these should be equal: %d %d\n", count, count_recvd);
             }
 
