@@ -60,7 +60,7 @@ void MIMPI_free_global_variables(bool final)
                 process_left_mimpi[i]=true;
                 for(int j=0;j<deadlock_threads_num; j++)
                 {
-                    pthread_cond_signal(&buffer_conditions[j]);
+                    pthread_cond_signal(&buffer_conditions[i]);
                     ASSERT_ZERO(pthread_join(deadlock_threads[j],NULL));
                 }
             }
