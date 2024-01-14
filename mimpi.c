@@ -429,7 +429,7 @@ void MIMPI_Init(bool enable_deadlock_detection) {
             ASSERT_ZERO(pthread_cond_init(&buffer_conditions[i], NULL));
 
             process_left_mimpi[i]=false;
-            message_buffers[i]=(struct buffer_node*)malloc(sizeof(struct buffer_node*));
+            message_buffers[i]=(struct buffer_node*)malloc(sizeof(struct buffer_node));
             //message_buffers[i]->next=(struct buffer_node*)malloc(sizeof(struct buffer_node*));
             message_buffers[i]->next=NULL;
             message_buffers[i]->message=NULL;
