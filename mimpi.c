@@ -542,7 +542,7 @@ MIMPI_Retcode MIMPI_Send(
         else
         {
             count_sent=count_sent+sent;
-            printf("This should be equal (s): %d %d\n", (count+2*sizeof(int)), count_sent);
+            printf("This should be equal (s): %d %d\n", (count+8), count_sent);
             free(data_to_send);
             return MIMPI_SUCCESS;
         }
