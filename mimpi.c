@@ -134,13 +134,13 @@ MIMPI_Retcode MIMPI_sync_reduce_send(
         MIMPI_Retcode status = MIMPI_sync_send(signal, destination);
         if (status==MIMPI_SUCCESS)
         {
-            MIMPI_free_global_variables(true);
+            MIMPI_free_global_variables(false);
             free(data);
             exit(0);
         }
         else
         {
-            MIMPI_free_global_variables(true);
+            MIMPI_free_global_variables(false);
             free(data);
             exit(1);
         }
@@ -153,13 +153,13 @@ MIMPI_Retcode MIMPI_sync_reduce_send(
             MIMPI_Retcode status = MIMPI_Send(data, count, destination, -2);
             if (status==MIMPI_SUCCESS)
             {
-                MIMPI_free_global_variables(true);
+                MIMPI_free_global_variables(false);
                 free(data);
                 exit(0);
             }
             else
             {
-                MIMPI_free_global_variables(true);
+                MIMPI_free_global_variables(false);
                 free(data);
                 exit(1);
             }
@@ -1439,7 +1439,7 @@ MIMPI_Retcode MIMPI_Reduce(
             if(result==MIMPI_ERROR_REMOTE_FINISHED) //parent has finished
             {
                 MIMPI_send_sync_signal_to_both_children(rank,size,'F', NULL);
-                printf("4\n");
+                printf("4 %d \n", rank);
                 return MIMPI_ERROR_REMOTE_FINISHED;
             }
             else
