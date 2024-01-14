@@ -29,5 +29,6 @@ int main(int argc, char **argv)
     ASSERT_MIMPI_RETCODE(MIMPI_Recv(data, sizeof(int) * 1000000, partner_rank, 1), MIMPI_ERROR_DEADLOCK_DETECTED);
     printf("done %d\n", world_rank);
     MIMPI_Finalize();
+    printf("done 2 %d\n", world_rank);
     return test_success();
 }
