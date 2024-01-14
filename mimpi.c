@@ -269,6 +269,10 @@ void *buffer_messages(void* source_pt)
         int result=chrecv(recv_fd, count_bytes, sizeof(int));
         if(result<=0)
         {
+            if(source==0)
+            {
+                printf("Process 0 ended, done with buffering\n", count, tag);
+            }
             free(count_bytes);
             free(tag_bytes);
             pthread_mutex_lock(&buffer_mutexes[source]);
