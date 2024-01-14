@@ -46,24 +46,25 @@ void MIMPI_free_global_variables(bool final)
 {
     int size=MIMPI_World_size();
     int rank=MIMPI_World_rank();
-    if(final)
+    if(final && deadlock_detection)
     {
         for(int i=0; i<size; i++)
         {
             process_left_mimpi[i]=true;
         }
-    }
-    for(int j=0;j<deadlock_threads_num; j++)
-    {
-        for(int i=0; i<size; i++)
+        for(int j=0;j<deadlock_threads_num; j++)
         {
-            if(i!=rank)
+            for(int i=0; i<size; i++)
             {
-                pthread_cond_signal(&buffer_conditions[i]);
+                if(i!=rank)
+                {
+                    pthread_cond_signal(&buffer_conditions[i]);
+                }
             }
+            ASSERT_ZERO(pthread_join(deadlock_threads[j],NULL));
         }
-        ASSERT_ZERO(pthread_join(deadlock_threads[j],NULL));
     }
+    
     for(int i=0; i<size; i++)
     {
         if(i!=rank)
