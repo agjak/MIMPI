@@ -1,5 +1,6 @@
 set -e
 for i in {1..100} ; do
+    echo $i
     ./run_test 1 2 examples_build/deadlock1
     ./run_test 1 2 examples_build/deadlock2
     ./run_test 1 2 examples_build/deadlock3
