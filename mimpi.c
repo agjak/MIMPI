@@ -313,7 +313,7 @@ void *buffer_messages(void* source_pt)
                 chrecv(recv_fd,&message[512*i],(count%512));
                 count_recvd=count_recvd+(count%512);
             }
-
+            printf("Buffered message succesfully\n");
             pthread_mutex_lock(&buffer_mutexes[source]);
 
             struct buffer_node *node;
