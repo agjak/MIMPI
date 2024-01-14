@@ -418,13 +418,17 @@ void MIMPI_Init(bool enable_deadlock_detection) {
 
 
 void MIMPI_Finalize() {
-
     int rank = MIMPI_World_rank();
     int size = MIMPI_World_size();
+    printf("Finalizing 1 %d\n", rank);
     MIMPI_close_all_program_channels(rank,size);
+    printf("Finalizing 2 %d\n", rank);
     MIMPI_free_global_variables(true);
+    printf("Finalizing 3 %d\n", rank);
     fflush(stdout);
+    printf("Finalizing 4 %d\n", rank);
     channels_finalize();
+    printf("Finalizing 5 %d\n", rank);
 }
 
 int MIMPI_World_size() {
