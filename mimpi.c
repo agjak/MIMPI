@@ -335,8 +335,10 @@ void *buffer_messages(void* source_pt)
                 struct buffer_node *last_node=message_buffers[source];
                 while(last_node->next!=NULL)
                 {
+                    printf("3.5\n");
                     last_node=last_node->next;
                 }
+                printf("4\n");
                 last_node->next=(struct buffer_node *) malloc(sizeof(struct buffer_node *));
                 node=last_node->next;
             }
