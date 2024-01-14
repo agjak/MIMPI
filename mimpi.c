@@ -350,7 +350,7 @@ void *buffer_messages(void* source_pt)
 
             if(message_buffers[source]==NULL)
             {
-                message_buffers[source]=(struct buffer_node *) malloc(sizeof(struct buffer_node *));
+                message_buffers[source]=(struct buffer_node *) malloc(sizeof(struct buffer_node));
                 message_buffers[source]->message=NULL;
             }
             if(message_buffers[source]->message==NULL)
@@ -364,7 +364,7 @@ void *buffer_messages(void* source_pt)
                 {
                     last_node=last_node->next;
                 }
-                last_node->next=(struct buffer_node *) malloc(sizeof(struct buffer_node *));
+                last_node->next=(struct buffer_node *) malloc(sizeof(struct buffer_node));
                 node=last_node->next;
             }
             node->message = malloc(count+2*sizeof(int));
