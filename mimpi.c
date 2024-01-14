@@ -640,6 +640,10 @@ MIMPI_Retcode MIMPI_Recv(
                 memcpy(&mess_tag, tag_bytes, sizeof(int));
                 free(count_bytes);
                 free(tag_bytes);
+                if(source==0 && pom==1 && MIMPI_World_rank()==1)
+                {
+                    printf("Buffered messages from 0 to 1, right before ending:%d %d\n", count, tag);
+                }
                 if(count==mess_count && (tag==mess_tag || tag==MIMPI_ANY_TAG))
                 {
                     for(int j=0; j<count; j++)
