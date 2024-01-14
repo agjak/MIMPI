@@ -447,7 +447,7 @@ void MIMPI_Init(bool enable_deadlock_detection) {
             message_buffers[i]->message=NULL;
         }
         count_bytes_arr[i]=(uint8_t*)malloc(sizeof(int));
-        memset(count_bytes_arr[i],0,4);
+        memset(count_bytes_arr[i],0,sizeof(int));
     }
 
 }
