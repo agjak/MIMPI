@@ -511,7 +511,7 @@ MIMPI_Retcode MIMPI_Send(
     {
         if((count+2*sizeof(int))-count_sent<=512)
         {
-            int sent=chsend(send_fd,&message[count_sent],(count+2*sizeof(int))-count_sent);
+            int sent=chsend(send_fd,&data_to_send[count_sent],(count+2*sizeof(int))-count_sent);
             if(sent==-1)
             {
                 free(data_to_send);
@@ -521,7 +521,7 @@ MIMPI_Retcode MIMPI_Send(
         }
         else
         {
-            int sent=chsend(send_fd,&message[count_sent],512);
+            int sent=chsend(send_fd,&data_to_send[count_sent],512);
             if(sent==-1)
             {
                 free(data_to_send);
