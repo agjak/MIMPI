@@ -539,6 +539,7 @@ MIMPI_Retcode MIMPI_Send(
         else
         {
             count_sent=count_sent+(count%512);
+            printf("These should be equal: %d %d\n", count, count_sent);
             free(data_to_send);
             return MIMPI_SUCCESS;
         }
