@@ -46,7 +46,6 @@ void MIMPI_free_global_variables(bool final)
 {
     int size=MIMPI_World_size();
     int rank=MIMPI_World_rank();
-    printf("Freeing 1 %d\n", rank);
     if(final)
     {
         for(int i=0; i<size; i++)
@@ -54,7 +53,6 @@ void MIMPI_free_global_variables(bool final)
             process_left_mimpi[i]=true;
         }
     }
-    printf("Freeing 1a %d\n", rank);
     for(int j=0;j<deadlock_threads_num; j++)
     {
         for(int i=0; i<size; i++)
@@ -64,32 +62,23 @@ void MIMPI_free_global_variables(bool final)
                 pthread_cond_signal(&buffer_conditions[i]);
             }
         }
-        printf("Freeing 1b %d\n", rank);
         ASSERT_ZERO(pthread_join(deadlock_threads[j],NULL));
-        printf("Freeing 1c %d\n", rank);
     }
-    printf("Freeing 2 %d\n", rank);
     for(int i=0; i<size; i++)
     {
         if(i!=rank)
         {
             if(final)
             {
-                printf("Freeing 2a %d\n", rank);
                 pthread_cond_signal(&buffer_conditions[i]);
                 ASSERT_ZERO(pthread_join(buffer_threads[i],NULL));
-                printf("Freeing 2b %d\n", rank);
                 
             }
             pthread_mutex_destroy(&buffer_mutexes[i]);
-            printf("Freeing 2c %d\n", rank);
             pthread_cond_destroy(&buffer_conditions[i]);
-            printf("Freeing 2d %d\n", rank);
             MIMPI_free_message_buffers(i);
-            printf("Freeing 2e %d\n", rank);
         }
     }
-    printf("Freeing 3 %d\n", rank);
     free(buffer_mutexes);
     free(message_buffers);
     free(buffer_conditions);
@@ -299,17 +288,9 @@ void *buffer_messages(void* source_pt)
 
     while(true)
     {
-        if(source==0)
-        {
-            printf("Process 1 ready to buffer a new thing\n");
-        }
         int result=chrecv(recv_fd, count_bytes, sizeof(int));
         if(result<=0)
         {
-            if(source==0)
-            {
-                printf("Process 0 ended, process 1 done with buffering\n");
-            }
             free(count_bytes);
             free(tag_bytes);
             pthread_mutex_lock(&buffer_mutexes[source]);
@@ -326,10 +307,6 @@ void *buffer_messages(void* source_pt)
             int tag;
             memcpy(&tag, tag_bytes, sizeof(int));
             uint8_t* message=malloc(count);
-            if(source==0)
-            {
-                printf("Receiving message from 0 to 1: %d %d\n", count, tag);
-            }
             if(count<=512)
             {
                 chrecv(recv_fd, message, count);
@@ -346,36 +323,27 @@ void *buffer_messages(void* source_pt)
                 chrecv(recv_fd,&message[512*i],(count%512));
                 count_recvd=count_recvd+(count%512);
             }
-            printf("Received message succesfully\n");
             pthread_mutex_lock(&buffer_mutexes[source]);
-            printf("Saving the message in a buffer\n");
             struct buffer_node *node;
 
             if(message_buffers[source]==NULL)
             {
-                printf("1\n");
                 message_buffers[source]=(struct buffer_node *) malloc(sizeof(struct buffer_node *));
             }
-            printf("A\n");
             if(message_buffers[source]->message==NULL)
             {
-                printf("2\n");
                 node=message_buffers[source];
             }
             else
             {
-                printf("3\n");
                 struct buffer_node *last_node=message_buffers[source];
                 while(last_node->next!=NULL)
                 {
-                    printf("3.5\n");
                     last_node=last_node->next;
                 }
-                printf("4\n");
                 last_node->next=(struct buffer_node *) malloc(sizeof(struct buffer_node *));
                 node=last_node->next;
             }
-            printf("B\n");
             node->message = malloc(count+2*sizeof(int));
             node->next=NULL;
 
@@ -388,8 +356,6 @@ void *buffer_messages(void* source_pt)
             {
                 node->message[i+2*sizeof(int)]=message[i];
             }
-            printf("C\n");
-            printf("Saved the message in a buffer\n");
             pthread_mutex_unlock(&buffer_mutexes[source]);
             pthread_cond_signal(&buffer_conditions[source]);
             free(message);
@@ -454,15 +420,10 @@ void MIMPI_Init(bool enable_deadlock_detection) {
 void MIMPI_Finalize() {
     int rank = MIMPI_World_rank();
     int size = MIMPI_World_size();
-    printf("Finalizing 1 %d\n", rank);
     MIMPI_close_all_program_channels(rank,size);
-    printf("Finalizing 2 %d\n", rank);
     MIMPI_free_global_variables(true);
-    printf("Finalizing 3 %d\n", rank);
     fflush(stdout);
-    printf("Finalizing 4 %d\n", rank);
     channels_finalize();
-    printf("Finalizing 5 %d\n", rank);
 }
 
 int MIMPI_World_size() {
