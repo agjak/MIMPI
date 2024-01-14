@@ -1335,7 +1335,7 @@ MIMPI_Retcode MIMPI_Reduce(
 
     uint8_t* child_1_data=malloc((count+1)*sizeof(uint8_t));
     uint8_t* child_2_data=malloc((count+1)*sizeof(uint8_t));
-    uint8_t* data_to_send=malloc((count+1)*sizeof(uint8_t));
+    
 
 
     if(rank*2+2<size)
@@ -1348,6 +1348,7 @@ MIMPI_Retcode MIMPI_Reduce(
         {
             messch1[0] = 'F';
         }
+        uint8_t* data_to_send=malloc((count+1)*sizeof(uint8_t));
         if(messch1[0]=='D' && messch2[0]=='D')
         {
             perform_MIMPI_Op_3(child_1_data, child_2_data, (uint8_t*)send_data, data_to_send, count, op);
@@ -1357,15 +1358,18 @@ MIMPI_Retcode MIMPI_Reduce(
     {
         if(MIMPI_sync_reduce_recv(messch1,rank*2+1,child_1_data,count)==MIMPI_ERROR_REMOTE_FINISHED)
         {
+            uint8_t* data_to_send=malloc((count+1)*sizeof(uint8_t));
             messch1[0] = 'F';
         }
         else if(messch1[0]=='D')
         {
+            uint8_t* data_to_send=malloc((count+1)*sizeof(uint8_t));
             perform_MIMPI_Op_2(child_1_data, (uint8_t*)send_data, data_to_send, count, op);
         }
     }
     else
     {
+        uint8_t* data_to_send=malloc((count+1)*sizeof(uint8_t));
         for(int i=0; i<count; i++)
         {
             data_to_send[i]=((uint8_t*)send_data)[i];
