@@ -283,6 +283,8 @@ void *buffer_messages(void* source_pt)
         }
         else
         {
+            printf("tag in bytes: %d %d %d %d\n", tag_bytes[0], tag_bytes[1], tag_bytes[2], tag_bytes[3]);
+            printf("count in bytes: %d %d %d %d\n", count_bytes[0], count_bytes[1], count_bytes[2], count_bytes[3]);
             chrecv(recv_fd, tag_bytes, sizeof(int));
             int count;
             memcpy(&count, count_bytes, sizeof(int));
