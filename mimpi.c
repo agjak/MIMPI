@@ -520,11 +520,6 @@ MIMPI_Retcode MIMPI_Send(
                 free(data_to_send);
                 return MIMPI_ERROR_REMOTE_FINISHED;
             }
-            else
-            {
-                free(data_to_send);
-                return MIMPI_SUCCESS;
-            }
             count_sent=count_sent+512;
         }
         if(chsend(send_fd, &data_to_send[512*i], (count%512))==-1)
@@ -534,11 +529,12 @@ MIMPI_Retcode MIMPI_Send(
         }
         else
         {
+            count_sent=count_sent+(count%512);
+            printf("these should be equal (sent): %d %d\n", count, count_sent);
             free(data_to_send);
             return MIMPI_SUCCESS;
         }
-        count_sent=count_sent+(count%512);
-        printf("these should be equal (sent): %d %d\n", count, count_sent);
+        
     }
     
 
