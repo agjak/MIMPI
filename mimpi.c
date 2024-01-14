@@ -1377,7 +1377,7 @@ MIMPI_Retcode MIMPI_Reduce(
             free(messch1);
             free(messch2);
             free(messpar);
-            MIMPI_send_sync_signal_to_both_children(rank, size, 'D', data_to_send, NULL);   //REDUCE
+            MIMPI_send_sync_signal_to_both_children(rank, size, 'D', data_to_send);   //REDUCE
             if(root==0)
             {
                 for(int i=0; i<count; i++)
