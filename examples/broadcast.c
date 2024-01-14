@@ -22,7 +22,6 @@ int main(int argc, char **argv)
     char number = 0;
     if (world_rank == 0)
         number = 42;
-    fflush(stdout);
     ASSERT_MIMPI_OK(MIMPI_Bcast(&number, 1, 0));
     printf("Number: %d\n", number);
     fflush(stdout);
