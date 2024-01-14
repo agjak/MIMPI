@@ -563,6 +563,7 @@ MIMPI_Retcode MIMPI_Recv(
     }
     if (source < 0 || source >= MIMPI_World_size())
     {
+        printf("%d %d %d\n", count, source, tag);
         return MIMPI_ERROR_NO_SUCH_RANK;
     }
 
