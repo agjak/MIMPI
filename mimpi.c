@@ -453,6 +453,7 @@ MIMPI_Retcode MIMPI_Send(
     }
     if (destination < 0 || destination >= MIMPI_World_size())
     {
+        printf("%d %d %d\n", count, destination, tag);
         return MIMPI_ERROR_NO_SUCH_RANK;
     }
 
