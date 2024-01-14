@@ -298,7 +298,6 @@ void *buffer_messages(void* source_pt)
 {
     int source= *((int*)source_pt);
     free(source_pt);
-    printf("%d\n", source);
 
     char* name = malloc(32*sizeof(char));
     sprintf(name, "MIMPI_channel_from_%d",source);
