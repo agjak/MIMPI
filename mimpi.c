@@ -186,7 +186,6 @@ MIMPI_Retcode MIMPI_send_sync_signal_to_left_child(int rank, int size, char sign
         printf("remote %d sending %c to left child %d\n", rank, signal, rank*2+1);
         return MIMPI_sync_send(signal, rank*2+1);
     }
-    else
     return MIMPI_SUCCESS;
 }
 
