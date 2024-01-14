@@ -21,6 +21,8 @@ pthread_t *buffer_threads;
 pthread_cond_t *buffer_conditions;
 bool *process_left_mimpi;
 bool deadlock_detection;
+pthread_t *deadlock_threads;
+int deadlock_threads_num;
 
 
 void MIMPI_free_message_buffers(int rank)
@@ -384,6 +386,7 @@ void MIMPI_Init(bool enable_deadlock_detection) {
     buffer_threads=malloc(size*sizeof(pthread_t));
     buffer_conditions=malloc(size*sizeof(pthread_cond_t));
     process_left_mimpi=malloc(size*sizeof(bool));
+    deadlock_threads_num=0;
 
     if(enable_deadlock_detection)
     {
@@ -481,10 +484,11 @@ MIMPI_Retcode MIMPI_Send(
         var_pt[0]=destination;
         var_pt[1]=count;
         var_pt[2]=tag;
-        pthread_t thread;
+        deadlock_threads_num=deadlock_threads_num+1;
+        deadlock_threads=realloc(deadlock_threads, deadlock_threads_num*sizeof(pthread_t));
         pthread_attr_t attr;
         ASSERT_ZERO(pthread_attr_init(&attr));
-        ASSERT_ZERO(pthread_create(&thread, &attr, MIMPI_Recv_R_deadlock_message, var_pt));
+        ASSERT_ZERO(pthread_create(&deadlock_threads[deadlock_threads_num-1], &attr, MIMPI_Recv_R_deadlock_message, var_pt));
         ASSERT_ZERO(pthread_attr_destroy(&attr));
 
 
