@@ -57,6 +57,7 @@ void MIMPI_free_global_variables(bool final)
                 pthread_cond_signal(&buffer_conditions[i]);
                 ASSERT_ZERO(pthread_join(buffer_threads[i],NULL));
                 printf("Freeing 2b %d\n", rank);
+                process_left_mimpi[i]=true;
                 for(int j=0;j<deadlock_threads_num; j++)
                 {
                     pthread_cond_signal(&buffer_conditions[j]);
