@@ -952,8 +952,7 @@ MIMPI_Retcode MIMPI_Barrier()
     messch1[0] = 'E';                       //EMPTY
     char* messch2 = malloc(1*sizeof(char));
     messch2[0] = 'E';                       //EMPTY
-    char* messpar = malloc(1*sizeof(char));
-    messpar[0] = 'E';                       //EMPTY
+
 
     if(rank*2+1<size)
     {
@@ -976,7 +975,6 @@ MIMPI_Retcode MIMPI_Barrier()
         {
             free(messch1);
             free(messch2);
-            free(messpar);
             MIMPI_send_sync_signal_to_both_children(rank, size, 'F', NULL);   //FINISHED
             return MIMPI_ERROR_REMOTE_FINISHED;
         }
@@ -984,7 +982,6 @@ MIMPI_Retcode MIMPI_Barrier()
         {
             free(messch1);
             free(messch2);
-            free(messpar);
             MIMPI_send_sync_signal_to_both_children(rank, size, 'B', NULL);   //BARRIER
             return MIMPI_SUCCESS;
         }
@@ -999,12 +996,13 @@ MIMPI_Retcode MIMPI_Barrier()
             MIMPI_Retcode result = MIMPI_send_sync_signal_to_parent(rank, 'F');    //FINISHED
             if(result==MIMPI_ERROR_REMOTE_FINISHED) //parent has finished
             {
-                free(messpar);
                 MIMPI_send_sync_signal_to_both_children(rank,size,'F', NULL);
                 return MIMPI_ERROR_REMOTE_FINISHED;
             }
             else
             {
+                char* messpar = malloc(1*sizeof(char));
+                messpar[0] = 'E';                       //EMPTY
                 MIMPI_sync_recv(messpar,(rank-1)/2);
                 free(messpar);
                 MIMPI_send_sync_signal_to_both_children(rank,size,'F', NULL);
@@ -1020,22 +1018,23 @@ MIMPI_Retcode MIMPI_Barrier()
             if(result==MIMPI_ERROR_REMOTE_FINISHED) //parent has finished
             {
                 MIMPI_send_sync_signal_to_both_children(rank,size,'F', NULL);
-                free(messpar);
                 return MIMPI_ERROR_REMOTE_FINISHED;
             }
             else
             {
+                char* messpar = malloc(1*sizeof(char));
+                messpar[0] = 'E';                       //EMPTY
                 MIMPI_Retcode result = MIMPI_sync_recv(messpar,(rank-1)/2);
                 if(messpar[0]=='F' || result==MIMPI_ERROR_REMOTE_FINISHED)
                 {
-                    MIMPI_send_sync_signal_to_both_children(rank,size,'F', NULL);
                     free(messpar);
+                    MIMPI_send_sync_signal_to_both_children(rank,size,'F', NULL);
                     return MIMPI_ERROR_REMOTE_FINISHED;
                 }
                 else    //messpar[0]=='B'
                 {
-                    MIMPI_send_sync_signal_to_both_children(rank,size,'B', NULL);
                     free(messpar);
+                    MIMPI_send_sync_signal_to_both_children(rank,size,'B', NULL);
                     return MIMPI_SUCCESS;
                 }
             }
