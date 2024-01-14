@@ -127,11 +127,13 @@ MIMPI_Retcode MIMPI_sync_reduce_send(
         if (status==MIMPI_SUCCESS)
         {
             MIMPI_free_global_variables(false);
+            free(data);
             exit(0);
         }
         else
         {
             MIMPI_free_global_variables(false);
+            free(data);
             exit(1);
         }
     }
@@ -144,11 +146,13 @@ MIMPI_Retcode MIMPI_sync_reduce_send(
             if (status==MIMPI_SUCCESS)
             {
                 MIMPI_free_global_variables(false);
+                free(data);
                 exit(0);
             }
             else
             {
                 MIMPI_free_global_variables(false);
+                free(data);
                 exit(1);
             }
         }
