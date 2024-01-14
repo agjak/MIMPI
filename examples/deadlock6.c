@@ -16,14 +16,14 @@ int main(int argc, char **argv)
     memset(data, 42, sizeof(data));
 
     if (world_rank == 0) {
-        MIMPI_Send(data, sizeof(int) * 1000000, partner_rank, 2);
-        MIMPI_Send(data, sizeof(int) * 1000000, partner_rank, 2);
-        MIMPI_Send(data, sizeof(int) * 1000000, partner_rank, 2);
-        MIMPI_Send(data, sizeof(int) * 1000000, partner_rank, 2);
-        MIMPI_Send(data, sizeof(int) * 1000000, partner_rank, 2);
-        MIMPI_Send(data, sizeof(int) * 1000000, partner_rank, 2);
-        MIMPI_Send(data, sizeof(int) * 1000000, partner_rank, 2);
-        MIMPI_Send(data, sizeof(int) * 1000000, partner_rank, 2);
+        ASSERT_MIMPI_OK(MIMPI_Send(data, sizeof(int) * 1000000, partner_rank, 2));
+        ASSERT_MIMPI_OK(MIMPI_Send(data, sizeof(int) * 1000000, partner_rank, 2));
+        ASSERT_MIMPI_OK(MIMPI_Send(data, sizeof(int) * 1000000, partner_rank, 2));
+        ASSERT_MIMPI_OK(MIMPI_Send(data, sizeof(int) * 1000000, partner_rank, 2));
+        ASSERT_MIMPI_OK(MIMPI_Send(data, sizeof(int) * 1000000, partner_rank, 2));
+        ASSERT_MIMPI_OK(MIMPI_Send(data, sizeof(int) * 1000000, partner_rank, 2));
+        ASSERT_MIMPI_OK(MIMPI_Send(data, sizeof(int) * 1000000, partner_rank, 2));
+        ASSERT_MIMPI_OK(MIMPI_Send(data, sizeof(int) * 1000000, partner_rank, 2));
     }
     ASSERT_MIMPI_RETCODE(MIMPI_Recv(data, sizeof(int) * 1000000, partner_rank, 1), MIMPI_ERROR_DEADLOCK_DETECTED);
     MIMPI_Finalize();
