@@ -249,7 +249,7 @@ MIMPI_Retcode MIMPI_send_sync_signal_to_both_children(int rank, int size, char s
         {
             free(pointer_to_free);
         }
-        MIMPI_free_global_variables(true);
+        MIMPI_free_global_variables(false);
         if (status==MIMPI_SUCCESS)
         {
             exit(0);
@@ -269,7 +269,7 @@ MIMPI_Retcode MIMPI_send_sync_signal_to_both_children(int rank, int size, char s
             {
                 free(pointer_to_free);
             }
-            MIMPI_free_global_variables(true);
+            MIMPI_free_global_variables(false);
             if (status==MIMPI_SUCCESS)
             {
                 exit(0);
