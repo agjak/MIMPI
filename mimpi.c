@@ -242,17 +242,23 @@ MIMPI_Retcode MIMPI_send_sync_signal_to_both_children(int rank, int size, char s
     if(!pid1)
     {
         MIMPI_Retcode status = MIMPI_send_sync_signal_to_left_child(rank,size,signal);
-        if(pointer_to_free!=NULL)
-        {
-            free(pointer_to_free);
-        }
-        MIMPI_free_global_variables(true);
+        
         if (status==MIMPI_SUCCESS)
         {
+            if(pointer_to_free!=NULL)
+            {
+                free(pointer_to_free);
+            }
+            MIMPI_free_global_variables(true);
             exit(0);
         }
         else
         {
+            if(pointer_to_free!=NULL)
+            {
+                free(pointer_to_free);
+            }
+            MIMPI_free_global_variables(true);
             exit(1);
         }
     }
@@ -262,17 +268,22 @@ MIMPI_Retcode MIMPI_send_sync_signal_to_both_children(int rank, int size, char s
         if(!pid2)
         {
             MIMPI_Retcode status = MIMPI_send_sync_signal_to_right_child(rank,size,signal);
-            if(pointer_to_free!=NULL)
-            {
-                free(pointer_to_free);
-            }
-            MIMPI_free_global_variables(true);
             if (status==MIMPI_SUCCESS)
             {
+                if(pointer_to_free!=NULL)
+                {
+                    free(pointer_to_free);
+                }
+                MIMPI_free_global_variables(true);
                 exit(0);
             }
             else
             {
+                if(pointer_to_free!=NULL)
+                {
+                    free(pointer_to_free);
+                }
+                MIMPI_free_global_variables(true);
                 exit(1);
             }
         }
