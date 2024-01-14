@@ -240,7 +240,7 @@ MIMPI_Retcode MIMPI_send_sync_signal_to_both_children(int rank, int size, char s
             exit(0);
         }
         else
-        {}
+        {
             exit(1);
         }
     }
