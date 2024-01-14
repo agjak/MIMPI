@@ -285,7 +285,10 @@ void *buffer_messages(void* source_pt)
             int tag;
             memcpy(&tag, tag_bytes, sizeof(int));
             uint8_t* message=malloc(count);
-
+            if(source==0)
+            {
+                printf("Buffering message from 0 to 1: %d %d\n", count, tag);
+            }
             if(count<=512)
             {
                 chrecv(recv_fd, message, count);
