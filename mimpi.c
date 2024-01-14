@@ -375,17 +375,17 @@ void *buffer_messages(void* source_pt)
             node->message = malloc(count+2*sizeof(int));
             node->next=NULL;
 
-            count_bytes=malloc(sizeof(int));
-            tag_bytes=malloc(sizeof(int));
-            memcpy(count_bytes, &count, sizeof(int));
-            memcpy(tag_bytes, &tag, sizeof(int));
+            uint8_t* count_bytes_2=malloc(sizeof(int));
+            uint8_t* tag_bytes_2=malloc(sizeof(int));
+            memcpy(count_bytes_2, &count, sizeof(int));
+            memcpy(tag_bytes_2, &tag, sizeof(int));
             for(int i=0; i<sizeof(int); i++)
             {
-                node->message[i]=count_bytes[i];
-                node->message[i+sizeof(int)]=tag_bytes[i];
+                node->message[i]=count_bytes_2[i];
+                node->message[i+sizeof(int)]=tag_bytes_2[i];
             }
-            free(count_bytes);
-            free(tag_bytes);
+            free(count_bytes_2);
+            free(tag_bytes_2);
             for(int i=0; i<count; i++)
             {
                 node->message[i+2*sizeof(int)]=message[i];
