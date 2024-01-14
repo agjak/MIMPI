@@ -533,7 +533,7 @@ MIMPI_Retcode MIMPI_Send(
             }
             count_sent=count_sent+sent;
         }
-        int sent=chsend(send_fd, &data_to_send[512*i], (count%512))
+        int sent=chsend(send_fd, &data_to_send[512*i], (count%512));
         if(sent==-1)
         {
             free(data_to_send);
