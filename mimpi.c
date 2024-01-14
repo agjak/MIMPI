@@ -1419,7 +1419,7 @@ MIMPI_Retcode MIMPI_Reduce(
             }
             else
             {
-                messpar = malloc(1*sizeof(char));
+                char *messpar = malloc(1*sizeof(char));
                 MIMPI_sync_recv(messpar,(rank-1)/2);
                 free(messpar);
                 MIMPI_send_sync_signal_to_both_children(rank,size,'F', NULL);
