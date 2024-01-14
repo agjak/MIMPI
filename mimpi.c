@@ -34,9 +34,16 @@ void MIMPI_free_message_buffers(int rank)
         {
             free(node->message);
         }
-        struct buffer_node *new_node = node->next;
-        free(node);
-        node=new_node;
+        if(node->next!=NULL)
+        {
+            struct buffer_node *new_node = node->next;
+            free(node);
+            node=new_node;
+        }
+        else
+        {
+            break;
+        }
     }
     free(node);
 }
