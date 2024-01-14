@@ -320,15 +320,18 @@ void *buffer_messages(void* source_pt)
 
             if(message_buffers[source]==NULL)
             {
+                printf("1\n");
                 message_buffers[source]=(struct buffer_node *) malloc(sizeof(struct buffer_node *));
             }
-
+            printf("A\n");
             if(message_buffers[source]->message==NULL)
             {
+                printf("2\n");
                 node=message_buffers[source];
             }
             else
             {
+                printf("3\n");
                 struct buffer_node *last_node=message_buffers[source];
                 while(last_node->next!=NULL)
                 {
@@ -337,7 +340,7 @@ void *buffer_messages(void* source_pt)
                 last_node->next=(struct buffer_node *) malloc(sizeof(struct buffer_node *));
                 node=last_node->next;
             }
-
+            printf("B\n");
             node->message = malloc(count+2*sizeof(int));
 
             for(int i=0; i<sizeof(int); i++)
@@ -349,6 +352,7 @@ void *buffer_messages(void* source_pt)
             {
                 node->message[i+2*sizeof(int)]=message[i];
             }
+            printf("C\n");
             printf("Saved the message in a buffer\n");
             pthread_mutex_unlock(&buffer_mutexes[source]);
             pthread_cond_signal(&buffer_conditions[source]);
