@@ -525,7 +525,7 @@ MIMPI_Retcode MIMPI_Send(
         int i=0;
         for(; i<count/512; i++)
         {
-            int sent=chsend(send_fd, &data_to_send[512*i], 512)
+            int sent=chsend(send_fd, &data_to_send[512*i], 512);
             if(sent==-1)
             {
                 free(data_to_send);
