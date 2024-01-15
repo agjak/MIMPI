@@ -20,15 +20,11 @@ int main(int argc, char* argv[]) {
 
     int** read_channels_between_programs = malloc(world_size*sizeof(int*));
     int** write_channels_between_programs = malloc(world_size*sizeof(int*));
-    int** read_sync_channels_between_programs = malloc(world_size*sizeof(int*));
-    int** write_sync_channels_between_programs = malloc(world_size*sizeof(int*));
 
     for(int i=0; i<world_size; i++)
     {
         read_channels_between_programs[i] = malloc(world_size*sizeof(int));
         write_channels_between_programs[i] = malloc(world_size*sizeof(int));
-        read_sync_channels_between_programs[i] = malloc(world_size*sizeof(int));
-        write_sync_channels_between_programs[i] = malloc(world_size*sizeof(int));
     }
 
     int free_fd=20;
@@ -40,8 +36,6 @@ int main(int argc, char* argv[]) {
             {
                 read_channels_between_programs[i][i]=0;
                 write_channels_between_programs[i][i]=0;
-                read_sync_channels_between_programs[i][i]=0;
-                write_sync_channels_between_programs[i][i]=0;
             }
             else
             {
@@ -54,15 +48,6 @@ int main(int argc, char* argv[]) {
                 dup2(fds[1],free_fd);
                 close(fds[1]);
                 write_channels_between_programs[i][j]=free_fd; 
-                free_fd++;  
-                ASSERT_SYS_OK(channel(fds));
-                dup2(fds[0],free_fd);
-                close(fds[0]);
-                read_sync_channels_between_programs[i][j]=free_fd;       //the first pipe is for data transfer, the second is for synchronization
-                free_fd++;
-                dup2(fds[1],free_fd);
-                close(fds[1]);
-                write_sync_channels_between_programs[i][j]=free_fd;
                 free_fd++;   
             }
             
@@ -89,13 +74,6 @@ int main(int argc, char* argv[]) {
                 sprintf(value2, "%d", write_channels_between_programs[i][j]);
                 ASSERT_SYS_OK(setenv(name1, value1, 1));
                 ASSERT_SYS_OK(setenv(name2, value2, 1));
-
-                sprintf(name1, "MIMPI_sync_channel_from_%d",j);
-                sprintf(value1, "%d", read_sync_channels_between_programs[j][i]);
-                sprintf(name2, "MIMPI_sync_channel_to_%d",j);
-                sprintf(value2, "%d", write_sync_channels_between_programs[i][j]);
-                ASSERT_SYS_OK(setenv(name1, value1, 1));
-                ASSERT_SYS_OK(setenv(name2, value2, 1));
             }
         }
 
@@ -111,8 +89,6 @@ int main(int argc, char* argv[]) {
                     {
                         close(read_channels_between_programs[k][j]);
                         close(write_channels_between_programs[j][k]);
-                        close(read_sync_channels_between_programs[k][j]);
-                        close(write_sync_channels_between_programs[j][k]);
                     }
                 }
             }
@@ -120,13 +96,9 @@ int main(int argc, char* argv[]) {
             {
                 free(read_channels_between_programs[i]);
                 free(write_channels_between_programs[i]);
-                free(read_sync_channels_between_programs[i]);
-                free(write_sync_channels_between_programs[i]);
             }
             free(read_channels_between_programs);
             free(write_channels_between_programs);
-            free(read_sync_channels_between_programs);
-            free(write_sync_channels_between_programs);
 
             free(name1);
             free(name2);
@@ -152,8 +124,6 @@ int main(int argc, char* argv[]) {
             {
                 close(read_channels_between_programs[i][j]);
                 close(write_channels_between_programs[i][j]);
-                close(read_sync_channels_between_programs[i][j]);
-                close(write_sync_channels_between_programs[i][j]);
             }
         }
     }
@@ -162,13 +132,9 @@ int main(int argc, char* argv[]) {
     {
         free(read_channels_between_programs[i]);
         free(write_channels_between_programs[i]);
-        free(read_sync_channels_between_programs[i]);
-        free(write_sync_channels_between_programs[i]);
     }
     free(read_channels_between_programs);
     free(write_channels_between_programs);
-    free(read_sync_channels_between_programs);
-    free(write_sync_channels_between_programs);
 
 
     for(int i=0; i<world_size; i++)
