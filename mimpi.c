@@ -23,6 +23,8 @@ bool deadlock_detection;
 pthread_t *deadlock_threads;
 int deadlock_threads_num;
 uint8_t ** count_bytes_arr;
+int* source_pt;
+
 
 
 void MIMPI_free_message_buffers(int rank)
@@ -89,6 +91,7 @@ void MIMPI_free_global_variables(bool final)
             free(count_bytes_arr[i]);
         }
     }
+    free(source_pt);
     free(buffer_mutexes);
     free(message_buffers);
     free(buffer_conditions);
@@ -310,7 +313,6 @@ MIMPI_Retcode MIMPI_send_sync_signal_to_both_children(int rank, int size, char s
 void *buffer_messages(void* source_pt)
 {
     int source= *((int*)source_pt);
-    free(source_pt);
 
     char* name = malloc(32*sizeof(char));
     sprintf(name, "MIMPI_channel_from_%d",source);
@@ -422,6 +424,7 @@ void MIMPI_Init(bool enable_deadlock_detection) {
     process_left_mimpi=malloc(size*sizeof(bool));
     deadlock_threads_num=0;
     count_bytes_arr=malloc(size*sizeof(uint8_t*));
+    source_pt = malloc(size*sizeof(int));
 
     if(enable_deadlock_detection)
     {
@@ -434,6 +437,7 @@ void MIMPI_Init(bool enable_deadlock_detection) {
 
     for(int i=0; i<size; i++)
     {
+        source_pt[i]=i;
         if(i!=rank)
         {
             pthread_mutexattr_t attr;
@@ -451,13 +455,11 @@ void MIMPI_Init(bool enable_deadlock_detection) {
 
             count_bytes_arr[i]=(uint8_t *)malloc(sizeof(int));
 
-            int* source_pt = malloc(sizeof(int));
-            *source_pt = i;
+            
             pthread_attr_t attr2;
             ASSERT_ZERO(pthread_attr_init(&attr2));
-            ASSERT_ZERO(pthread_create(&buffer_threads[i], &attr2, buffer_messages, source_pt));
+            ASSERT_ZERO(pthread_create(&buffer_threads[i], &attr2, buffer_messages, &source_pt[i]));
             ASSERT_ZERO(pthread_attr_destroy(&attr2));
-            //free(source_pt);
         }
     }
 
