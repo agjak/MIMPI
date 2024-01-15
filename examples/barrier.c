@@ -21,5 +21,6 @@ int main(int argc, char **argv)
     }
 
     MIMPI_Finalize();
+    printf("%d\n", process_rank);
     return test_success();
 }
