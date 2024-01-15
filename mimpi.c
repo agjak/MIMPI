@@ -79,12 +79,12 @@ void MIMPI_free_global_variables(bool final)
         {
             if(final)
             {
-                ASSERT_SYS_OK(pthread_cond_signal(&buffer_conditions[i]));
+                pthread_cond_signal(&buffer_conditions[i]);
                 ASSERT_ZERO(pthread_join(buffer_threads[i],NULL));
-                
             }
-            ASSERT_SYS_OK(pthread_mutex_destroy(&buffer_mutexes[i]));
-            ASSERT_SYS_OK(pthread_cond_destroy(&buffer_conditions[i]));
+            pthread_mutex_unlock(&buffer_mutexes[i]);
+            pthread_mutex_destroy(&buffer_mutexes[i]);
+            pthread_cond_destroy(&buffer_conditions[i]);
             MIMPI_free_message_buffers(i);
             free(count_bytes_arr[i]);
         }
@@ -323,10 +323,10 @@ void *buffer_messages(void* source_pt)
         int result=chrecv(recv_fd, count_bytes_arr[source], sizeof(int));
         if(result<=0)
         {
-            ASSERT_SYS_OK(pthread_mutex_lock(&buffer_mutexes[source]));
+            pthread_mutex_lock(&buffer_mutexes[source]);
             process_left_mimpi[source]=true;
-            ASSERT_SYS_OK(pthread_mutex_unlock(&(buffer_mutexes[source])));
-            ASSERT_SYS_OK(pthread_cond_signal(&(buffer_conditions[source])));
+            pthread_mutex_unlock(&(buffer_mutexes[source]));
+            pthread_cond_signal(&(buffer_conditions[source]));
             return 0;
         }
         else
@@ -353,7 +353,7 @@ void *buffer_messages(void* source_pt)
                     count_recvd=count_recvd+chrecv(recv_fd,&message[count_recvd],512);
                 }
             }
-            ASSERT_SYS_OK(pthread_mutex_lock(&buffer_mutexes[source]));
+            pthread_mutex_lock(&buffer_mutexes[source]);
             struct buffer_node *node;
 
             if(message_buffers[source]==NULL)
@@ -393,8 +393,8 @@ void *buffer_messages(void* source_pt)
             {
                 node->message[i+2*sizeof(int)]=message[i];
             }
-            ASSERT_SYS_OK(pthread_mutex_unlock(&buffer_mutexes[source]));
-            ASSERT_SYS_OK(pthread_cond_signal(&buffer_conditions[source]));
+            pthread_mutex_unlock(&buffer_mutexes[source]);
+            pthread_cond_signal(&buffer_conditions[source]);
             free(message);
         }
     }
@@ -618,12 +618,12 @@ MIMPI_Retcode MIMPI_Recv(
         }
         else if(sync_signal=='R')
         {
-            ASSERT_SYS_OK(pthread_cond_signal(&buffer_conditions[source]));
+            pthread_cond_signal(&buffer_conditions[source]);
             return MIMPI_ERROR_DEADLOCK_DETECTED;
         }
         else
         {
-            ASSERT_SYS_OK(pthread_mutex_lock(&buffer_mutexes[source]));
+            pthread_mutex_lock(&buffer_mutexes[source]);
             int pom=0;
             while(true)
             {
@@ -671,7 +671,7 @@ MIMPI_Retcode MIMPI_Recv(
                         }
                         
 
-                        ASSERT_SYS_OK(pthread_mutex_unlock(&buffer_mutexes[source]));
+                        pthread_mutex_unlock(&buffer_mutexes[source]);
                         return MIMPI_SUCCESS;
                     }
                     last_node=node;
@@ -684,10 +684,10 @@ MIMPI_Retcode MIMPI_Recv(
                         pom++;
                         continue;
                     }
-                    ASSERT_SYS_OK(pthread_mutex_unlock(&buffer_mutexes[source]));
+                    pthread_mutex_unlock(&buffer_mutexes[source]);
                     return MIMPI_ERROR_REMOTE_FINISHED;
                 }
-                ASSERT_SYS_OK(pthread_cond_wait(&buffer_conditions[source], &buffer_mutexes[source]));
+                pthread_cond_wait(&buffer_conditions[source], &buffer_mutexes[source]);
             }
 
         }
@@ -695,7 +695,7 @@ MIMPI_Retcode MIMPI_Recv(
     }
     else
     {
-        ASSERT_SYS_OK(pthread_mutex_lock(&buffer_mutexes[source]));
+        pthread_mutex_lock(&buffer_mutexes[source]);
         int pom=0;
         while(true)
         {
@@ -742,7 +742,7 @@ MIMPI_Retcode MIMPI_Recv(
                     }
                     
 
-                    ASSERT_SYS_OK(pthread_mutex_unlock(&buffer_mutexes[source]));
+                    pthread_mutex_unlock(&buffer_mutexes[source]);
                     return MIMPI_SUCCESS;
                 }
                 last_node=node;
@@ -755,10 +755,10 @@ MIMPI_Retcode MIMPI_Recv(
                     pom++;
                     continue;
                 }
-                ASSERT_SYS_OK(pthread_mutex_unlock(&buffer_mutexes[source]));
+                pthread_mutex_unlock(&buffer_mutexes[source]);
                 return MIMPI_ERROR_REMOTE_FINISHED;
             }
-            ASSERT_SYS_OK(pthread_cond_wait(&buffer_conditions[source], &buffer_mutexes[source]));
+            pthread_cond_wait(&buffer_conditions[source], &buffer_mutexes[source]);
         }
     }
 
@@ -782,7 +782,7 @@ void* MIMPI_Recv_R_deadlock_message(
     {
         return 0;
     }
-    ASSERT_SYS_OK(pthread_mutex_lock(&buffer_mutexes[source]));
+    pthread_mutex_lock(&buffer_mutexes[source]);
     int pom=0;
     while(true)
     {
@@ -841,7 +841,7 @@ void* MIMPI_Recv_R_deadlock_message(
                     }
                     
 
-                    ASSERT_SYS_OK(pthread_mutex_unlock(&buffer_mutexes[source]));
+                    pthread_mutex_unlock(&buffer_mutexes[source]);
                     return 0;
                 }
             }
@@ -855,10 +855,10 @@ void* MIMPI_Recv_R_deadlock_message(
                 pom++;
                 continue;
             }
-            ASSERT_SYS_OK(pthread_mutex_unlock(&buffer_mutexes[source]));
+            pthread_mutex_unlock(&buffer_mutexes[source]);
             return 0;
         }
-        ASSERT_SYS_OK(pthread_cond_wait(&buffer_conditions[source], &buffer_mutexes[source]));
+        pthread_cond_wait(&buffer_conditions[source], &buffer_mutexes[source]);
     }
 }
 
@@ -869,7 +869,7 @@ char MIMPI_Recv_R_or_S_deadlock_message(
     int expected_tag
 ) {
 
-    ASSERT_SYS_OK(pthread_mutex_lock(&buffer_mutexes[source]));
+    pthread_mutex_lock(&buffer_mutexes[source]);
     int pom=0;
     while(true)
     {   
@@ -932,7 +932,7 @@ char MIMPI_Recv_R_or_S_deadlock_message(
                         }
                         
 
-                        ASSERT_SYS_OK(pthread_mutex_unlock(&buffer_mutexes[source]));
+                        pthread_mutex_unlock(&buffer_mutexes[source]);
                         return result;
                     }
                 }
@@ -947,10 +947,10 @@ char MIMPI_Recv_R_or_S_deadlock_message(
                 pom++;
                 continue;
             }
-            ASSERT_SYS_OK(pthread_mutex_unlock(&buffer_mutexes[source]));
+            pthread_mutex_unlock(&buffer_mutexes[source]);
             return 'F';
         }
-        ASSERT_SYS_OK(pthread_cond_wait(&buffer_conditions[source], &buffer_mutexes[source]));
+        pthread_cond_wait(&buffer_conditions[source], &buffer_mutexes[source]);
     }
 }
 
