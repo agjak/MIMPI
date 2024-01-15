@@ -10,7 +10,7 @@ int main(int argc, char **argv)
     MIMPI_Init(false);
     int const process_rank = MIMPI_World_rank();
     int const size_of_cluster = MIMPI_World_size();
-    printf("B %d\n", process_rank);
+    printf("YYY\n");
 
     for (int i = 0; i < size_of_cluster; i++)
     {
@@ -23,6 +23,5 @@ int main(int argc, char **argv)
     }
 
     MIMPI_Finalize();
-    printf("AC %d\n", process_rank);
     return test_success();
 }
