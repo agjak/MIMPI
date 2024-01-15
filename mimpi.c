@@ -312,6 +312,7 @@ void *buffer_messages(void* source_pt)
             pthread_mutex_lock(&buffer_mutexes[source]);
             process_left_mimpi[source]=true;
             pthread_mutex_unlock(&(buffer_mutexes[source]));
+            pthread_cond_signal(&(buffer_conditions[source]));
             return 0;
         }
         else
