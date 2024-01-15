@@ -129,7 +129,7 @@ MIMPI_Retcode MIMPI_sync_reduce_send(
 {
     pid_t pid1;
     pid_t pid2;
-    ASSERT_SYS_OK(fflush(stdout));
+    fflush(stdout);
     ASSERT_SYS_OK(pid1 = fork());
     if(!pid1)
     {
@@ -461,10 +461,15 @@ void MIMPI_Init(bool enable_deadlock_detection) {
 void MIMPI_Finalize() {
     int rank = MIMPI_World_rank();
     int size = MIMPI_World_size();
+    printf("1 %d\n", rank);
     MIMPI_close_all_program_channels(rank,size);
+    printf("2 %d\n", rank);
     MIMPI_free_global_variables(true);
+    printf("3 %d\n", rank);
     fflush(stdout);
+    printf("4 %d\n", rank);
     channels_finalize();
+    printf("5 %d\n", rank);
 }
 
 int MIMPI_World_size() {
