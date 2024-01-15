@@ -5,8 +5,7 @@
 #include "channel.h"
 #include "mimpi.h"
 #include "mimpi_common.h"
-#include <string.h>
-#include <pthread.h>
+
 
 struct buffer_node   
 {  

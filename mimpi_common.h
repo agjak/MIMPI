@@ -12,6 +12,7 @@
 #include <stdbool.h>
 #include <stdnoreturn.h>
 
+#include <errno.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <sys/types.h>
@@ -19,6 +20,10 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <sys/wait.h>
+#include <stdarg.h>
+#include <string.h>
+
+#include <pthread.h>
 
 /*
     Assert that expression doesn't evaluate to -1 (as almost every system function does in case of error).
