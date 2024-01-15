@@ -350,18 +350,13 @@ void *buffer_messages(void* source_pt)
             pthread_mutex_lock(&buffer_mutexes[source]);
             struct buffer_node *node;
 
-            if(message_buffers[source]==NULL)
-            {
-                message_buffers[source]=(struct buffer_node) malloc(sizeof(struct buffer_node));
-                message_buffers[source].message=NULL;
-            }
             if(message_buffers[source].message==NULL)
             {
                 node=&message_buffers[source];
             }
             else
             {
-                struct buffer_node *last_node=message_buffers[source];
+                struct buffer_node *last_node=&message_buffers[source];
                 while(last_node->next!=NULL)
                 {
                     last_node=last_node->next;
