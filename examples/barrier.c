@@ -6,7 +6,7 @@
 
 int main(int argc, char **argv)
 {
-    printf("A %d\n", process_rank);
+    printf("XXX\n");
     MIMPI_Init(false);
     printf("B %d\n", process_rank);
     int const process_rank = MIMPI_World_rank();
@@ -23,6 +23,6 @@ int main(int argc, char **argv)
     }
 
     MIMPI_Finalize();
-    printf("A %d\n", process_rank);
+    printf("AC %d\n", process_rank);
     return test_success();
 }
