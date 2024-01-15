@@ -136,12 +136,14 @@ MIMPI_Retcode MIMPI_sync_reduce_send(
         MIMPI_Retcode status = MIMPI_sync_send(signal, destination);
         if (status==MIMPI_SUCCESS)
         {
+            MIMPI_close_all_program_channels(rank,size);
             MIMPI_free_global_variables(false);
             free(data);
             exit(0);
         }
         else
         {
+            MIMPI_close_all_program_channels(rank,size);
             MIMPI_free_global_variables(false);
             free(data);
             exit(1);
@@ -155,12 +157,14 @@ MIMPI_Retcode MIMPI_sync_reduce_send(
             MIMPI_Retcode status = MIMPI_Send(data, count, destination, -2);
             if (status==MIMPI_SUCCESS)
             {
+                MIMPI_close_all_program_channels(rank,size);
                 MIMPI_free_global_variables(false);
                 free(data);
                 exit(0);
             }
             else
             {
+                MIMPI_close_all_program_channels(rank,size);
                 MIMPI_free_global_variables(false);
                 free(data);
                 exit(1);
@@ -248,6 +252,7 @@ MIMPI_Retcode MIMPI_send_sync_signal_to_both_children(int rank, int size, char s
         {
             free(pointer_to_free);
         }
+        MIMPI_close_all_program_channels(rank,size);
         MIMPI_free_global_variables(false);
         if (status==MIMPI_SUCCESS)
         {
@@ -268,6 +273,7 @@ MIMPI_Retcode MIMPI_send_sync_signal_to_both_children(int rank, int size, char s
             {
                 free(pointer_to_free);
             }
+            MIMPI_close_all_program_channels(rank,size);
             MIMPI_free_global_variables(false);
             if (status==MIMPI_SUCCESS)
             {
@@ -1105,6 +1111,7 @@ MIMPI_Retcode MIMPI_Bcast(
                         {
                             MIMPI_Send(data,count,i,-1);
                         }
+                        MIMPI_close_all_program_channels(rank,size);
                         MIMPI_free_global_variables(false);
                         exit(0);
                     }
@@ -1184,6 +1191,7 @@ MIMPI_Retcode MIMPI_Bcast(
                                 {
                                     MIMPI_Send(data,count,i,-1);
                                 }
+                                MIMPI_close_all_program_channels(rank,size);
                                 MIMPI_free_global_variables(false);
                                 exit(0);
                             }
