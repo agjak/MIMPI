@@ -52,19 +52,19 @@ void MIMPI_close_all_program_channels(int rank, int size)
             sprintf(name2, "MIMPI_channel_from_%d",i);
             int write_fd=atoi(getenv(name1));
             int read_fd=atoi(getenv(name2));
-            close(write_fd);
-            close(read_fd);
+            ASSERT_SYS_OK(close(write_fd));
+            ASSERT_SYS_OK(close(read_fd));
 
             sprintf(name1, "MIMPI_sync_channel_to_%d", i);
             sprintf(name2, "MIMPI_sync_channel_from_%d",i);
             write_fd=atoi(getenv(name1));
             read_fd=atoi(getenv(name2));
-            close(write_fd);
-            close(read_fd);
+            ASSERT_SYS_OK(close(write_fd));
+            ASSERT_SYS_OK(close(read_fd));
         }
     }
-    free(name1);
-    free(name2);
+    ASSERT_SYS_OK(free(name1));
+    ASSERT_SYS_OK(free(name2));
 }
 
 
