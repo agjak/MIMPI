@@ -342,7 +342,7 @@ void *buffer_messages(void* source_pt)
             
             uint8_t* message=malloc(count);
             int count_recvd=0;
-            while(count_recvd!=count)
+            while(count_recvd<count)
             {
                 if(count-count_recvd<=512)
                 {
