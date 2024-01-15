@@ -32,13 +32,13 @@ void MIMPI_free_message_buffers(int rank)
     {
         if(node->message!=NULL)
         {
-            ASSERT_SYS_OK(free(node->message));
+            free(node->message);
             node->message=NULL;
         }
         if(node->next!=NULL)
         {
             struct buffer_node *new_node = node->next;
-            ASSERT_SYS_OK(free(node));
+            free(node);
             node=new_node;
         }
         else
@@ -46,7 +46,7 @@ void MIMPI_free_message_buffers(int rank)
             break;
         }
     }
-    ASSERT_SYS_OK(free(node));
+    free(node);
 }
 
 
@@ -86,15 +86,15 @@ void MIMPI_free_global_variables(bool final)
             ASSERT_SYS_OK(pthread_mutex_destroy(&buffer_mutexes[i]));
             ASSERT_SYS_OK(pthread_cond_destroy(&buffer_conditions[i]));
             MIMPI_free_message_buffers(i);
-            ASSERT_SYS_OK(free(count_bytes_arr[i]));
+            free(count_bytes_arr[i]);
         }
     }
-    ASSERT_SYS_OK(free(buffer_mutexes));
-    ASSERT_SYS_OK(free(message_buffers));
-    ASSERT_SYS_OK(free(buffer_conditions));
-    ASSERT_SYS_OK(free(buffer_threads));
-    ASSERT_SYS_OK(free(process_left_mimpi));
-    ASSERT_SYS_OK(free(count_bytes_arr));
+    free(buffer_mutexes);
+    free(message_buffers);
+    free(buffer_conditions);
+    free(buffer_threads);
+    free(process_left_mimpi);
+    free(count_bytes_arr);
 }
 
 
@@ -108,7 +108,7 @@ MIMPI_Retcode MIMPI_sync_send(
     char *signal_arr=malloc(sizeof(char));
     signal_arr[0]=signal;
     MIMPI_Retcode result= MIMPI_Send(signal_arr, 1, destination, -3);
-    ASSERT_SYS_OK(free(signal_arr));
+    free(signal_arr);
     return result;
 }
 
@@ -140,7 +140,7 @@ MIMPI_Retcode MIMPI_sync_reduce_send(
             int size=MIMPI_World_size();
             MIMPI_close_all_program_channels(rank,size);
             MIMPI_free_global_variables(false);
-            ASSERT_SYS_OK(free(data));
+            free(data);
             exit(0);
         }
         else
@@ -149,7 +149,7 @@ MIMPI_Retcode MIMPI_sync_reduce_send(
             int size=MIMPI_World_size();
             MIMPI_close_all_program_channels(rank,size);
             MIMPI_free_global_variables(false);
-            ASSERT_SYS_OK(free(data));
+            free(data);
             exit(1);
         }
     }
@@ -165,7 +165,7 @@ MIMPI_Retcode MIMPI_sync_reduce_send(
                 int size=MIMPI_World_size();
                 MIMPI_close_all_program_channels(rank,size);
                 MIMPI_free_global_variables(false);
-                ASSERT_SYS_OK(free(data));
+                free(data);
                 exit(0);
             }
             else
@@ -174,7 +174,7 @@ MIMPI_Retcode MIMPI_sync_reduce_send(
                 int size=MIMPI_World_size();
                 MIMPI_close_all_program_channels(rank,size);
                 MIMPI_free_global_variables(false);
-                ASSERT_SYS_OK(free(data));
+                free(data);
                 exit(1);
             }
         }
@@ -258,7 +258,7 @@ MIMPI_Retcode MIMPI_send_sync_signal_to_both_children(int rank, int size, char s
         MIMPI_Retcode status = MIMPI_send_sync_signal_to_left_child(rank,size,signal);
         if(pointer_to_free!=NULL)
         {
-            ASSERT_SYS_OK(free(pointer_to_free));
+            free(pointer_to_free);
         }
         MIMPI_close_all_program_channels(rank,size);
         MIMPI_free_global_variables(false);
@@ -279,7 +279,7 @@ MIMPI_Retcode MIMPI_send_sync_signal_to_both_children(int rank, int size, char s
             MIMPI_Retcode status = MIMPI_send_sync_signal_to_right_child(rank,size,signal);
             if(pointer_to_free!=NULL)
             {
-                ASSERT_SYS_OK(free(pointer_to_free));
+                free(pointer_to_free);
             }
             MIMPI_close_all_program_channels(rank,size);
             MIMPI_free_global_variables(false);
@@ -310,12 +310,12 @@ MIMPI_Retcode MIMPI_send_sync_signal_to_both_children(int rank, int size, char s
 void *buffer_messages(void* source_pt)
 {
     int source= *((int*)source_pt);
-    ASSERT_SYS_OK(free(source_pt));
+    free(source_pt);
 
     char* name = malloc(32*sizeof(char));
     sprintf(name, "MIMPI_channel_from_%d",source);
     int recv_fd=atoi(getenv(name));
-    ASSERT_SYS_OK(free(name));
+    free(name);
     
 
     while(true)
@@ -337,7 +337,7 @@ void *buffer_messages(void* source_pt)
             chrecv(recv_fd, tag_bytes, sizeof(int));
             int tag;
             ASSERT_SYS_OK(memcpy(&tag, tag_bytes, sizeof(int)));
-            ASSERT_SYS_OK(free(tag_bytes));
+            free(tag_bytes);
             
             
             uint8_t* message=malloc(count);
@@ -387,15 +387,15 @@ void *buffer_messages(void* source_pt)
                 node->message[i]=count_bytes_2[i];
                 node->message[i+sizeof(int)]=tag_bytes_2[i];
             }
-            ASSERT_SYS_OK(free(count_bytes_2));
-            ASSERT_SYS_OK(free(tag_bytes_2));
+            free(count_bytes_2);
+            free(tag_bytes_2);
             for(int i=0; i<count; i++)
             {
                 node->message[i+2*sizeof(int)]=message[i];
             }
             ASSERT_SYS_OK(pthread_mutex_unlock(&buffer_mutexes[source]));
             ASSERT_SYS_OK(pthread_cond_signal(&buffer_conditions[source]));
-            ASSERT_SYS_OK(free(message));
+            free(message);
         }
     }
     return 0;
@@ -500,7 +500,7 @@ MIMPI_Retcode MIMPI_Send(
         ASSERT_SYS_OK(memcpy(&signal_arr[1], &count, sizeof(int)));
         ASSERT_SYS_OK(memcpy(&signal_arr[sizeof(int)+1], &tag, sizeof(int)));
         MIMPI_Retcode result= MIMPI_Send(signal_arr, sizeof(char)+2*sizeof(int), destination, -4);
-        ASSERT_SYS_OK(free(signal_arr));
+        free(signal_arr);
         if(result==MIMPI_ERROR_REMOTE_FINISHED)
         {
             return result;
@@ -530,8 +530,8 @@ MIMPI_Retcode MIMPI_Send(
         data_to_send[i]=count_bytes[i];
         data_to_send[i+sizeof(int)]=tag_bytes[i];
     }
-    ASSERT_SYS_OK(free(count_bytes));
-    ASSERT_SYS_OK(free(tag_bytes));
+    free(count_bytes);
+    free(tag_bytes);
     for(int i=0; i<count; i++)
     {
         data_to_send[i+2*sizeof(int)]=((uint8_t*)data)[i];
@@ -540,7 +540,7 @@ MIMPI_Retcode MIMPI_Send(
     char* name = malloc(32*sizeof(char));
     sprintf(name, "MIMPI_channel_to_%d",destination);
     int send_fd=atoi(getenv(name));
-    ASSERT_SYS_OK(free(name));
+    free(name);
 
     int count_sent=0;
     while(count_sent!=(count+2*sizeof(int)))
@@ -550,7 +550,7 @@ MIMPI_Retcode MIMPI_Send(
             int sent=chsend(send_fd,&data_to_send[count_sent],(count+2*sizeof(int))-count_sent);
             if(sent==-1)
             {
-                ASSERT_SYS_OK(free(data_to_send));
+                free(data_to_send);
                 return MIMPI_ERROR_REMOTE_FINISHED;
             }
             count_sent=count_sent+sent;
@@ -560,13 +560,13 @@ MIMPI_Retcode MIMPI_Send(
             int sent=chsend(send_fd,&data_to_send[count_sent],512);
             if(sent==-1)
             {
-                ASSERT_SYS_OK(free(data_to_send));
+                free(data_to_send);
                 return MIMPI_ERROR_REMOTE_FINISHED;
             }
             count_sent=count_sent+sent;
         }
     }
-    ASSERT_SYS_OK(free(data_to_send));
+    free(data_to_send);
     return MIMPI_SUCCESS;
     
 }
@@ -600,11 +600,11 @@ MIMPI_Retcode MIMPI_Recv(
             signal_arr[1+i]=count_arr[i];
             signal_arr[1+i+sizeof(int)]=tag_arr[i];
         }
-        ASSERT_SYS_OK(free(count_arr));
-        ASSERT_SYS_OK(free(tag_arr));
+        free(count_arr);
+        free(tag_arr);
 
         MIMPI_Send(signal_arr, sizeof(char)+2*sizeof(int), source, -4);
-        ASSERT_SYS_OK(free(signal_arr));
+        free(signal_arr);
 
         char sync_signal=MIMPI_Recv_R_or_S_deadlock_message(source,count,tag);
         if(sync_signal=='F')
@@ -637,22 +637,22 @@ MIMPI_Retcode MIMPI_Recv(
                     ASSERT_SYS_OK(memcpy(&mess_count, count_bytes, sizeof(int)));
                     int mess_tag=0;
                     ASSERT_SYS_OK(memcpy(&mess_tag, tag_bytes, sizeof(int)));
-                    ASSERT_SYS_OK(free(count_bytes));
-                    ASSERT_SYS_OK(free(tag_bytes));
+                    free(count_bytes);
+                    free(tag_bytes);
                     if(count==mess_count && (tag==mess_tag || tag==MIMPI_ANY_TAG))
                     {
                         for(int j=0; j<count; j++)
                         {
                             ((uint8_t*)data)[j]=node->message[j+2*sizeof(int)];
                         }
-                        ASSERT_SYS_OK(free(node->message));
+                        free(node->message);
                         
                         if(last_node==NULL)
                         {
                             if(node->next!=NULL)
                             {
                                 message_buffers[source]=node->next;
-                                ASSERT_SYS_OK(free(node));
+                                free(node);
                             }
                             else
                             {
@@ -662,7 +662,7 @@ MIMPI_Retcode MIMPI_Recv(
                         else
                         {
                             last_node->next=node->next;
-                            ASSERT_SYS_OK(free(node));
+                            free(node);
                         }
                         
 
@@ -709,15 +709,15 @@ MIMPI_Retcode MIMPI_Recv(
                 ASSERT_SYS_OK(memcpy(&mess_count, count_bytes, sizeof(int)));
                 int mess_tag=0;
                 ASSERT_SYS_OK(memcpy(&mess_tag, tag_bytes, sizeof(int)));
-                ASSERT_SYS_OK(free(count_bytes));
-                ASSERT_SYS_OK(free(tag_bytes));
+                free(count_bytes);
+                free(tag_bytes);
                 if(count==mess_count && (tag==mess_tag || tag==MIMPI_ANY_TAG))
                 {
                     for(int j=0; j<count; j++)
                     {
                         ((uint8_t*)data)[j]=node->message[j+2*sizeof(int)];
                     }
-                    ASSERT_SYS_OK(free(node->message));
+                    free(node->message);
                     
                     if(last_node==NULL)
                     {
@@ -733,7 +733,7 @@ MIMPI_Retcode MIMPI_Recv(
                     else
                     {
                         last_node->next=node->next;
-                        ASSERT_SYS_OK(free(node));
+                        free(node);
                     }
                     
 
@@ -766,7 +766,7 @@ void* MIMPI_Recv_R_deadlock_message(
     int source= ((int*)var_pt)[0];
     int expected_count=((int*)var_pt)[1];
     int expected_tag=((int*)var_pt)[2];
-    ASSERT_SYS_OK(free(var_pt));
+    free(var_pt);
 
 
     if (source == MIMPI_World_rank())
@@ -796,8 +796,8 @@ void* MIMPI_Recv_R_deadlock_message(
             ASSERT_SYS_OK(memcpy(&mess_count, count_bytes, sizeof(int)));
             int mess_tag=0;
             ASSERT_SYS_OK(memcpy(&mess_tag, tag_bytes, sizeof(int)));
-            ASSERT_SYS_OK(free(count_bytes));
-            ASSERT_SYS_OK(free(tag_bytes));
+            free(count_bytes);
+            free(tag_bytes);
             if(mess_count==sizeof(char)+2*sizeof(int) && mess_tag==-4 && node->message[2*sizeof(int)]=='R')
             {
                 uint8_t *count_bytes=malloc(sizeof(int));
@@ -811,12 +811,12 @@ void* MIMPI_Recv_R_deadlock_message(
                 ASSERT_SYS_OK(memcpy(&r_count, count_bytes, sizeof(int)));
                 int r_tag=0;
                 ASSERT_SYS_OK(memcpy(&r_tag, tag_bytes, sizeof(int)));
-                ASSERT_SYS_OK(free(count_bytes));
-                ASSERT_SYS_OK(free(tag_bytes));
+                free(count_bytes);
+                free(tag_bytes);
 
                 if(r_tag==expected_tag && r_count==expected_count)
                 {
-                    ASSERT_SYS_OK(free(node->message));
+                    free(node->message);
                     
                     if(last_node==NULL)
                     {
@@ -832,7 +832,7 @@ void* MIMPI_Recv_R_deadlock_message(
                     else
                     {
                         last_node->next=node->next;
-                        ASSERT_SYS_OK(free(node));
+                        free(node);
                     }
                     
 
@@ -886,8 +886,8 @@ char MIMPI_Recv_R_or_S_deadlock_message(
                 ASSERT_SYS_OK(memcpy(&mess_count, count_bytes, sizeof(int)));
                 int mess_tag=0;
                 ASSERT_SYS_OK(memcpy(&mess_tag, tag_bytes, sizeof(int)));
-                ASSERT_SYS_OK(free(count_bytes));
-                ASSERT_SYS_OK(free(tag_bytes));
+                free(count_bytes);
+                free(tag_bytes);
                 if(mess_count==sizeof(char)+2*sizeof(int) && mess_tag==-4 && ((node->message[2*sizeof(int)]=='R' && i==1) || (node->message[2*sizeof(int)]=='S')))
                 {
                     uint8_t *count_bytes=malloc(sizeof(int));
@@ -901,13 +901,13 @@ char MIMPI_Recv_R_or_S_deadlock_message(
                     ASSERT_SYS_OK(memcpy(&r_count, count_bytes, sizeof(int)));
                     int r_tag=0;
                     ASSERT_SYS_OK(memcpy(&r_tag, tag_bytes, sizeof(int)));
-                    ASSERT_SYS_OK(free(count_bytes));
-                    ASSERT_SYS_OK(free(tag_bytes));
+                    free(count_bytes);
+                    free(tag_bytes);
 
                     if((r_tag==expected_tag && r_count==expected_count && node->message[2*sizeof(int)]=='S') || node->message[2*sizeof(int)]=='R')
                     {
                         char result=node->message[2*sizeof(int)];
-                        ASSERT_SYS_OK(free(node->message));
+                        free(node->message);
                         
                         if(last_node==NULL)
                         {
@@ -923,7 +923,7 @@ char MIMPI_Recv_R_or_S_deadlock_message(
                         else
                         {
                             last_node->next=node->next;
-                            ASSERT_SYS_OK(free(node));
+                            free(node);
                         }
                         
 
@@ -980,15 +980,15 @@ MIMPI_Retcode MIMPI_Barrier()
     {
         if(messch1[0]=='F' || messch2[0]=='F')   //some descendant has already finished the MIMPI block
         {
-            ASSERT_SYS_OK(free(messch1));
-            ASSERT_SYS_OK(free(messch2));
+            free(messch1);
+            free(messch2);
             MIMPI_send_sync_signal_to_both_children(rank, size, 'F', NULL);   //FINISHED
             return MIMPI_ERROR_REMOTE_FINISHED;
         }
         else    //messch1[0]=='B' && messch2[0]=='B'
         {
-            ASSERT_SYS_OK(free(messch1));
-            ASSERT_SYS_OK(free(messch2));
+            free(messch1);
+            free(messch2);
             MIMPI_send_sync_signal_to_both_children(rank, size, 'B', NULL);   //BARRIER
             return MIMPI_SUCCESS;
         }
@@ -997,8 +997,8 @@ MIMPI_Retcode MIMPI_Barrier()
     {
         if(messch1[0]=='F' || messch2[0]=='F')   //some descendant has already finished the MIMPI block
         {
-            ASSERT_SYS_OK(free(messch1));
-            ASSERT_SYS_OK(free(messch2));
+            free(messch1);
+            free(messch2);
             
             MIMPI_Retcode result = MIMPI_send_sync_signal_to_parent(rank, 'F');    //FINISHED
             if(result==MIMPI_ERROR_REMOTE_FINISHED) //parent has finished
@@ -1011,7 +1011,7 @@ MIMPI_Retcode MIMPI_Barrier()
                 char* messpar = malloc(1*sizeof(char));
                 messpar[0] = 'E';                       //EMPTY
                 MIMPI_sync_recv(messpar,(rank-1)/2);
-                ASSERT_SYS_OK(free(messpar));
+                free(messpar);
                 MIMPI_send_sync_signal_to_both_children(rank,size,'F', NULL);
                 return MIMPI_ERROR_REMOTE_FINISHED;
             }
@@ -1019,8 +1019,8 @@ MIMPI_Retcode MIMPI_Barrier()
         }
         else    //both children have started MIMPI_Barrier
         {
-            ASSERT_SYS_OK(free(messch1));
-            ASSERT_SYS_OK(free(messch2));
+            free(messch1);
+            free(messch2);
             MIMPI_Retcode result = MIMPI_send_sync_signal_to_parent(rank,'B');    //BARRIER
             if(result==MIMPI_ERROR_REMOTE_FINISHED) //parent has finished
             {
@@ -1034,13 +1034,13 @@ MIMPI_Retcode MIMPI_Barrier()
                 MIMPI_Retcode result = MIMPI_sync_recv(messpar,(rank-1)/2);
                 if(messpar[0]=='F' || result==MIMPI_ERROR_REMOTE_FINISHED)
                 {
-                    ASSERT_SYS_OK(free(messpar));
+                    free(messpar);
                     MIMPI_send_sync_signal_to_both_children(rank,size,'F', NULL);
                     return MIMPI_ERROR_REMOTE_FINISHED;
                 }
                 else    //messpar[0]=='B'
                 {
-                    ASSERT_SYS_OK(free(messpar));
+                    free(messpar);
                     MIMPI_send_sync_signal_to_both_children(rank,size,'B', NULL);
                     return MIMPI_SUCCESS;
                 }
@@ -1089,15 +1089,15 @@ MIMPI_Retcode MIMPI_Bcast(
     {
         if(messch1[0]=='F' || messch2[0]=='F')   //some descendant has already finished the MIMPI block
         {
-            ASSERT_SYS_OK(free(messch1));
-            ASSERT_SYS_OK(free(messch2));
+            free(messch1);
+            free(messch2);
             MIMPI_send_sync_signal_to_both_children(rank, size, 'F', NULL);   //FINISHED
             return MIMPI_ERROR_REMOTE_FINISHED;
         }
         else    //(messch1[0]=='R'||messch1[0]=='E') && (messch2[0]=='R'||messch2[0]=='E')
         {
-            ASSERT_SYS_OK(free(messch1));
-            ASSERT_SYS_OK(free(messch2));
+            free(messch1);
+            free(messch2);
             MIMPI_send_sync_signal_to_both_children(rank, size, 'R', NULL);   //BROADCAST
 
             if(rank==root)
@@ -1134,8 +1134,8 @@ MIMPI_Retcode MIMPI_Bcast(
     {
         if(messch1[0]=='F' || messch2[0]=='F')   //some descendant has already finished the MIMPI block
         {
-            ASSERT_SYS_OK(free(messch1));
-            ASSERT_SYS_OK(free(messch2));
+            free(messch1);
+            free(messch2);
             
             MIMPI_Retcode result = MIMPI_send_sync_signal_to_parent(rank, 'F');    //FINISHED
             if(result==MIMPI_ERROR_REMOTE_FINISHED) //parent has finished
@@ -1148,7 +1148,7 @@ MIMPI_Retcode MIMPI_Bcast(
                 char* messpar = malloc(1*sizeof(char));
                 messpar[0] = 'E';                       //EMPTY
                 MIMPI_sync_recv(messpar,(rank-1)/2);
-                ASSERT_SYS_OK(free(messpar));
+                free(messpar);
                 MIMPI_send_sync_signal_to_both_children(rank,size,'F', NULL);
                 return MIMPI_ERROR_REMOTE_FINISHED;
             }
@@ -1156,8 +1156,8 @@ MIMPI_Retcode MIMPI_Bcast(
         }
         else    //both children have started MIMPI_Broadcast
         {
-            ASSERT_SYS_OK(free(messch1));
-            ASSERT_SYS_OK(free(messch2));
+            free(messch1);
+            free(messch2);
             MIMPI_Retcode result = MIMPI_send_sync_signal_to_parent(rank, 'R');    //BROADCAST
             if(result==MIMPI_ERROR_REMOTE_FINISHED) //parent has finished
             {
@@ -1171,13 +1171,13 @@ MIMPI_Retcode MIMPI_Bcast(
                 MIMPI_sync_recv(messpar,(rank-1)/2);
                 if(messpar[0]=='F')
                 {
-                    ASSERT_SYS_OK(free(messpar));
+                    free(messpar);
                     MIMPI_send_sync_signal_to_both_children(rank,size,'F', NULL);
                     return MIMPI_ERROR_REMOTE_FINISHED;
                 }
                 else    //messpar[0]=='R'
                 {
-                    ASSERT_SYS_OK(free(messpar));
+                    free(messpar);
                     MIMPI_send_sync_signal_to_both_children(rank,size,'R', NULL);
 
                     if(rank==root)
@@ -1387,23 +1387,23 @@ MIMPI_Retcode MIMPI_Reduce(
             data_to_send[i]=((uint8_t*)send_data)[i];
         }
     }
-    ASSERT_SYS_OK(free(child_1_data));
-    ASSERT_SYS_OK(free(child_2_data));
+    free(child_1_data);
+    free(child_2_data);
 
     if(rank==0)
     {
         if(messch1[0]=='F' || messch2[0]=='F')   //some descendant has already finished the MIMPI block
         {
-            ASSERT_SYS_OK(free(messch1));
-            ASSERT_SYS_OK(free(messch2));
-            ASSERT_SYS_OK(free(data_to_send));
+            free(messch1);
+            free(messch2);
+            free(data_to_send);
             MIMPI_send_sync_signal_to_both_children(rank, size, 'F', NULL);   //FINISHED
             return MIMPI_ERROR_REMOTE_FINISHED;
         }
         else    //messch1[0]=='D' && messch2[0]=='D'
         {
-            ASSERT_SYS_OK(free(messch1));
-            ASSERT_SYS_OK(free(messch2));
+            free(messch1);
+            free(messch2);
             MIMPI_send_sync_signal_to_both_children(rank, size, 'D', data_to_send);   //REDUCE
             if(root==0)
             {
@@ -1416,7 +1416,7 @@ MIMPI_Retcode MIMPI_Reduce(
             {
                 MIMPI_Send(data_to_send,count,root,-2);
             }
-            ASSERT_SYS_OK(free(data_to_send));
+            free(data_to_send);
             return MIMPI_SUCCESS;
         }
     }
@@ -1424,9 +1424,9 @@ MIMPI_Retcode MIMPI_Reduce(
     {
         if(messch1[0]=='F' || messch2[0]=='F')   //some descendant has already finished the MIMPI block
         {
-            ASSERT_SYS_OK(free(messch1));
-            ASSERT_SYS_OK(free(messch2));
-            ASSERT_SYS_OK(free(data_to_send));
+            free(messch1);
+            free(messch2);
+            free(data_to_send);
             MIMPI_Retcode result = MIMPI_send_sync_signal_to_parent(rank, 'F');    //FINISHED
             if(result==MIMPI_ERROR_REMOTE_FINISHED) //parent has finished
             {
@@ -1437,7 +1437,7 @@ MIMPI_Retcode MIMPI_Reduce(
             {
                 char *messpar = malloc(1*sizeof(char));
                 MIMPI_sync_recv(messpar,(rank-1)/2);
-                ASSERT_SYS_OK(free(messpar));
+                free(messpar);
                 MIMPI_send_sync_signal_to_both_children(rank,size,'F', NULL);
                 return MIMPI_ERROR_REMOTE_FINISHED;
             }
@@ -1445,10 +1445,10 @@ MIMPI_Retcode MIMPI_Reduce(
         }
         else    //both children and their descendants have started MIMPI_Reduce
         {
-            ASSERT_SYS_OK(free(messch1));
-            ASSERT_SYS_OK(free(messch2));
+            free(messch1);
+            free(messch2);
             MIMPI_Retcode result = MIMPI_sync_reduce_send('D', (rank-1)/2, data_to_send, count);
-            ASSERT_SYS_OK(free(data_to_send));
+            free(data_to_send);
             if(result==MIMPI_ERROR_REMOTE_FINISHED) //parent has finished
             {
                 MIMPI_send_sync_signal_to_both_children(rank,size,'F', NULL);
@@ -1461,13 +1461,13 @@ MIMPI_Retcode MIMPI_Reduce(
                 MIMPI_Retcode result = MIMPI_sync_recv(messpar,(rank-1)/2);
                 if(messpar[0]=='F' || result==MIMPI_ERROR_REMOTE_FINISHED)
                 {
-                    ASSERT_SYS_OK(free(messpar));
+                    free(messpar);
                     MIMPI_send_sync_signal_to_both_children(rank,size,'F', NULL);
                     return MIMPI_ERROR_REMOTE_FINISHED;
                 }
                 else    //messpar[0]=='D'
                 {
-                    ASSERT_SYS_OK(free(messpar));
+                    free(messpar);
                     MIMPI_send_sync_signal_to_both_children(rank,size,'D', NULL);
                     if(rank==root)
                     {
