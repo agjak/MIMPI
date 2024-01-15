@@ -32,7 +32,8 @@ int main(int argc, char **argv)
     }
 
     // Process with rank 0 finishes before rank 1 gets its message.
+    printf("A %d\n", world_rank);
     MIMPI_Finalize();
-    printf("%d\n", world_rank);
+    printf("B %d\n", world_rank);
     return test_success();
 }
