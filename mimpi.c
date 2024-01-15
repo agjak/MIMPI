@@ -15,7 +15,7 @@ struct buffer_node
 };  
 
 
-struct buffer_node *message_buffers;
+struct buffer_node **message_buffers;
 pthread_mutex_t *buffer_mutexes;
 pthread_t *buffer_threads;
 pthread_cond_t *buffer_conditions;
@@ -27,7 +27,7 @@ int deadlock_threads_num;
 
 void MIMPI_free_message_buffers(int rank)
 {
-    struct buffer_node *node = &message_buffers[rank];
+    struct buffer_node *node = message_buffers[rank];
     while(node!=NULL)
     {
         if(node->message!=NULL)
@@ -89,7 +89,7 @@ void MIMPI_free_global_variables(bool final)
         }
     }
     free(buffer_mutexes);
-    //free(message_buffers);
+    free(message_buffers);
     free(buffer_conditions);
     free(buffer_threads);
     free(process_left_mimpi);
@@ -312,7 +312,7 @@ void *buffer_messages(void* source_pt)
             pthread_mutex_lock(&buffer_mutexes[source]);
             process_left_mimpi[source]=true;
             pthread_mutex_unlock(&(buffer_mutexes[source]));
-            pthread_cond_signal(&(buffer_conditions[source]));
+            pthread_cond_signal(&(buffer_conditions[source]);
             return 0;
         }
         else
@@ -350,13 +350,18 @@ void *buffer_messages(void* source_pt)
             pthread_mutex_lock(&buffer_mutexes[source]);
             struct buffer_node *node;
 
-            if(message_buffers[source].message==NULL)
+            if(message_buffers[source]==NULL)
             {
-                node=&message_buffers[source];
+                message_buffers[source]=(struct buffer_node *) malloc(sizeof(struct buffer_node));
+                message_buffers[source]->message=NULL;
+            }
+            if(message_buffers[source]->message==NULL)
+            {
+                node=message_buffers[source];
             }
             else
             {
-                struct buffer_node *last_node=&message_buffers[source];
+                struct buffer_node *last_node=message_buffers[source];
                 while(last_node->next!=NULL)
                 {
                     last_node=last_node->next;
@@ -397,7 +402,7 @@ void MIMPI_Init(bool enable_deadlock_detection) {
     int rank = MIMPI_World_rank();
     int size = MIMPI_World_size();
 
-    message_buffers=malloc(size*sizeof(struct buffer_node));
+    message_buffers=malloc(size*sizeof(struct buffer_node *));
     buffer_mutexes=malloc(size*sizeof(pthread_mutex_t));
     buffer_threads=malloc(size*sizeof(pthread_t));
     buffer_conditions=malloc(size*sizeof(pthread_cond_t));
@@ -433,9 +438,10 @@ void MIMPI_Init(bool enable_deadlock_detection) {
             ASSERT_ZERO(pthread_cond_init(&buffer_conditions[i], NULL));
 
             process_left_mimpi[i]=false;
+            message_buffers[i]=(struct buffer_node*)malloc(sizeof(struct buffer_node));
             //message_buffers[i]->next=(struct buffer_node*)malloc(sizeof(struct buffer_node*));
-            message_buffers[i].next=NULL;
-            message_buffers[i].message=NULL;
+            message_buffers[i]->next=NULL;
+            message_buffers[i]->message=NULL;
         }
     }
 
@@ -608,7 +614,7 @@ MIMPI_Retcode MIMPI_Recv(
             while(true)
             {
                 struct buffer_node *last_node=NULL;
-                struct buffer_node *node=&message_buffers[source];
+                struct buffer_node *node=message_buffers[source];
                 while(node!=NULL && node->message!=NULL)
                 {
                     uint8_t *count_bytes=malloc(sizeof(int));
@@ -636,7 +642,7 @@ MIMPI_Retcode MIMPI_Recv(
                         {
                             if(node->next!=NULL)
                             {
-                                message_buffers[source]=*node->next;
+                                message_buffers[source]=node->next;
                                 free(node);
                             }
                             else
@@ -680,7 +686,7 @@ MIMPI_Retcode MIMPI_Recv(
         while(true)
         {
             struct buffer_node *last_node=NULL;
-            struct buffer_node *node=&message_buffers[source];
+            struct buffer_node *node=message_buffers[source];
             while(node!=NULL && node->message!=NULL)
             {
                 uint8_t *count_bytes=malloc(sizeof(int));
@@ -708,7 +714,7 @@ MIMPI_Retcode MIMPI_Recv(
                     {
                         if(node->next!=NULL)
                         {
-                            message_buffers[source]=*node->next;
+                            message_buffers[source]=node->next;
                         }
                         else
                         {
@@ -767,7 +773,7 @@ void* MIMPI_Recv_R_deadlock_message(
     while(true)
     {
         struct buffer_node *last_node=NULL;
-        struct buffer_node *node=&message_buffers[source];
+        struct buffer_node *node=message_buffers[source];
         while(node!=NULL && node->message!=NULL)
         {
             uint8_t *count_bytes=malloc(sizeof(int));
@@ -807,7 +813,7 @@ void* MIMPI_Recv_R_deadlock_message(
                     {
                         if(node->next!=NULL)
                         {
-                            message_buffers[source]=*node->next;
+                            message_buffers[source]=node->next;
                         }
                         else
                         {
@@ -856,7 +862,7 @@ char MIMPI_Recv_R_or_S_deadlock_message(
         for(int i=0;i<2;i++)
         {
             struct buffer_node *last_node=NULL;
-            struct buffer_node *node=&message_buffers[source];
+            struct buffer_node *node=message_buffers[source];
             while(node!=NULL && node->message!=NULL)
             {
 
@@ -898,7 +904,7 @@ char MIMPI_Recv_R_or_S_deadlock_message(
                         {
                             if(node->next!=NULL)
                             {
-                                message_buffers[source]=*node->next;
+                                message_buffers[source]=node->next;
                             }
                             else
                             {
