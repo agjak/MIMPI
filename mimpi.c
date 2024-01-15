@@ -23,7 +23,6 @@ bool *process_left_mimpi;
 bool deadlock_detection;
 pthread_t *deadlock_threads;
 int deadlock_threads_num;
-uint8_t** count_bytes_arr;
 
 
 void MIMPI_free_message_buffers(int rank)
@@ -88,14 +87,12 @@ void MIMPI_free_global_variables(bool final)
             pthread_cond_destroy(&buffer_conditions[i]);
             MIMPI_free_message_buffers(i);
         }
-        free(count_bytes_arr[i]);
     }
     free(buffer_mutexes);
     free(message_buffers);
     free(buffer_conditions);
     free(buffer_threads);
     free(process_left_mimpi);
-    free(count_bytes_arr);
 }
 
 
@@ -307,9 +304,11 @@ void *buffer_messages(void* source_pt)
 
     while(true)
     {
-        int result=chrecv(recv_fd, count_bytes_arr[source], sizeof(int));
+        uint8_t* count_bytes=malloc(sizeof(int));
+        int result=chrecv(recv_fd, count_bytes, sizeof(int));
         if(result<=0)
         {
+            free(count_bytes);
             pthread_mutex_lock(&buffer_mutexes[source]);
             process_left_mimpi[source]=true;
             pthread_mutex_unlock(&(buffer_mutexes[source]));
@@ -319,8 +318,8 @@ void *buffer_messages(void* source_pt)
         else
         {
             int count;
-            memcpy(&count, count_bytes_arr[source], sizeof(int));
-
+            memcpy(&count, count_bytes, sizeof(int));
+            free(count_bytes);
             uint8_t* tag_bytes=malloc(sizeof(int));
             chrecv(recv_fd, tag_bytes, sizeof(int));
             int tag;
@@ -409,7 +408,6 @@ void MIMPI_Init(bool enable_deadlock_detection) {
     buffer_conditions=malloc(size*sizeof(pthread_cond_t));
     process_left_mimpi=malloc(size*sizeof(bool));
     deadlock_threads_num=0;
-    count_bytes_arr=(uint8_t **)malloc(size*sizeof(uint8_t *));
 
     if(enable_deadlock_detection)
     {
@@ -445,8 +443,6 @@ void MIMPI_Init(bool enable_deadlock_detection) {
             message_buffers[i]->next=NULL;
             message_buffers[i]->message=NULL;
         }
-        count_bytes_arr[i]=(uint8_t*)malloc(sizeof(int));
-        memset(count_bytes_arr[i],0,sizeof(int));
     }
 
 }
