@@ -297,7 +297,6 @@ MIMPI_Retcode MIMPI_send_sync_signal_to_both_children(int rank, int size, char s
 void *buffer_messages(void* source_pt)
 {
     int source= *((int*)source_pt);
-    free(source_pt);
 
     char* name = malloc(32*sizeof(char));
     sprintf(name, "MIMPI_channel_from_%d",source);
@@ -434,7 +433,6 @@ void MIMPI_Init(bool enable_deadlock_detection) {
             ASSERT_ZERO(pthread_attr_init(&attr2));
             ASSERT_ZERO(pthread_create(&buffer_threads[i], &attr2, buffer_messages, &source));
             ASSERT_ZERO(pthread_attr_destroy(&attr2));
-            //free(source_pt);
 
             ASSERT_ZERO(pthread_cond_init(&buffer_conditions[i], NULL));
 
