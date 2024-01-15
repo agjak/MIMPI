@@ -63,8 +63,8 @@ void MIMPI_close_all_program_channels(int rank, int size)
             ASSERT_SYS_OK(close(read_fd));
         }
     }
-    ASSERT_SYS_OK(free(name1));
-    ASSERT_SYS_OK(free(name2));
+    free(name1);
+    free(name2);
 }
 
 
