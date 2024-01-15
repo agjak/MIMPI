@@ -80,6 +80,7 @@ void MIMPI_free_global_variables(bool final)
             printf("A %d\n", rank);
             if(final)
             {
+                process_left_mimpi[i]=true;
                 pthread_cond_signal(&buffer_conditions[i]);
                 ASSERT_ZERO(pthread_join(buffer_threads[i],NULL));
             }
