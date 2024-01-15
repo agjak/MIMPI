@@ -332,11 +332,11 @@ void *buffer_messages(void* source_pt)
         else
         {
             int count;
-            ASSERT_SYS_OK(memcpy(&count, count_bytes_arr[source], sizeof(int)));
+            memcpy(&count, count_bytes_arr[source], sizeof(int));
             uint8_t* tag_bytes=malloc(sizeof(int));
             chrecv(recv_fd, tag_bytes, sizeof(int));
             int tag;
-            ASSERT_SYS_OK(memcpy(&tag, tag_bytes, sizeof(int)));
+            memcpy(&tag, tag_bytes, sizeof(int));
             free(tag_bytes);
             
             
@@ -380,8 +380,8 @@ void *buffer_messages(void* source_pt)
 
             uint8_t* count_bytes_2=malloc(sizeof(int));
             uint8_t* tag_bytes_2=malloc(sizeof(int));
-            ASSERT_SYS_OK(memcpy(count_bytes_2, &count, sizeof(int)));
-            ASSERT_SYS_OK(memcpy(tag_bytes_2, &tag, sizeof(int)));
+            memcpy(count_bytes_2, &count, sizeof(int));
+            memcpy(tag_bytes_2, &tag, sizeof(int));
             for(int i=0; i<sizeof(int); i++)
             {
                 node->message[i]=count_bytes_2[i];
@@ -497,8 +497,8 @@ MIMPI_Retcode MIMPI_Send(
     {
         char *signal_arr=malloc(sizeof(char)+2*sizeof(int));
         signal_arr[0]='S';
-        ASSERT_SYS_OK(memcpy(&signal_arr[1], &count, sizeof(int)));
-        ASSERT_SYS_OK(memcpy(&signal_arr[sizeof(int)+1], &tag, sizeof(int)));
+        memcpy(&signal_arr[1], &count, sizeof(int));
+        memcpy(&signal_arr[sizeof(int)+1], &tag, sizeof(int));
         MIMPI_Retcode result= MIMPI_Send(signal_arr, sizeof(char)+2*sizeof(int), destination, -4);
         free(signal_arr);
         if(result==MIMPI_ERROR_REMOTE_FINISHED)
@@ -519,9 +519,9 @@ MIMPI_Retcode MIMPI_Send(
     }
     
     uint8_t *count_bytes=malloc(sizeof(int));
-    ASSERT_SYS_OK(memcpy(count_bytes, &count, sizeof(int)));
+    memcpy(count_bytes, &count, sizeof(int));
     uint8_t *tag_bytes=malloc(sizeof(int));
-    ASSERT_SYS_OK(memcpy(tag_bytes, &tag, sizeof(int)));
+    memcpy(tag_bytes, &tag, sizeof(int));
 
     uint8_t *data_to_send=malloc((count+2*sizeof(int)));
 
@@ -592,8 +592,8 @@ MIMPI_Retcode MIMPI_Recv(
         signal_arr[0]='R';
         uint8_t *count_arr=malloc(sizeof(int));
         uint8_t *tag_arr=malloc(sizeof(int));
-        ASSERT_SYS_OK(memcpy(count_arr, &count, sizeof(int)));
-        ASSERT_SYS_OK(memcpy(tag_arr, &tag, sizeof(int)));
+        memcpy(count_arr, &count, sizeof(int));
+        memcpy(tag_arr, &tag, sizeof(int));
 
         for(int i=0;i<sizeof(int);i++)
         {
@@ -634,9 +634,9 @@ MIMPI_Retcode MIMPI_Recv(
                         tag_bytes[j]=node->message[j+sizeof(int)];
                     }
                     int mess_count=0;
-                    ASSERT_SYS_OK(memcpy(&mess_count, count_bytes, sizeof(int)));
+                    memcpy(&mess_count, count_bytes, sizeof(int));
                     int mess_tag=0;
-                    ASSERT_SYS_OK(memcpy(&mess_tag, tag_bytes, sizeof(int)));
+                    memcpy(&mess_tag, tag_bytes, sizeof(int));
                     free(count_bytes);
                     free(tag_bytes);
                     if(count==mess_count && (tag==mess_tag || tag==MIMPI_ANY_TAG))
@@ -706,9 +706,9 @@ MIMPI_Retcode MIMPI_Recv(
                     tag_bytes[j]=node->message[j+sizeof(int)];
                 }
                 int mess_count=0;
-                ASSERT_SYS_OK(memcpy(&mess_count, count_bytes, sizeof(int)));
+                memcpy(&mess_count, count_bytes, sizeof(int));
                 int mess_tag=0;
-                ASSERT_SYS_OK(memcpy(&mess_tag, tag_bytes, sizeof(int)));
+                memcpy(&mess_tag, tag_bytes, sizeof(int));
                 free(count_bytes);
                 free(tag_bytes);
                 if(count==mess_count && (tag==mess_tag || tag==MIMPI_ANY_TAG))
@@ -793,9 +793,9 @@ void* MIMPI_Recv_R_deadlock_message(
                 tag_bytes[j]=node->message[j+sizeof(int)];
             }
             int mess_count=0;
-            ASSERT_SYS_OK(memcpy(&mess_count, count_bytes, sizeof(int)));
+            memcpy(&mess_count, count_bytes, sizeof(int));
             int mess_tag=0;
-            ASSERT_SYS_OK(memcpy(&mess_tag, tag_bytes, sizeof(int)));
+            memcpy(&mess_tag, tag_bytes, sizeof(int));
             free(count_bytes);
             free(tag_bytes);
             if(mess_count==sizeof(char)+2*sizeof(int) && mess_tag==-4 && node->message[2*sizeof(int)]=='R')
@@ -808,9 +808,9 @@ void* MIMPI_Recv_R_deadlock_message(
                     tag_bytes[j]=node->message[j+1+3*sizeof(int)];
                 }
                 int r_count=0;
-                ASSERT_SYS_OK(memcpy(&r_count, count_bytes, sizeof(int)));
+                memcpy(&r_count, count_bytes, sizeof(int));
                 int r_tag=0;
-                ASSERT_SYS_OK(memcpy(&r_tag, tag_bytes, sizeof(int)));
+                memcpy(&r_tag, tag_bytes, sizeof(int));
                 free(count_bytes);
                 free(tag_bytes);
 
@@ -883,9 +883,9 @@ char MIMPI_Recv_R_or_S_deadlock_message(
                     tag_bytes[j]=node->message[j+sizeof(int)];
                 }
                 int mess_count=0;
-                ASSERT_SYS_OK(memcpy(&mess_count, count_bytes, sizeof(int)));
+                memcpy(&mess_count, count_bytes, sizeof(int));
                 int mess_tag=0;
-                ASSERT_SYS_OK(memcpy(&mess_tag, tag_bytes, sizeof(int)));
+                memcpy(&mess_tag, tag_bytes, sizeof(int));
                 free(count_bytes);
                 free(tag_bytes);
                 if(mess_count==sizeof(char)+2*sizeof(int) && mess_tag==-4 && ((node->message[2*sizeof(int)]=='R' && i==1) || (node->message[2*sizeof(int)]=='S')))
@@ -898,9 +898,9 @@ char MIMPI_Recv_R_or_S_deadlock_message(
                         tag_bytes[j]=node->message[3*sizeof(int)+1+j];
                     }
                     int r_count=0;
-                    ASSERT_SYS_OK(memcpy(&r_count, count_bytes, sizeof(int)));
+                    memcpy(&r_count, count_bytes, sizeof(int));
                     int r_tag=0;
-                    ASSERT_SYS_OK(memcpy(&r_tag, tag_bytes, sizeof(int)));
+                    memcpy(&r_tag, tag_bytes, sizeof(int));
                     free(count_bytes);
                     free(tag_bytes);
 
