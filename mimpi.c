@@ -463,7 +463,7 @@ void MIMPI_Finalize() {
     int size = MIMPI_World_size();
     MIMPI_close_all_program_channels(rank,size);
     MIMPI_free_global_variables(true);
-    ASSERT_SYS_OK(fflush(stdout));
+    fflush(stdout);
     channels_finalize();
 }
 
