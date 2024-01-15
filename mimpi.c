@@ -87,8 +87,8 @@ void MIMPI_free_global_variables(bool final)
             pthread_mutex_destroy(&buffer_mutexes[i]);
             pthread_cond_destroy(&buffer_conditions[i]);
             MIMPI_free_message_buffers(i);
-            free(count_bytes_arr[i]);
         }
+        free(count_bytes_arr[i]);
     }
     free(buffer_mutexes);
     free(message_buffers);
