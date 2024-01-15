@@ -77,6 +77,7 @@ void MIMPI_free_global_variables(bool final)
     {
         if(i!=rank)
         {
+            printf("A %d\n", rank);
             if(final)
             {
                 pthread_cond_signal(&buffer_conditions[i]);
