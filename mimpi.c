@@ -731,6 +731,7 @@ MIMPI_Retcode MIMPI_Recv(
                         if(node->next!=NULL)
                         {
                             message_buffers[source]=node->next;
+                            free(node);
                         }
                         else
                         {
@@ -830,6 +831,7 @@ void* MIMPI_Recv_R_deadlock_message(
                         if(node->next!=NULL)
                         {
                             message_buffers[source]=node->next;
+                            free(node);
                         }
                         else
                         {
@@ -921,6 +923,7 @@ char MIMPI_Recv_R_or_S_deadlock_message(
                             if(node->next!=NULL)
                             {
                                 message_buffers[source]=node->next;
+                                free(node);
                             }
                             else
                             {
