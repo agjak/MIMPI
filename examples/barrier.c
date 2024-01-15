@@ -8,9 +8,9 @@ int main(int argc, char **argv)
 {
     printf("XXX\n");
     MIMPI_Init(false);
-    printf("B %d\n", process_rank);
     int const process_rank = MIMPI_World_rank();
     int const size_of_cluster = MIMPI_World_size();
+    printf("B %d\n", process_rank);
 
     for (int i = 0; i < size_of_cluster; i++)
     {
