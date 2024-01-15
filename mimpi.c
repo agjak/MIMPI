@@ -66,7 +66,7 @@ void MIMPI_free_global_variables(bool final)
             {
                 if(i!=rank)
                 {
-                    ASSERT_SYS_OK(pthread_cond_signal(&buffer_conditions[i]));
+                    pthread_cond_signal(&buffer_conditions[i]);
                 }
             }
             ASSERT_ZERO(pthread_join(deadlock_threads[j],NULL));
