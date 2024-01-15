@@ -89,7 +89,7 @@ void MIMPI_free_global_variables(bool final)
         }
     }
     free(buffer_mutexes);
-    free(message_buffers);
+    //free(message_buffers);
     free(buffer_conditions);
     free(buffer_threads);
     free(process_left_mimpi);
