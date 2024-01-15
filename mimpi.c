@@ -82,10 +82,15 @@ void MIMPI_free_global_variables(bool final)
                 pthread_cond_signal(&buffer_conditions[i]);
                 ASSERT_ZERO(pthread_join(buffer_threads[i],NULL));
             }
+            printf("A %d\n", rank);
             pthread_mutex_unlock(&buffer_mutexes[i]);
+            printf("B %d\n", rank);
             pthread_mutex_destroy(&buffer_mutexes[i]);
+            printf("C %d\n", rank);
             pthread_cond_destroy(&buffer_conditions[i]);
+            printf("D %d\n", rank);
             MIMPI_free_message_buffers(i);
+            printf("E %d\n", rank);
             free(count_bytes_arr[i]);
         }
     }
@@ -461,15 +466,10 @@ void MIMPI_Init(bool enable_deadlock_detection) {
 void MIMPI_Finalize() {
     int rank = MIMPI_World_rank();
     int size = MIMPI_World_size();
-    printf("1 %d\n", rank);
     MIMPI_close_all_program_channels(rank,size);
-    printf("2 %d\n", rank);
     MIMPI_free_global_variables(true);
-    printf("3 %d\n", rank);
     fflush(stdout);
-    printf("4 %d\n", rank);
     channels_finalize();
-    printf("5 %d\n", rank);
 }
 
 int MIMPI_World_size() {
