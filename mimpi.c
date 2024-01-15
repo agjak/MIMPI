@@ -427,14 +427,6 @@ void MIMPI_Init(bool enable_deadlock_detection) {
             ASSERT_ZERO(pthread_mutex_init(&buffer_mutexes[i], &attr));
             ASSERT_ZERO(pthread_mutexattr_destroy(&attr));
 
-            int* source_pt = malloc(sizeof(int));
-            *source_pt = i;
-            pthread_attr_t attr2;
-            ASSERT_ZERO(pthread_attr_init(&attr2));
-            ASSERT_ZERO(pthread_create(&buffer_threads[i], &attr2, buffer_messages, source_pt));
-            ASSERT_ZERO(pthread_attr_destroy(&attr2));
-            //free(source_pt);
-
             ASSERT_ZERO(pthread_cond_init(&buffer_conditions[i], NULL));
 
             process_left_mimpi[i]=false;
@@ -442,6 +434,14 @@ void MIMPI_Init(bool enable_deadlock_detection) {
             //message_buffers[i]->next=(struct buffer_node*)malloc(sizeof(struct buffer_node*));
             message_buffers[i]->next=NULL;
             message_buffers[i]->message=NULL;
+
+            int* source_pt = malloc(sizeof(int));
+            *source_pt = i;
+            pthread_attr_t attr2;
+            ASSERT_ZERO(pthread_attr_init(&attr2));
+            ASSERT_ZERO(pthread_create(&buffer_threads[i], &attr2, buffer_messages, source_pt));
+            ASSERT_ZERO(pthread_attr_destroy(&attr2));
+            //free(source_pt);
         }
     }
 
