@@ -136,8 +136,8 @@ MIMPI_Retcode MIMPI_sync_reduce_send(
         MIMPI_Retcode status = MIMPI_sync_send(signal, destination);
         if (status==MIMPI_SUCCESS)
         {
-            rank=MIMPI_World_rank();
-            size=MIMPI_World_size();
+            int rank=MIMPI_World_rank();
+            int size=MIMPI_World_size();
             MIMPI_close_all_program_channels(rank,size);
             MIMPI_free_global_variables(false);
             free(data);
@@ -145,8 +145,8 @@ MIMPI_Retcode MIMPI_sync_reduce_send(
         }
         else
         {
-            rank=MIMPI_World_rank();
-            size=MIMPI_World_size();
+            int rank=MIMPI_World_rank();
+            int size=MIMPI_World_size();
             MIMPI_close_all_program_channels(rank,size);
             MIMPI_free_global_variables(false);
             free(data);
@@ -161,8 +161,8 @@ MIMPI_Retcode MIMPI_sync_reduce_send(
             MIMPI_Retcode status = MIMPI_Send(data, count, destination, -2);
             if (status==MIMPI_SUCCESS)
             {
-                rank=MIMPI_World_rank();
-                size=MIMPI_World_size();
+                int rank=MIMPI_World_rank();
+                int size=MIMPI_World_size();
                 MIMPI_close_all_program_channels(rank,size);
                 MIMPI_free_global_variables(false);
                 free(data);
@@ -170,8 +170,8 @@ MIMPI_Retcode MIMPI_sync_reduce_send(
             }
             else
             {
-                rank=MIMPI_World_rank();
-                size=MIMPI_World_size();
+                int rank=MIMPI_World_rank();
+                int size=MIMPI_World_size();
                 MIMPI_close_all_program_channels(rank,size);
                 MIMPI_free_global_variables(false);
                 free(data);
