@@ -82,8 +82,6 @@ void MIMPI_free_global_variables(bool final)
                 pthread_cond_signal(&buffer_conditions[i]);
                 ASSERT_ZERO(pthread_join(buffer_threads[i],NULL));
             }
-            printf("A %d\n", rank);
-            pthread_mutex_unlock(&buffer_mutexes[i]);
             printf("B %d\n", rank);
             pthread_mutex_destroy(&buffer_mutexes[i]);
             printf("C %d\n", rank);
